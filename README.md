@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Optique App
 
 A modern product management application built with Next.js, Prisma, and TypeScript.
@@ -189,3 +190,6 @@ The application uses SQLite for simplicity. For production, consider using Postg
 ## License
 
 MIT License - see LICENSE file for details.
+=======
+# optique-app
+>>>>>>> 38f62e201fbc369b1bcf572784e68aa812006078

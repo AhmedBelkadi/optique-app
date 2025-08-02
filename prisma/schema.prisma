@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+
+  @@map("users")
+  @@index([email])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  encryptedData String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  image       String?   // Path to category image
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
+
+  // Relations
+  products ProductCategory[]
+
+  @@map("categories")
+  @@index([name])
+  @@index([createdAt])
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  brand       String?
+  reference   String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete timestamp
+  isDeleted   Boolean   @default(false) // Soft delete flag
+
+  categories ProductCategory[]
+  images     ProductImage[]
+
+  @@map("products")
+  @@index([isDeleted])
+  @@index([brand])
+  @@index([reference])
+  @@index([createdAt])
+  @@index([price])
+  @@index([name])
+}
+
+model ProductCategory {
+  id         String   @id @default(cuid())
+  productId  String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, categoryId])
+  @@map("product_categories")
+  @@index([productId])
+  @@index([categoryId])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  filename  String
+  path      String
+  alt       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+  @@index([productId])
+  @@index([order])
+} 

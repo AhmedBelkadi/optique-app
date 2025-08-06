@@ -6,7 +6,7 @@ import { RestoreProductState } from '@/types/api';
 
 
 export async function restoreProductAction(prevState: RestoreProductState, formData: FormData): Promise<RestoreProductState> {
-  const id = formData.get('id') as string;
+  const id = formData.get('productId') as string;
 
   if (!id) {
     return {

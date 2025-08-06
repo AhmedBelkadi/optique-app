@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,76 +8,71 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
-  email     String   @unique
+  email     String    @unique
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sessions  Session[]
 
-  sessions Session[]
-
-  @@map("users")
   @@index([email])
   @@index([createdAt])
+  @@map("users")
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
+  id            String   @id @default(cuid())
+  userId        String
+  token         String   @unique
   encryptedData String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
   @@index([token])
   @@index([userId])
   @@index([expiresAt])
+  @@map("sessions")
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
+  id          String            @id @default(cuid())
+  name        String            @unique
   description String?
-  image       String?   // Path to category image
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   deletedAt   DateTime?
-  isDeleted   Boolean   @default(false)
+  image       String?
+  isDeleted   Boolean           @default(false)
+  products    ProductCategory[]
 
-  // Relations
-  products ProductCategory[]
-
-  @@map("categories")
   @@index([name])
   @@index([createdAt])
+  @@map("categories")
 }
 
 model Product {
-  id          String    @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
   description String
   price       Float
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean           @default(false)
   brand       String?
-  reference   String?   @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // Soft delete timestamp
-  isDeleted   Boolean   @default(false) // Soft delete flag
+  reference   String?           @unique
+  categories  ProductCategory[]
+  images      ProductImage[]
 
-  categories ProductCategory[]
-  images     ProductImage[]
-
-  @@map("products")
   @@index([isDeleted])
   @@index([brand])
   @@index([reference])
   @@index([createdAt])
   @@index([price])
   @@index([name])
+  @@map("products")
 }
 
 model ProductCategory {
@@ -88,28 +80,116 @@ model ProductCategory {
   productId  String
   categoryId String
   createdAt  DateTime @default(now())
-
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([productId, categoryId])
-  @@map("product_categories")
   @@index([productId])
   @@index([categoryId])
+  @@map("product_categories")
 }
 
 model ProductImage {
   id        String   @id @default(cuid())
-  productId String
   filename  String
   path      String
   alt       String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@map("product_images")
   @@index([productId])
   @@index([order])
-} 
+  @@map("product_images")
+}
+
+model Testimonial {
+  id        String    @id @default(cuid())
+  name      String
+  message   String
+  title     String?
+  image     String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
+
+  @@index([isDeleted])
+  @@index([isActive])
+  @@index([createdAt])
+  @@index([name])
+  @@map("testimonials")
+}
+
+model Customer {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  address      String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+  isDeleted    Boolean       @default(false)
+  appointments Appointment[]
+
+  @@index([isDeleted])
+  @@index([email])
+  @@index([name])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  customerId  String
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  status      AppointmentStatus @default(SCHEDULED)
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+  isDeleted   Boolean           @default(false)
+  customer    Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([isDeleted])
+  @@index([status])
+  @@index([startTime])
+  @@index([customerId])
+  @@index([createdAt])
+  @@map("appointments")
+}
+
+model Settings {
+  id             String   @id @default("singleton")
+  siteName       String?
+  slogan         String?
+  logoUrl        String?
+  heroImageUrl   String?
+  primaryColor   String?
+  secondaryColor String?
+  contactEmail   String?
+  phone          String?
+  whatsapp       String?
+  address        String?
+  openingHours   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("settings")
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}

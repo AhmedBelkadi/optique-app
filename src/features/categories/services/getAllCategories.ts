@@ -22,6 +22,7 @@ export const getAllCategories = async () => {
       updatedAt: category.updatedAt,
       deletedAt: category.deletedAt,
       isDeleted: category.isDeleted,
+      
     }));
 
     return { success: true, data: transformedCategories };

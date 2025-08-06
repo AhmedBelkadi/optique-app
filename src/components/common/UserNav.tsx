@@ -1,53 +1,78 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useRef, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { logoutAction } from '@/features/auth/actions/logout';
+import { Button } from '../ui/button';
+import { LogOut, Loader2 } from 'lucide-react';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface UserNavProps {
-  user: User;
-}
-
-export default function UserNav({ user }: UserNavProps) {
+export default function UserNav() {
   const router = useRouter();
-  
+  const previousIsPending = useRef(false);
+  const { csrfToken, isLoading, error } = useCSRF();
+
   const [state, formAction, isPending] = useActionState(logoutAction, {
     success: false,
     error: '',
   });
 
-  // Handle success/error states
-  React.useEffect(() => {
-    if (state.success) {
-      toast.success('Logged out successfully!');
-      router.push('/login');
-    } else if (state.error) {
-      toast.error(state.error || 'Failed to logout');
+  useEffect(() => {
+    if (previousIsPending.current && !isPending) {
+      if (state.success) {
+        toast.success('Logged out successfully!');
+        router.push('/auth/login');
+      } else if (state.error) {
+        toast.error(state.error || 'Failed to logout');
+      }
     }
-  }, [state.success, state.error, router]);
+    previousIsPending.current = isPending;
+  }, [isPending, state.success, state.error, router]);
+
+  const handleLogout = () => {
+    if (isLoading) {
+      toast.error('Security token is still loading. Please wait.');
+      return;
+    }
+
+    if (error) {
+      toast.error('Security token error. Please refresh the page.');
+      return;
+    }
+
+    const formData = new FormData();
+    
+    // Add CSRF token to form data
+    if (csrfToken) {
+      formData.append('csrf_token', csrfToken);
+    } else {
+      toast.error('Security token not available. Please refresh the page.');
+      return;
+    }
+    
+    // Wrap the formAction call in startTransition
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
 
   return (
     <div className="flex items-center space-x-4">
-      <span className="text-sm text-gray-700">
-        Welcome, {user.name}
-      </span>
-      <form action={formAction}>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
-        >
-          {isPending ? 'Logging out...' : 'Logout'}
-        </button>
-      </form>
+      <Button
+        onClick={handleLogout}
+        disabled={isPending || isLoading}
+        variant="destructive"
+        size="sm"
+      >
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <LogOut className="w-4 h-4" />
+        )}
+        {isPending ? 'Logging out...' : isLoading ? 'Loading...' : 'Logout'}
+      </Button>
     </div>
   );
-} 
+}

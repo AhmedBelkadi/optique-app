@@ -51,7 +51,9 @@ export default function ProductsContainer({
 
     const items = [];
     const maxVisiblePages = 5;
-    const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    
+    // Fixed: Use let instead of const for variables that need to be reassigned
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     const endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
 
     // Adjust start page if we're near the end
@@ -160,7 +162,7 @@ export default function ProductsContainer({
               
               {renderPaginationItems()}
               
-              <PaginationItem>
+              <PaginationItem>  
                 <PaginationNext
                   href="#"
                   onClick={(e) => {
@@ -178,4 +180,4 @@ export default function ProductsContainer({
       )}
     </div>
   );
-} 
+}

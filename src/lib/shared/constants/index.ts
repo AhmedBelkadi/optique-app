@@ -41,6 +41,19 @@ export const VALIDATION_CONSTANTS = {
       maxLength: 50,
     },
   },
+  testimonials: {
+    name: {
+      minLength: 2,
+      maxLength: 100,
+    },
+    message: {
+      minLength: 10,
+      maxLength: 500,
+    },
+    title: {
+      maxLength: 100,
+    },
+  },
 } as const;
 
 export const ERROR_MESSAGES = {
@@ -68,5 +81,12 @@ export const ERROR_MESSAGES = {
     createFailed: 'Failed to create category',
     updateFailed: 'Failed to update category',
     deleteFailed: 'Failed to delete category',
+  },
+  testimonials: {
+    createFailed: 'Failed to create testimonial',
+    updateFailed: 'Failed to update testimonial',
+    deleteFailed: 'Failed to delete testimonial',
+    restoreFailed: 'Failed to restore testimonial',
+    toggleFailed: 'Failed to toggle testimonial status',
   },
 } as const; 

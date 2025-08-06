@@ -71,7 +71,7 @@ export default function CategoryImageUpload({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-foreground">
         Category Image
       </label>
       
@@ -89,7 +89,7 @@ export default function CategoryImageUpload({
           <button
             type="button"
             onClick={removeImage}
-            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-destructive/90"
           >
             ×
           </button>
@@ -101,8 +101,8 @@ export default function CategoryImageUpload({
         <div
           className={`w-full h-32 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
             dragActive
-              ? 'border-indigo-500 bg-indigo-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-primary bg-primary/5'
+              : 'border-border hover:border-border/80'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -111,12 +111,12 @@ export default function CategoryImageUpload({
           onClick={() => fileInputRef.current?.click()}
         >
           <div className="text-center">
-            <div className="text-gray-500">
+            <div className="text-muted-foreground">
               <svg className="mx-auto h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
               <p className="text-sm">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-400">PNG, JPG, WebP up to 5MB</p>
+              <p className="text-xs text-muted-foreground/60">PNG, JPG, WebP up to 5MB</p>
             </div>
           </div>
         </div>

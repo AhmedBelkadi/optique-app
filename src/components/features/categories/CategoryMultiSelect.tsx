@@ -40,19 +40,21 @@ export default function CategoryMultiSelect({
     onSelectionChange(selectedCategoryIds.filter(id => id !== categoryId));
   };
 
-  const selectedCategories = categories.filter(cat => selectedCategoryIds.includes(cat.id));
+  const selectedCategories = Array.isArray(categories)
+    ? categories.filter(cat => selectedCategoryIds.includes(cat.id))
+    : [];
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className="w-full justify-between h-10 px-3 py-2 text-sm border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-200"
           >
-            <span className="truncate">
+            <span className="truncate text-left">
               {selectedCategories.length === 0
                 ? placeholder
                 : `${selectedCategories.length} selected`}
@@ -60,26 +62,36 @@ export default function CategoryMultiSelect({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Search categories..." />
-            <CommandList>
-              <CommandEmpty>No category found.</CommandEmpty>
+        <PopoverContent 
+          className="w-[var(--radix-popover-trigger-width)] p-0" 
+          align="start"
+          sideOffset={4}
+        >
+          <Command className="w-full">
+            <CommandInput 
+              placeholder="Search categories..." 
+              className="h-9 border-0 focus:ring-0"
+            />
+            <CommandList className="max-h-[200px] overflow-y-auto">
+              <CommandEmpty className="py-6 text-center text-sm text-slate-500">
+                No category found.
+              </CommandEmpty>
               <CommandGroup>
-                {categories.map((category) => (
+                {Array.isArray(categories) && categories.map(category => (
                   <CommandItem
                     key={category.id}
                     onSelect={() => handleSelect(category.id)}
+                    className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-slate-50 data-[selected=true]:bg-slate-100"
                   >
                     <Check
                       className={cn(
-                        "mr-2 h-4 w-4",
+                        "h-4 w-4 shrink-0",
                         selectedCategoryIds.includes(category.id)
-                          ? "opacity-100"
+                          ? "opacity-100 text-indigo-600"
                           : "opacity-0"
                       )}
                     />
-                    {category.name}
+                    <span className="flex-1 text-sm">{category.name}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -90,20 +102,20 @@ export default function CategoryMultiSelect({
 
       {/* Selected Categories Display */}
       {selectedCategories.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-2">
           {selectedCategories.map((category) => (
             <Badge
               key={category.id}
               variant="secondary"
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 px-2 py-1 text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors"
             >
-              {category.name}
+              <span className="truncate max-w-[120px]">{category.name}</span>
               <button
                 type="button"
                 onClick={() => handleRemove(category.id)}
-                className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="ml-1 rounded-full p-0.5 hover:bg-indigo-200 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
               >
-                <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                <X className="h-3 w-3 text-indigo-600 hover:text-indigo-800" />
               </button>
             </Badge>
           ))}

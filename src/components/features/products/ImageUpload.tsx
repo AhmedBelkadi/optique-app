@@ -33,15 +33,8 @@ export default function ImageUpload({
 
     setError('');
 
-    // Validate image count
-    const countValidation = validateImageCount(images.length);
-    if (!countValidation.isValid) {
-      setError(countValidation.error!);
-      return;
-    }
-
-    const newImages: ImageFile[] = [];
     const fileArray = Array.from(files);
+    const newImages: ImageFile[] = [];
 
     for (const file of fileArray) {
       // Check if we've reached the maximum

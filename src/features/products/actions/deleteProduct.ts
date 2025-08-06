@@ -5,7 +5,7 @@ import { DeleteProductState } from '@/types/api';
 
 
 export async function deleteProductAction(prevState: DeleteProductState, formData: FormData): Promise<DeleteProductState> {
-  const id = formData.get('id') as string;
+  const id = formData.get('productId') as string;
 
   if (!id) {
     return {

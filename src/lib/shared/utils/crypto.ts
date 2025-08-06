@@ -1,11 +1,15 @@
 import { hash, compare } from 'bcryptjs';
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto';
+import { env } from '@/lib/env';
 
 const ALGORITHM = 'aes-256-cbc';
 
 // Ensure we have a 32-byte key for AES-256-CBC
 function getSecretKey(): Buffer {
-  const envKey = process.env.ENCRYPTION_KEY || 'your-32-character-secret-key-here!!';
+  const envKey = env.ENCRYPTION_KEY;
+  if (!envKey || envKey.length < 32) {
+    throw new Error('Invalid encryption key configuration');
+  }
   // Use SHA-256 to generate a consistent 32-byte key from any input
   return createHash('sha256').update(envKey).digest();
 }
@@ -43,12 +47,19 @@ export function encryptSession(data: string): string {
 }
 
 export function decryptSession(encryptedData: string): string {
-  const parts = encryptedData.split(':');
-  const iv = Buffer.from(parts[0], 'hex');
-  const encrypted = parts[1];
-  const secretKey = getSecretKey();
-  const decipher = createDecipheriv(ALGORITHM, secretKey, iv);
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+  try {
+    const parts = encryptedData.split(':');
+    if (parts.length !== 2) {
+      throw new Error('Invalid encrypted data format');
+    }
+    const iv = Buffer.from(parts[0], 'hex');
+    const encrypted = parts[1];
+    const secretKey = getSecretKey();
+    const decipher = createDecipheriv(ALGORITHM, secretKey, iv);
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (error) {
+    throw new Error('Failed to decrypt session data');
+  }
 } 

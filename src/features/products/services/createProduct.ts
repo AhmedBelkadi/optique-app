@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { CreateProductInput, Product } from '../schema/productSchema';
 import { productSchema } from '../schema/productSchema';
 import { validateAndSanitizeProduct } from '@/lib/shared/utils/sanitize';
+import { createError, ErrorCode, logError } from '@/lib/errorHandling';
 
 export interface CreateProductResult {
   success: boolean;
@@ -71,10 +72,35 @@ export async function createProduct(productData: CreateProductInput): Promise<Cr
       data: transformedProduct,
     };
   } catch (error) {
-    console.error('Error creating product:', error);
+    logError(error as Error, { 
+      action: 'createProduct', 
+      productData: { 
+        name: productData.name,
+        price: productData.price,
+        categoryIds: productData.categoryIds 
+      } 
+    });
+    
+    // Check for specific database errors
+    if (error instanceof Error) {
+      if (error.message.includes('Unique constraint')) {
+        return {
+          success: false,
+          error: 'A product with this reference already exists.',
+        };
+      }
+      
+      if (error.message.includes('Foreign key constraint')) {
+        return {
+          success: false,
+          error: 'One or more selected categories do not exist.',
+        };
+      }
+    }
+    
     return {
       success: false,
-      error: 'Failed to create product',
+      error: 'Failed to create product. Please try again.',
     };
   }
 } 

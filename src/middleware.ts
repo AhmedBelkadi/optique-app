@@ -9,9 +9,9 @@ export function middleware(request: NextRequest) {
   
   // Protected routes that require authentication
   const protectedRoutes = [
-    '/products/new',
-    '/products/[id]/edit',
-    '/products/trash'
+    '/admin/products/new',
+    '/admin/products/[id]/edit',
+    '/admin/products/trash'
   ];
   
   // Check if current path matches any protected route pattern
@@ -27,14 +27,14 @@ export function middleware(request: NextRequest) {
   
   // If it's a protected route and no session token, redirect to login
   if (isProtectedRoute && !sessionToken) {
-    const loginUrl = new URL('/login', request.url);
+    const loginUrl = new URL('/auth/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
   
   // If user is logged in and tries to access login/register, redirect to products
-  if (sessionToken && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/products', request.url));
+  if (sessionToken && (pathname === '/auth/login' || pathname === '/auth/register')) {
+    return NextResponse.redirect(new URL('/admin/products', request.url));
   }
   
   return NextResponse.next();

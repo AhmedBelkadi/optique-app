@@ -1,96 +1,164 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Trash2, AlertTriangle, X, Loader2 } from 'lucide-react';
 import { deleteCategoryAction } from '@/features/categories/actions/deleteCategory';
-import { Category } from '@/features/categories/schema/categorySchema';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface DeleteCategoryModalProps {
-  category: Category;
+  open: boolean;
+  onClose: () => void;
+  categoryId: string;
+  categoryName: string;
   onSuccess?: () => void;
 }
 
-export default function DeleteCategoryModal({ category, onSuccess }: DeleteCategoryModalProps) {
-  const [open, setOpen] = useState(false);
+export default function DeleteCategoryModal({
+  open,
+  onClose,
+  categoryId,
+  categoryName,
+  onSuccess,
+}: DeleteCategoryModalProps) {
   const previousIsPending = useRef(false);
-  
+  const { csrfToken } = useCSRF();
+
   const [state, formAction, isPending] = useActionState(deleteCategoryAction, {
-    error: '',
     success: false,
+    error: '',
   });
 
+  useEffect(() => {
+    if (previousIsPending.current && !isPending) {
+      if (state.success) {
+        toast.success('Category deleted successfully!', {
+          icon: '✅',
+          style: {
+            background: '#10b981',
+            color: '#ffffff',
+          },
+        });
+        onSuccess?.();
+        onClose();
+      } else if (state.error) {
+        toast.error(state.error || 'Failed to delete category', {
+          icon: '❌',
+          style: {
+            background: '#ef4444',
+            color: '#ffffff',
+          },
+        });
+      }
+    }
+    previousIsPending.current = isPending;
+  }, [isPending, state.success, state.error, onSuccess, onClose]);
+
   const handleSubmit = (formData: FormData) => {
-    formData.append('categoryId', category.id);
+    formData.append('categoryId', categoryId);
+    // Add CSRF token to form data
+    if (csrfToken) {
+      formData.append('csrf_token', csrfToken);
+    }
     formAction(formData);
   };
 
-  // Handle successful deletion
-  useEffect(() => {
-    if (previousIsPending.current && !isPending && state.success) {
-      setOpen(false);
-      toast.success('Category deleted successfully!');
-      onSuccess?.();
-    } else if (previousIsPending.current && !isPending && state.error) {
-      toast.error(state.error || 'Failed to delete category');
-    }
-    previousIsPending.current = isPending;
-  }, [isPending, state.success, state.error, onSuccess]);
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          Delete
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Delete Category</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Are you sure you want to delete "{category.name}"?
-            </h3>
-            <p className="text-sm text-gray-500">
-              This action cannot be undone. The category will be permanently deleted.
-            </p>
+            <div>
+              <DialogTitle className="text-xl font-semibold text-slate-900">
+                Delete Category
+              </DialogTitle>
+              <p className="text-sm text-slate-500 mt-1">
+                This action cannot be undone
+              </p>
+            </div>
           </div>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <Card className="border-orange-200 bg-orange-50">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-orange-800">
+                    Are you sure you want to delete "{categoryName}"?
+                  </p>
+                  <p className="text-sm text-orange-700">
+                    This will permanently remove the category from your system. 
+                    If the category is used by any products, the deletion will be prevented.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {state.error && (
-            <div className="text-red-600 text-sm text-center">{state.error}</div>
+            <Card className="border-red-200 bg-red-50">
+              <CardContent className="p-4">
+                <div className="flex items-center text-red-700">
+                  <X className="w-4 h-4 mr-2" />
+                  <span className="text-sm font-medium">{state.error}</span>
+                </div>
+              </CardContent>
+            </Card>
           )}
-
-          <form action={handleSubmit} className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={isPending}
-            >
-              {isPending ? 'Deleting...' : 'Delete Category'}
-            </Button>
-          </form>
         </div>
+
+        <form action={handleSubmit}>
+          <input type="hidden" name="categoryId" value={categoryId} />
+
+          <DialogFooter className="pt-4">
+            <div className="flex space-x-3 w-full">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isPending}
+                className="flex-1 bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={isPending}
+                className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Category
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -1,20 +1,31 @@
 'use server';
 
+import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
+import { validateCSRFToken } from '@/lib/csrf';
 import { createProduct } from '@/features/products/services/createProduct';
 import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
 import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/errorHandling';
 import { CreateProductState } from '@/types/api';
 
-
 export async function createProductAction(prevState: CreateProductState, formData: FormData): Promise<CreateProductState> {
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
-  const price = formData.get('price') as string;
-  const brand = formData.get('brand') as string;
-  const reference = formData.get('reference') as string;
-  const categoryIds = formData.getAll('categoryIds') as string[];
-
   try {
+    // Get client identifier for rate limiting
+    const identifier = await getClientIdentifier();
+    
+    // Apply rate limiting
+    await apiRateLimit(identifier);
+    
+    // Validate CSRF token
+    await validateCSRFToken(formData);
+    
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const price = formData.get('price') as string;
+    const brand = formData.get('brand') as string;
+    const reference = formData.get('reference') as string;
+    const categoryIds = formData.getAll('categoryIds') as string[];
+
     // Create the product first
     const result = await createProduct({
       name,
@@ -28,33 +39,37 @@ export async function createProductAction(prevState: CreateProductState, formDat
     if (result.success && result.data) {
       // Handle image uploads if any
       const imageFiles = formData.getAll('images') as File[];
+      
       if (imageFiles.length > 0) {
-        // Save images and create ProductImage records
-        for (let i = 0; i < imageFiles.length; i++) {
-          const file = imageFiles[i];
-          if (file && file.size > 0) {
-            try {
-              const imageResult = await saveImage(file, result.data.id, i);
+        try {
+          for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+            if (file && file.size > 0) {
+              const uploadResult = await saveImage(file, result.data.id, i);
               
-              // Create ProductImage record in database
               await prisma.productImage.create({
                 data: {
                   productId: result.data.id,
-                  filename: imageResult.filename,
-                  path: imageResult.path,
+                  filename: uploadResult.filename,
+                  path: uploadResult.path,
                   alt: generateImageAlt(result.data.name, i),
                   order: i,
                 },
               });
-            } catch (error) {
-              console.error('Error saving product image:', error);
-              // Continue even if image upload fails
             }
           }
+        } catch (imageError) {
+          logError(imageError as Error, { 
+            action: 'createProduct', 
+            productId: result.data.id,
+            step: 'imageUpload' 
+          });
+          // Continue even if image upload fails
         }
       }
 
       return {
+        success: true,
         error: '',
         fieldErrors: {},
         values: {
@@ -65,13 +80,13 @@ export async function createProductAction(prevState: CreateProductState, formDat
           reference: '',
           categoryIds: [],
         },
-        success: true,
         productId: result.data.id,
       };
     } else {
       return {
+        success: false,
         error: result.error || 'Failed to create product',
-        fieldErrors: result.fieldErrors,
+        fieldErrors: result.fieldErrors || {},
         values: {
           name,
           description,
@@ -83,17 +98,64 @@ export async function createProductAction(prevState: CreateProductState, formDat
       };
     }
   } catch (error) {
-    console.error('Create product action error:', error);
+    // Handle rate limiting errors
+    if (error instanceof Error && error.name === 'RateLimitError') {
+      return {
+        success: false,
+        error: error.message,
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+          price: formData.get('price') as string,
+          brand: formData.get('brand') as string,
+          reference: formData.get('reference') as string,
+          categoryIds: formData.getAll('categoryIds') as string[],
+        },
+      };
+    }
+    
+    // Handle CSRF errors
+    if (error instanceof Error && error.name === 'CSRFError') {
+      return {
+        success: false,
+        error: 'Security validation failed. Please refresh the page and try again.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+          price: formData.get('price') as string,
+          brand: formData.get('brand') as string,
+          reference: formData.get('reference') as string,
+          categoryIds: formData.getAll('categoryIds') as string[],
+        },
+      };
+    }
+
+    // Log and handle other errors
+    logError(error as Error, { 
+      action: 'createProduct',
+      formData: {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: formData.get('price'),
+        brand: formData.get('brand'),
+        reference: formData.get('reference'),
+        categoryIds: formData.getAll('categoryIds'),
+      }
+    });
+    
     return {
-      error: 'An unexpected error occurred while creating the product',
+      success: false,
+      error: 'An unexpected error occurred while creating the product. Please try again.',
       fieldErrors: {},
       values: {
-        name,
-        description,
-        price,
-        brand,
-        reference,
-        categoryIds,
+        name: formData.get('name') as string,
+        description: formData.get('description') as string,
+        price: formData.get('price') as string,
+        brand: formData.get('brand') as string,
+        reference: formData.get('reference') as string,
+        categoryIds: formData.getAll('categoryIds') as string[],
       },
     };
   }

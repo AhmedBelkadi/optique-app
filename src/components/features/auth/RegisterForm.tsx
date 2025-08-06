@@ -6,12 +6,23 @@ import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import { registerAction } from '@/features/auth/actions/register';
+import { useCSRF } from '@/components/common/CSRFProvider';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 export default function RegisterForm() {
   const router = useRouter();
   const previousIsPending = useRef(false);
+  const { csrfToken, isLoading, error } = useCSRF();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [state, formAction, isPending] = useActionState(registerAction, {
+    success: false,
     error: '',
     fieldErrors: {},
     values: {
@@ -19,13 +30,14 @@ export default function RegisterForm() {
       email: '',
     },
   });
+  
 
   // Handle registration success/error
   useEffect(() => {
     if (previousIsPending.current && !isPending && !state.error && state.success) {
       // Success - show toast and redirect
       toast.success('Registration successful! Welcome to Optique!');
-      router.push('/login');
+      router.push('/auth/login');
     } else if (previousIsPending.current && !isPending && state.error) {
       // Error occurred
       toast.error(state.error || 'Registration failed');
@@ -33,103 +45,235 @@ export default function RegisterForm() {
     previousIsPending.current = isPending;
   }, [isPending, state.error, state.success, router]);
 
+  if (isLoading) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center space-x-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Loading security token...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="p-6">
+          <div className="text-center text-red-600">
+            <p>Error loading security token.</p>
+            <p className="text-sm">Please refresh the page.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!csrfToken) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="p-6">
+          <div className="text-center text-red-600">
+            <p>Security token not available.</p>
+            <p className="text-sm">Please refresh the page.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <form className="mt-8 space-y-6" action={formAction}>
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Full Name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            autoComplete="name"
-            required
-            defaultValue={state.values?.name || ''}
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Full Name"
-          />
-          {state.fieldErrors?.name && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.name}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            defaultValue={state.values?.email || ''}
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Email address"
-          />
-          {state.fieldErrors?.email && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.email}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Password"
-          />
-          {state.fieldErrors?.password && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.password}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-            Confirm Password
-          </label>
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            autoComplete="new-password"
-            required
-            className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Confirm Password"
-          />
-          {state.fieldErrors?.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.confirmPassword}</p>
-          )}
-        </div>
-      </div>
+    <Card className="w-full max-w-md">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
+        <p className="text-sm text-muted-foreground text-center">
+          Enter your information to create your account
+        </p>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4" action={formAction}>
+          {/* CSRF Token */}
+          <input type="hidden" name="csrf_token" value={csrfToken} />
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Full Name
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  defaultValue={state.values?.name || ''}
+                  className={`pl-10 ${
+                    state.fieldErrors?.name 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      : ''
+                  }`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {state.fieldErrors?.name && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {state.fieldErrors.name}
+                </p>
+              )}
+            </div>
 
-      {state.error && (
-        <div className="text-red-600 text-sm text-center">{state.error}</div>
-      )}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  defaultValue={state.values?.email || ''}
+                  className={`pl-10 ${
+                    state.fieldErrors?.email 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      : ''
+                  }`}
+                  placeholder="Enter your email address"
+                />
+              </div>
+              {state.fieldErrors?.email && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {state.fieldErrors.email}
+                </p>
+              )}
+            </div>
 
-      <div>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {isPending ? 'Creating account...' : 'Create account'}
-        </button>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  className={`pl-10 pr-10 ${
+                    state.fieldErrors?.password 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      : ''
+                  }`}
+                  placeholder="Create a password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+              {state.fieldErrors?.password && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {state.fieldErrors.password}
+                </p>
+              )}
+            </div>
 
-      <div className="text-center">
-        <Link
-          href="/login"
-          className="font-medium text-indigo-600 hover:text-indigo-500"
-        >
-          Already have an account? Sign in
-        </Link>
-      </div>
-    </form>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  className={`pl-10 pr-10 ${
+                    state.fieldErrors?.confirmPassword 
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      : ''
+                  }`}
+                  placeholder="Confirm your password"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+              {state.fieldErrors?.confirmPassword && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {state.fieldErrors.confirmPassword}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {state.error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-center">
+                <span className="mr-2">❌</span>
+                {state.error}
+              </div>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="w-full"
+            size="lg"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              'Create account'
+            )}
+          </Button>
+
+          <div className="text-center">
+            <Link
+              href="/auth/login"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 } 

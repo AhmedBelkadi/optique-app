@@ -1,16 +1,27 @@
 'use server';
 
+import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
+import { validateCSRFToken } from '@/lib/csrf';
 import { updateCategory } from '@/features/categories/services/updateCategory';
 import { categorySchema } from '@/features/categories/schema/categorySchema';
 import { validateAndSanitizeCategory } from '@/lib/shared/utils/sanitize';
 import { saveCategoryImage } from '@/lib/shared/utils/serverCategoryImageUpload';
 import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
 import { CategoryActionState } from '@/types/api';
 
-
 export async function updateCategoryAction(prevState: CategoryActionState, formData: FormData): Promise<CategoryActionState> {
   try {
+    // Get client identifier for rate limiting
+    const identifier = await getClientIdentifier();
+    
+    // Apply rate limiting
+    await apiRateLimit(identifier);
+    
+    // Validate CSRF token
+    await validateCSRFToken(formData);
+
     const categoryId = formData.get('categoryId') as string;
     const rawData = {
       name: formData.get('name') as string,
@@ -46,7 +57,11 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
             data: { image: imageResult.path },
           });
         } catch (error) {
-          console.error('Error saving category image:', error);
+          logError(error as Error, { 
+            action: 'updateCategory', 
+            categoryId,
+            step: 'imageUpload' 
+          });
           // Continue even if image upload fails
         }
       }
@@ -71,9 +86,42 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
       };
     }
   } catch (error) {
-    console.error('Error updating category:', error);
+    // Handle rate limiting errors
+    if (error instanceof Error && error.name === 'RateLimitError') {
+      return {
+        error: error.message,
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+        },
+      };
+    }
+    
+    // Handle CSRF errors
+    if (error instanceof Error && error.name === 'CSRFError') {
+      return {
+        error: 'Security validation failed. Please refresh the page and try again.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+        },
+      };
+    }
+
+    // Log and handle other errors
+    logError(error as Error, { 
+      action: 'updateCategory',
+      formData: {
+        categoryId: formData.get('categoryId'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+      }
+    });
+    
     return {
-      error: 'An unexpected error occurred',
+      error: 'An unexpected error occurred while updating the category. Please try again.',
       fieldErrors: {},
       values: {
         name: formData.get('name') as string,

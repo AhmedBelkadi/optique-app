@@ -22,6 +22,7 @@ import {
   UserCheck,
   Info,
   Search,
+  Wrench,
 } from 'lucide-react';
 import AdminNavItem from './AdminNavItem';
 import Link from 'next/link';
@@ -110,6 +111,13 @@ const navGroups: NavGroup[] = [
         label: 'Bannières',
         icon: Image,
         description: 'Gérer les bannières du site',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/services',
+        label: 'Services',
+        icon: Wrench,
+        description: 'Gérer les services affichés',
         staffAccessible: true
       }
     ],

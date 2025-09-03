@@ -47,27 +47,27 @@ export class AppError extends Error {
 }
 
 export const ErrorMessages = {
-  [ErrorCode.AUTH_INVALID_CREDENTIALS]: 'Invalid email or password. Please try again.',
-  [ErrorCode.AUTH_SESSION_EXPIRED]: 'Your session has expired. Please log in again.',
-  [ErrorCode.AUTH_UNAUTHORIZED]: 'You are not authorized to perform this action.',
+  [ErrorCode.AUTH_INVALID_CREDENTIALS]: 'Email ou mot de passe invalide. Veuillez réessayer.',
+  [ErrorCode.AUTH_SESSION_EXPIRED]: 'Votre session a expiré. Veuillez vous reconnecter.',
+  [ErrorCode.AUTH_UNAUTHORIZED]: 'Vous n\'êtes pas autorisé à effectuer cette action.',
   
-  [ErrorCode.PRODUCT_NOT_FOUND]: 'The requested product could not be found.',
-  [ErrorCode.PRODUCT_CREATE_FAILED]: 'Failed to create the product. Please try again.',
-  [ErrorCode.PRODUCT_UPDATE_FAILED]: 'Failed to update the product. Please try again.',
-  [ErrorCode.PRODUCT_DELETE_FAILED]: 'Failed to delete the product. Please try again.',
+  [ErrorCode.PRODUCT_NOT_FOUND]: 'Le produit demandé n\'a pas pu être trouvé.',
+  [ErrorCode.PRODUCT_CREATE_FAILED]: 'Échec de la création du produit. Veuillez réessayer.',
+  [ErrorCode.PRODUCT_UPDATE_FAILED]: 'Échec de la mise à jour du produit. Veuillez réessayer.',
+  [ErrorCode.PRODUCT_DELETE_FAILED]: 'Échec de la suppression du produit. Veuillez réessayer.',
   
-  [ErrorCode.CATEGORY_NOT_FOUND]: 'The requested category could not be found.',
-  [ErrorCode.CATEGORY_CREATE_FAILED]: 'Failed to create the category. Please try again.',
-  [ErrorCode.CATEGORY_UPDATE_FAILED]: 'Failed to update the category. Please try again.',
-  [ErrorCode.CATEGORY_DELETE_FAILED]: 'Failed to delete the category. Please try again.',
+  [ErrorCode.CATEGORY_NOT_FOUND]: 'La catégorie demandée n\'a pas pu être trouvée.',
+  [ErrorCode.CATEGORY_CREATE_FAILED]: 'Échec de la création de la catégorie. Veuillez réessayer.',
+  [ErrorCode.CATEGORY_UPDATE_FAILED]: 'Échec de la mise à jour de la catégorie. Veuillez réessayer.',
+  [ErrorCode.CATEGORY_DELETE_FAILED]: 'Échec de la suppression de la catégorie. Veuillez réessayer.',
   
-  [ErrorCode.VALIDATION_ERROR]: 'Please check your input and try again.',
-  [ErrorCode.INVALID_INPUT]: 'The provided data is invalid.',
+  [ErrorCode.VALIDATION_ERROR]: 'Veuillez vérifier vos données et réessayer.',
+  [ErrorCode.INVALID_INPUT]: 'Les données fournies sont invalides.',
   
-  [ErrorCode.DATABASE_ERROR]: 'A database error occurred. Please try again later.',
-  [ErrorCode.ENCRYPTION_ERROR]: 'A security error occurred. Please try again.',
-  [ErrorCode.FILE_UPLOAD_ERROR]: 'Failed to upload the file. Please try again.',
-  [ErrorCode.UNKNOWN_ERROR]: 'An unexpected error occurred. Please try again later.',
+  [ErrorCode.DATABASE_ERROR]: 'Une erreur de base de données s\'est produite. Veuillez réessayer plus tard.',
+  [ErrorCode.ENCRYPTION_ERROR]: 'Une erreur de sécurité s\'est produite. Veuillez réessayer.',
+  [ErrorCode.FILE_UPLOAD_ERROR]: 'Échec du téléchargement du fichier. Veuillez réessayer.',
+  [ErrorCode.UNKNOWN_ERROR]: 'Une erreur inattendue s\'est produite. Veuillez réessayer plus tard.',
 } as const;
 
 export function createError(code: ErrorCode, message?: string, statusCode?: number): AppError {

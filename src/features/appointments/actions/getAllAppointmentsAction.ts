@@ -1,24 +1,20 @@
 'use server';
 
-import { getAllAppointments } from '../services/getAllAppointments';
-import { AppointmentStatus } from '../schema/appointmentSchema';
+import { getAllAppointments, GetAllAppointmentsOptions } from '../services/getAllAppointments';
+import { requirePermission } from '@/lib/auth/authorization';
 
-export async function getAllAppointmentsAction(params: {
-  search?: string;
-  status?: AppointmentStatus;
-  isDeleted?: boolean;
-  sortBy?: 'startTime' | 'title' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-  startDate?: Date;
-  endDate?: Date;
-}) {
+export async function getAllAppointmentsAction(options: GetAllAppointmentsOptions) {
   try {
-    const result = await getAllAppointments(params);
-    return result;
+ // 🔐 AUTHENTICATION CHECK - Ensure user is logged in
+
+    requirePermission('appointments', 'read');
+
+    return await getAllAppointments(options);
   } catch (error) {
     console.error('Error in getAllAppointmentsAction:', error);
-    return { success: false, error: 'Failed to get appointments' };
+    return {
+      success: false,
+      error: 'Erreur lors de la récupération des rendez-vous'
+    };
   }
-} 
+}

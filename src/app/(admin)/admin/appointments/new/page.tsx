@@ -1,16 +1,31 @@
-import AppointmentForm from '@/components/features/appointments/AppointmentForm';
+import { Suspense } from 'react';
+import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
+import AppointmentCreateContainer from '@/components/features/appointments/AppointmentCreateContainer';
+import AppointmentCreateSkeleton from '@/components/features/appointments/AppointmentCreateSkeleton';
+import { requirePermission } from '@/lib/auth/authorization';
 
-export default function NewAppointmentPage() {
+export default async function NewAppointmentPage() {
+  // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+  await requirePermission('appointments', 'create');
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Add New Appointment</h1>
-        <p className="text-gray-600 mt-2">
-          Schedule a new appointment with a customer.
-        </p>
-      </div>
+    <>
+      <AdminPageConfig
+        title="Nouveau rendez-vous"
+        subtitle="Créer un nouveau rendez-vous pour un client."
+        breadcrumbs={[
+          { label: 'Appointments', href: '/admin/appointments' },
+          { label: 'Nouveau', href: '/admin/appointments/new' }
+        ]}
+      />
 
-      <AppointmentForm mode="create" />
-    </div>
+      <div className="min-h-screen bg-muted/50">
+        <div className="py-4">
+          <Suspense fallback={<AppointmentCreateSkeleton />}>
+            <AppointmentCreateContainer />
+          </Suspense>
+        </div>
+      </div>
+    </>
   );
 } 

@@ -28,6 +28,6 @@ export const getAllCategories = async () => {
     return { success: true, data: transformedCategories };
   } catch (error) {
     console.error('Error fetching categories:', error);
-    return { success: false, error: 'Failed to fetch categories.' };
+    return { success: false, error: 'Échec de la récupération des catégories.' };
   }
 }; 

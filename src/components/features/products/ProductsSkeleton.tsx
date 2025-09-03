@@ -19,7 +19,7 @@ export default function ProductsSkeleton() {
         {/* Stats skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="border-0 shadow-sm bg-white/50 backdrop-blur-sm">
+            <Card key={i} className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
                   <Skeleton className="h-12 w-12 rounded-xl" />
@@ -39,7 +39,7 @@ export default function ProductsSkeleton() {
         {/* Products grid skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Card key={i} className="border-0 shadow-sm bg-white/50 backdrop-blur-sm overflow-hidden">
+            <Card key={i} className="border-0 shadow-sm bg-background/50 backdrop-blur-sm overflow-hidden">
               <Skeleton className="h-48 w-full" />
               <CardContent className="p-6 space-y-4">
                 <Skeleton className="h-6 w-3/4" />

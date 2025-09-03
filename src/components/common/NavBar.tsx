@@ -1,80 +1,64 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Home, Package, Users, HelpCircle, MessageSquare, Phone, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import UserNavWrapper from "./UserNavWrapper";
-import { getCurrentUser } from "@/features/auth/services/session";    
+import { getCurrentUser } from "@/features/auth/services/session";
+import NavBarClient from "./NavBarClient";
+import ResponsiveNavBar from "./ResponsiveNavBar";
+import { getSiteSettings } from "@/features/settings/services/siteSettings";
 
 export default async function NavBar() {
+    const siteSettingsResult = await getSiteSettings();
+    const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null;
     const user = await getCurrentUser();
 
     return (
-        <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-indigo-600">
-                Optique
-              </Link>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <Home className="w-4 h-4 mr-1" />
-                Home
-              </Link>
-              <Link href="/products" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <Package className="w-4 h-4 mr-1" />
-                Products
-              </Link>
-              <Link href="/about" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <Users className="w-4 h-4 mr-1" />
-                About Us
-              </Link>
-              <Link href="/faq" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <HelpCircle className="w-4 h-4 mr-1" />
-                FAQ
-              </Link>
-              <Link href="/testimonials" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <MessageSquare className="w-4 h-4 mr-1" />
-                Testimonials
-              </Link>
-              <Link href="/contact" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <Phone className="w-4 h-4 mr-1" />
-                Contact
-              </Link>
-              <Link href="/appointment" className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
-                <Calendar className="w-4 h-4 mr-1" />
-                Book Appointment
-              </Link>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {user ? (
-                <div className="flex items-center space-x-2">
-                  <UserNavWrapper user={user} />
-                  <Link href="/admin">
-                    <Button variant="outline" size="sm">
-                      Admin
-                    </Button>
-                  </Link>
+        <nav className="bg-background shadow-sm border-b border-border sticky top-0 z-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between h-16">
+                    {/* Logo - Always visible */}
+                    <div className="flex items-center">
+                        <Link href="/" className="text-xl font-bold text-primary">
+                            {siteSettings?.siteName || 'Notre Boutique'}
+                        </Link>
+                    </div>
+                    
+                    {/* Desktop Navigation - Hidden on mobile */}
+                    <div className="hidden md:flex items-center">
+                        <NavBarClient />
+                    </div>
+                    
+                    {/* Right side buttons - Responsive */}
+                    <div className="flex items-center space-x-2 md:space-x-4">
+                        {user ? (
+                            <div className="flex items-center space-x-2">
+                                <UserNavWrapper user={user} />
+                                <Link href="/admin">
+                                    <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                                        Admin
+                                    </Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            // Public users - responsive button
+                            <div className="ml-6 flex items-center space-x-2">
+                                <Link href="/appointment">
+                                    <Button size="sm" className="bg-primary hover:bg-primary/90">
+                                        <Calendar className="w-4 h-4 mr-1 md:mr-2" />
+                                        <span className="hidden sm:inline">Prendre Rendez-vous</span>
+                                        <span className="sm:hidden">RDV</span>
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+                        
+                        {/* Mobile Menu Button - Only visible on mobile */}
+                        <div className="md:hidden">
+                            <ResponsiveNavBar />
+                        </div>
+                    </div>
                 </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Link href="/auth/login">
-                    <Button variant="outline" size="sm">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/auth/register">
-                    <Button size="sm">
-                      Register
-                    </Button>
-                  </Link>
-                </div>
-              )}
             </div>
-          </div>
-        </div>
-      </nav>
-    )
+        </nav>
+    );
 }

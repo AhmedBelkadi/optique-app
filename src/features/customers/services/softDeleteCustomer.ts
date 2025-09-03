@@ -13,6 +13,6 @@ export async function softDeleteCustomer(id: string) {
     return { success: true, data: customer };
   } catch (error) {
     console.error('Error soft deleting customer:', error);
-    return { success: false, error: 'Failed to delete customer' };
+    return { success: false, error: 'Échec de la suppression du client' };
   }
 } 

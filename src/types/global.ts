@@ -3,6 +3,27 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userRoles: UserRole[];
+}
+
+export interface UserRole {
+  id: string;
+  userId: string;
+  roleId: string;
+  assignedBy: string | null;
+  assignedAt: Date;
+  role: Role;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

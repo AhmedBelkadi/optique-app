@@ -1,12 +1,27 @@
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { generateSecureToken, encryptSession, decryptSession } from '@/lib/shared/utils/crypto';
+import { getUserRoleNames, isUserAdmin, isUserStaff } from './roleService';
+import { updateLastLogin } from '../../users/services/profileService';
 
 export interface Session {
   id: string;
   userId: string;
   token: string;
   expiresAt: Date;
+}
+
+export interface UserWithRoles {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt: Date | null;
+  roles: string[];
+  isAdmin: boolean;
+  isStaff: boolean;
 }
 
 export async function createSession(userId: string): Promise<Session> {
@@ -106,16 +121,43 @@ export async function isAuthenticated(): Promise<boolean> {
   return session !== null && session.expiresAt > new Date();
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<UserWithRoles | null> {
   const session = await getSession();
   if (!session) return null;
 
-  return await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: session.userId },
     select: {
       id: true,
       name: true,
       email: true,
+      phone: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
+      lastLoginAt: true,
     },
   });
+
+  if (!user || !user.isActive) return null;
+
+  const roles = await getUserRoleNames(session.userId);
+  const isAdmin = await isUserAdmin(session.userId);
+  const isStaff = await isUserStaff(session.userId);
+
+  // Update last login time
+  await updateLastLogin(session.userId);
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    lastLoginAt: user.lastLoginAt,
+    roles,
+    isAdmin,
+    isStaff,
+  };
 } 

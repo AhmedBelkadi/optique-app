@@ -12,12 +12,17 @@ model User {
   name      String
   email     String    @unique
   password  String
+  phone     String?
+  isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  lastLoginAt DateTime?
   sessions  Session[]
+  userRoles UserRole[]
 
   @@index([email])
   @@index([createdAt])
+  @@index([isActive])
   @@map("users")
 }
 
@@ -34,6 +39,69 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userRoles   UserRole[]
+  permissions RolePermission[]
+
+  @@index([name])
+  @@index([isActive])
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  resource   String           // e.g., "products", "appointments", "users"
+  action     String           // e.g., "create", "read", "update", "delete"
+  isActive   Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  rolePermissions RolePermission[]
+
+  @@index([name])
+  @@index([resource])
+  @@index([action])
+  @@index([isActive])
+  @@map("permissions")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  assignedBy String? // ID of admin who assigned this role
+  assignedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  grantedAt    DateTime   @default(now())
+  grantedBy    String?    // ID of admin who granted this permission
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
 }
 
 model Category {
@@ -108,9 +176,18 @@ model Testimonial {
   id        String    @id @default(cuid())
   name      String
   message   String
+  rating    Int       @default(5)
+  source    String    @default("internal") // internal, facebook, google, trustpilot
+  externalId String?
+  externalUrl String?
+  externalData Json?  // Store platform-specific data
   title     String?
   image     String?
   isActive  Boolean   @default(true)
+  isVerified Boolean  @default(false)
+  isSynced  Boolean   @default(false)
+  lastSynced DateTime?
+  syncStatus String   @default("pending") // pending, success, failed
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -120,6 +197,10 @@ model Testimonial {
   @@index([isActive])
   @@index([createdAt])
   @@index([name])
+  @@index([source])
+  @@index([isVerified])
+  @@index([syncStatus])
+  @@index([externalId])
   @@map("testimonials")
 }
 
@@ -143,6 +224,25 @@ model Customer {
   @@map("customers")
 }
 
+model AppointmentStatus {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  color       String   @default("#6b7280") // Default gray
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  appointments Appointment[]
+
+  @@index([order])
+  @@index([isActive])
+  @@map("appointment_statuses")
+}
+
 model Appointment {
   id          String            @id @default(cuid())
   customerId  String
@@ -150,7 +250,8 @@ model Appointment {
   description String?
   startTime   DateTime
   endTime     DateTime
-  status      AppointmentStatus @default(SCHEDULED)
+  statusId    String
+  status      AppointmentStatus @relation(fields: [statusId], references: [id])
   notes       String?
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
@@ -159,37 +260,194 @@ model Appointment {
   customer    Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@index([isDeleted])
-  @@index([status])
+  @@index([statusId])
   @@index([startTime])
   @@index([customerId])
   @@index([createdAt])
   @@map("appointments")
 }
 
-model Settings {
-  id             String   @id @default("singleton")
-  siteName       String?
-  slogan         String?
-  logoUrl        String?
-  heroImageUrl   String?
-  primaryColor   String?
+// Site Settings - Basic site information
+model SiteSettings {
+  id        String   @id @default("singleton")
+  siteName  String?
+  slogan    String?
+  logoUrl   String?
+  heroBackgroundImg String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("site_settings")
+}
+
+// Contact Settings - Contact information and location
+model ContactSettings {
+  id              String   @id @default("singleton")
+  contactEmail    String?
+  phone           String?
+  whatsapp        String?
+  address         String?
+  city            String?
+  openingHours    String?
+  googleMapsApiKey String?
+  whatsappChatLink String?
+  googleMapEmbed  String?
+  googleMapLink   String?
+  instagramLink   String?
+  facebookLink    String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("contact_settings")
+}
+
+// SEO Settings - Search engine optimization and marketing
+model SEOSettings {
+  id                  String   @id @default("singleton")
+  metaTitle           String?
+  metaDescription     String?
+  productMetaTitle    String?
+  productMetaDescription String?
+  categoryMetaTitle   String?
+  categoryMetaDescription String?
+  ogImage             String?
+  googleAnalyticsId   String?
+  facebookPixelId     String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("seo_settings")
+}
+
+// Theme Settings - All visual and styling configurations
+model ThemeSettings {
+  id            String   @id @default("singleton")
+  primaryColor  String?
   secondaryColor String?
-  contactEmail   String?
-  phone          String?
-  whatsapp       String?
-  address        String?
-  openingHours   String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@map("settings")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("theme_settings")
 }
 
-enum AppointmentStatus {
-  SCHEDULED
-  CONFIRMED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-  NO_SHOW
+// Operational Settings - System configuration and maintenance
+model OperationalSettings {
+  id              String   @id @default("singleton")
+  maintenanceMode Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("operational_settings")
 }
+
+model Banner {
+  id        String   @id @default(cuid())
+  text      String
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("banners")
+}
+
+
+model AboutSection {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  image     String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@map("about_sections")
+}
+
+model AboutBenefit {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  highlight   String   // Highlight text for the feature
+  icon        String   // Icon name (e.g., "Eye", "Shield")
+  color       String   // Tailwind color class
+  bgColor     String   // Tailwind background color class
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@map("about_benefits")
+}
+
+
+
+
+
+
+
+
+
+model HomeValues {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  highlight   String
+  icon        String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+  @@map("home_values")
+}
+
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@map("faqs")
+}
+
+model ExternalAPISettings {
+  id                  String   @id @default(cuid())
+  googlePlacesApiKey  String?
+  googlePlaceId       String?
+  facebookAccessToken String?
+  facebookPageId      String?
+  enableGoogleSync    Boolean  @default(false)
+  enableFacebookSync  Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("external_api_settings")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

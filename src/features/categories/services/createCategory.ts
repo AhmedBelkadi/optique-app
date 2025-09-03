@@ -14,10 +14,10 @@ export async function createCategory(data: CategoryCreateInput) {
     return { success: true, data: category };
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return { success: false, error: 'A category with this name already exists.' };
+      return { success: false, error: 'Une catégorie avec ce nom existe déjà.' };
     }
     
     console.error('Error creating category:', error);
-    return { success: false, error: 'Failed to create category.' };
+    return { success: false, error: 'Échec de la création de la catégorie.' };
   }
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductGrid from './ProductGrid';
 import { Product } from '@/features/products/schema/productSchema';
 import {
@@ -13,6 +13,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { getAllProductsAction } from '@/features/products/actions/getAllProductsAction';
 
 interface ProductsContainerProps {
   initialProducts: Product[];
@@ -33,8 +34,43 @@ export default function ProductsContainer({
   currentPage 
 }: ProductsContainerProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [currentPagination, setCurrentPagination] = useState(pagination);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Refetch products when search params change
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const filters = {
+          search: searchParams.get('search') || undefined,
+          categoryIds: searchParams.get('category') ? [searchParams.get('category')!] : undefined,
+          brand: searchParams.get('brand') || undefined,
+          reference: searchParams.get('reference') || undefined,
+          minPrice: searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined,
+          maxPrice: searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined,
+          sortBy: (searchParams.get('sortBy') as any) || 'createdAt',
+          sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
+          page: parseInt(searchParams.get('page') || '1'),
+          limit: 12
+        };
+
+        const result = await getAllProductsAction(filters);
+        if (result.success && result.data) {
+          setProducts(result.data);
+          setCurrentPagination(result.pagination);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [searchParams]);
 
   const handleDelete = (productId: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== productId));
@@ -43,18 +79,18 @@ export default function ProductsContainer({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`/products?${params.toString()}`);
+    router.push(`/admin/products?${params.toString()}`);
   };
 
   const renderPaginationItems = () => {
-    if (!pagination || pagination.totalPages <= 1) return null;
+    if (!currentPagination || currentPagination.totalPages <= 1) return null;
 
     const items = [];
     const maxVisiblePages = 5;
     
     // Fixed: Use let instead of const for variables that need to be reassigned
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(currentPagination.totalPages, startPage + maxVisiblePages - 1);
 
     // Adjust start page if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
@@ -105,8 +141,8 @@ export default function ProductsContainer({
     }
 
     // Last page
-    if (endPage < pagination.totalPages) {
-      if (endPage < pagination.totalPages - 1) {
+    if (endPage < currentPagination.totalPages) {
+      if (endPage < currentPagination.totalPages - 1) {
         items.push(
           <PaginationItem key="ellipsis2">
             <PaginationEllipsis />
@@ -115,15 +151,15 @@ export default function ProductsContainer({
       }
 
       items.push(
-        <PaginationItem key={pagination.totalPages}>
+        <PaginationItem key={currentPagination.totalPages}>
           <PaginationLink
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              handlePageChange(pagination.totalPages);
+              handlePageChange(currentPagination.totalPages);
             }}
           >
-            {pagination.totalPages}
+            {currentPagination.totalPages}
           </PaginationLink>
         </PaginationItem>
       );
@@ -134,15 +170,21 @@ export default function ProductsContainer({
 
   return (
     <div className="space-y-6">
-      <ProductGrid products={products} onDelete={handleDelete} />
+      {isLoading ? (
+        <div className="text-center py-8">
+          <div className="text-muted-foreground">Loading products...</div>
+        </div>
+      ) : (
+        <ProductGrid products={products} onDelete={handleDelete} />
+      )}
       
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
+      {currentPagination && currentPagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700">
-            Showing {((currentPage - 1) * pagination.limit) + 1} to{' '}
-            {Math.min(currentPage * pagination.limit, pagination.total)} of{' '}
-            {pagination.total} results
+          <div className="text-sm text-foreground">
+            Showing {((currentPage - 1) * currentPagination.limit) + 1} to{' '}
+            {Math.min(currentPage * currentPagination.limit, currentPagination.total)} of{' '}
+            {currentPagination.total} results
           </div>
           
           <Pagination>
@@ -152,11 +194,11 @@ export default function ProductsContainer({
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (pagination.hasPrev) {
+                    if (currentPagination.hasPrev) {
                       handlePageChange(currentPage - 1);
                     }
                   }}
-                  className={!pagination.hasPrev ? 'pointer-events-none opacity-50' : ''}
+                  className={!currentPagination.hasPrev ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
               
@@ -167,11 +209,11 @@ export default function ProductsContainer({
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (pagination.hasNext) {
+                    if (currentPagination.hasNext) {
                       handlePageChange(currentPage + 1);
                     }
                   }}
-                  className={!pagination.hasNext ? 'pointer-events-none opacity-50' : ''}
+                  className={!currentPagination.hasNext ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
             </PaginationContent>

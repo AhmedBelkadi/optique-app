@@ -58,7 +58,7 @@ export default function LoginForm() {
     return (
       <Card className="w-full max-w-md">
         <CardContent className="p-6">
-          <div className="text-center text-red-600">
+          <div className="text-center text-destructive">
             <p>Error loading security token.</p>
             <p className="text-sm">Please refresh the page.</p>
           </div>
@@ -71,7 +71,7 @@ export default function LoginForm() {
     return (
       <Card className="w-full max-w-md">
         <CardContent className="p-6">
-          <div className="text-center text-red-600">
+          <div className="text-center text-destructive">
             <p>Security token not available.</p>
             <p className="text-sm">Please refresh the page.</p>
           </div>
@@ -109,14 +109,14 @@ export default function LoginForm() {
                   defaultValue={state.values?.email || ''}
                   className={`pl-10 ${
                     state.fieldErrors?.email 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : ''
                   }`}
                   placeholder="Enter your email address"
                 />
               </div>
               {state.fieldErrors?.email && (
-                <p className="text-sm text-red-600 flex items-center">
+                <p className="text-sm text-destructive flex items-center">
                   <span className="mr-1">⚠️</span>
                   {state.fieldErrors.email}
                 </p>
@@ -137,7 +137,7 @@ export default function LoginForm() {
                   required
                   className={`pl-10 pr-10 ${
                     state.fieldErrors?.password 
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
+                      ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : ''
                   }`}
                   placeholder="Enter your password"
@@ -157,7 +157,7 @@ export default function LoginForm() {
                 </Button>
               </div>
               {state.fieldErrors?.password && (
-                <p className="text-sm text-red-600 flex items-center">
+                <p className="text-sm text-destructive flex items-center">
                   <span className="mr-1">⚠️</span>
                   {state.fieldErrors.password}
                 </p>
@@ -166,7 +166,7 @@ export default function LoginForm() {
           </div>
 
           {state.error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-3 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-md">
               <div className="flex items-center">
                 <span className="mr-2">❌</span>
                 {state.error}
@@ -191,12 +191,9 @@ export default function LoginForm() {
           </Button>
 
           <div className="text-center">
-            <Link
-              href="/auth/register"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Don&apos;t have an account? Sign up
-            </Link>
+            <p className="text-sm text-muted-foreground">
+              Staff and admin access only
+            </p>
           </div>
         </form>
       </CardContent>

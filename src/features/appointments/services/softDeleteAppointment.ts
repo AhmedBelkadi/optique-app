@@ -13,6 +13,6 @@ export async function softDeleteAppointment(id: string) {
     return { success: true, data: appointment };
   } catch (error) {
     console.error('Error soft deleting appointment:', error);
-    return { success: false, error: 'Failed to delete appointment' };
+    return { success: false, error: 'Échec de la suppression du rendez-vous' };
   }
 } 

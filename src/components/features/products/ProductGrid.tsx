@@ -8,11 +8,8 @@ import {
   Trash2, 
   Eye, 
   MoreVertical, 
-  Calendar, 
-  DollarSign, 
   Tag, 
   Package,
-  ExternalLink,
   Clock,
   Hash
 } from 'lucide-react';
@@ -27,6 +24,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { deleteProductAction } from '@/features/products/actions/deleteProduct';
+import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 
 interface ProductGridProps {
   products: Product[];
@@ -48,7 +47,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
             Get started by creating your first product to showcase your optical collection.
           </p>
           <Link href="/admin/products/new">
-                         <Button className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-200">
+                         <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all duration-200">
               <Package className="w-4 h-4 mr-2" />
               Create First Product
             </Button>
@@ -84,8 +83,8 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
 
             {/* Price Badge */}
             <div className="absolute top-3 right-3">
-              <Badge className="bg-emerald-500/90 backdrop-blur-sm text-white font-semibold text-sm px-3 py-1.5 shadow-lg border-0">
-                ${product.price.toFixed(2)}
+              <Badge className="bg-emerald-500/90 backdrop-blur-sm text-primary-foreground font-semibold text-sm px-3 py-1.5 shadow-lg border-0">
+                {product.price.toFixed(2)} MAD
               </Badge>
             </div>
 
@@ -131,13 +130,13 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/products/${product.id}`} className="flex items-center">
                       <Eye className="w-4 h-4 mr-2" />
-                      View Details
+                      Voir les Détails
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/products/${product.id}/edit`} className="flex items-center">
                       <Edit className="w-4 h-4 mr-2" />
-                      Edit Product
+                      Modifier le Produit
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -145,7 +144,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Product
+                                          Supprimer le Produit
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -164,7 +163,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Tag className="w-3 h-3 text-muted-foreground/60" />
                   <span className="truncate">
-                    <span className="font-medium text-muted-foreground">Brand:</span> {product.brand}
+                    <span className="font-medium text-muted-foreground">Marque :</span> {product.brand}
                   </span>
                 </div>
               )}
@@ -172,7 +171,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Hash className="w-3 h-3 text-muted-foreground/60" />
                   <span className="truncate">
-                    <span className="font-medium text-muted-foreground">SKU:</span> {product.reference}
+                    <span className="font-medium text-muted-foreground">Référence :</span> {product.reference}
                   </span>
                 </div>
               )}
@@ -195,7 +194,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                     variant="secondary" 
                     className="px-2.5 py-1 text-xs bg-muted text-muted-foreground border border-border"
                   >
-                    +{product.categories.length - 2} more
+                    +{product.categories.length - 2} autres
                   </Badge>
                 )}
               </div>
@@ -204,7 +203,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
             {/* Creation Date */}
             <div className="flex items-center text-xs text-muted-foreground mb-4">
               <Clock className="w-3 h-3 mr-1.5 text-muted-foreground/60" />
-              <span>Created {new Date(product.createdAt).toLocaleDateString()}</span>
+              <span>Créé le {formatDateShort(product.createdAt)}</span>
             </div>
 
             {/* Footer Actions */}
@@ -215,7 +214,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                     variant="ghost" 
                     size="sm" 
                     className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="View Details"
+                    title="Voir les Détails"
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
@@ -226,7 +225,7 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
                     variant="ghost" 
                     size="sm" 
                     className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="Edit Product"
+                    title="Modifier le Produit"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>

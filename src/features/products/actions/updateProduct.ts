@@ -1,33 +1,49 @@
 'use server';
 
+import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
+import { validateCSRFToken } from '@/lib/csrf';
 import { updateProduct } from '@/features/products/services/updateProduct';
+import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
+import { prisma } from '@/lib/prisma';
+import { logError } from '@/lib/errorHandling';
+import { requirePermission } from '@/lib/auth/authorization';
 import { UpdateProductState } from '@/types/api';
 
-
-
 export async function updateProductAction(prevState: UpdateProductState, formData: FormData): Promise<UpdateProductState> {
-  const id = formData.get('id') as string;
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
-  const price = formData.get('price') as string;
-  const brand = formData.get('brand') as string;
-  const reference = formData.get('reference') as string;
-  const categoryIds = formData.getAll('categoryIds') as string[];
-  const keepImageIds = formData.getAll('keepImageIds') as string[];
-  const newImages: File[] = [];
-  formData.forEach((value, key) => {
-    if (key === 'images' && value instanceof File) {
-      newImages.push(value);
-    }
-  });
-
-  if (!id) {
-    return {
-      error: 'Product ID is required',
-    };
-  }
-
   try {
+    // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+    await requirePermission('products', 'update');
+
+    // Get client identifier for rate limiting
+    const identifier = await getClientIdentifier();
+    
+    // Apply rate limiting
+    await apiRateLimit(identifier);
+    
+    // Validate CSRF token
+    await validateCSRFToken(formData);
+
+    const id = formData.get('id') as string;
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const price = formData.get('price') as string;
+    const brand = formData.get('brand') as string;
+    const reference = formData.get('reference') as string;
+    const categoryIds = formData.getAll('categoryIds') as string[];
+    const keepImageIds = formData.getAll('keepImageIds') as string[];
+    const newImages: File[] = [];
+    formData.forEach((value, key) => {
+      if (key === 'images' && value instanceof File) {
+        newImages.push(value);
+      }
+    });
+
+    if (!id) {
+      return {
+        error: 'Product ID is required',
+      };
+    }
+
     const result = await updateProduct(id, {
       name,
       description,
@@ -69,6 +85,24 @@ export async function updateProductAction(prevState: UpdateProductState, formDat
     }
   } catch (error) {
     console.error('Update product action error:', error);
+    // Handle CSRF errors
+    if (error instanceof Error && error.name === 'CSRFError') {
+      return {
+        success: false,
+        error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
+        fieldErrors: {}
+      };
+    }
+
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      // This is a redirect error, likely due to permission issues
+      return {
+        success: false,
+        error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
+        fieldErrors: {}
+      };
+    }
     return {
       error: 'An unexpected error occurred while updating the product',
       fieldErrors: {},

@@ -49,4 +49,30 @@ export function validateAndSanitizeCategory(data: {
     name: sanitizeString(data.name).slice(0, 50), // Limit to 50 chars
     description: data.description ? sanitizeString(data.description).slice(0, 200) : undefined, // Limit to 200 chars
   };
+}
+
+export function validateAndSanitize(data: any): any {
+  if (typeof data === 'string') {
+    return sanitizeString(data);
+  }
+  
+  if (typeof data === 'number') {
+    return sanitizeNumber(data);
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(item => validateAndSanitize(item));
+  }
+  
+  if (data && typeof data === 'object') {
+    const sanitized: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined && value !== null) {
+        sanitized[key] = validateAndSanitize(value);
+      }
+    }
+    return sanitized;
+  }
+  
+  return data;
 } 

@@ -9,10 +9,18 @@ import { saveCategoryImage } from '@/lib/shared/utils/serverCategoryImageUpload'
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
-import { CategoryActionState } from '@/types/api';
+import { requirePermission } from '@/lib/auth/authorization';
+import { UpdateCategoryState } from '@/types/api';
 
-export async function updateCategoryAction(prevState: CategoryActionState, formData: FormData): Promise<CategoryActionState> {
+
+
+
+
+export async function updateCategoryAction(prevState: UpdateCategoryState, formData: FormData): Promise<UpdateCategoryState> {
   try {
+    // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+    await requirePermission('categories', 'update');
+
     // Get client identifier for rate limiting
     const identifier = await getClientIdentifier();
     
@@ -30,11 +38,12 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
 
     // Sanitize input
     const sanitizedData = validateAndSanitizeCategory(rawData);
-    
+
     // Validate sanitized input
     const validation = categorySchema.update.safeParse(sanitizedData);
     if (!validation.success) {
       return {
+        success: false,
         error: '',
         fieldErrors: validation.error.flatten().fieldErrors,
         values: rawData,
@@ -52,17 +61,29 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
           const imageResult = await saveCategoryImage(imageFile, categoryId);
           
           // Update category with new image path
-          await prisma.category.update({
+          const updatedCategory = await prisma.category.update({
             where: { id: categoryId },
             data: { image: imageResult.path },
           });
+
+          // Return the fully updated category
+          return {
+            success: true,
+            error: '',
+            fieldErrors: {},
+            values: {
+              name: '',
+              description: '',
+            },
+            data: updatedCategory,
+          };
         } catch (error) {
           logError(error as Error, { 
             action: 'updateCategory', 
             categoryId,
             step: 'imageUpload' 
           });
-          // Continue even if image upload fails
+          // Continue even if image upload fails, return original result
         }
       }
 
@@ -70,16 +91,18 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
       revalidateTag('categories');
 
       return {
+        success: true,
         error: '',
         fieldErrors: {},
         values: {
           name: '',
           description: '',
         },
-        success: true,
+        data: result.data,
       };
     } else {
       return {
+        success: false,
         error: result.error || 'Failed to update category',
         fieldErrors: {},
         values: rawData,
@@ -89,6 +112,7 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       return {
+        success: false,
         error: error.message,
         fieldErrors: {},
         values: {
@@ -101,7 +125,22 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
     // Handle CSRF errors
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
-        error: 'Security validation failed. Please refresh the page and try again.',
+        success: false,
+        error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+        },
+      };
+    }
+
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      // This is a redirect error, likely due to permission issues
+      return {
+        success: false,
+        error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -121,6 +160,7 @@ export async function updateCategoryAction(prevState: CategoryActionState, formD
     });
     
     return {
+      success: false,
       error: 'An unexpected error occurred while updating the category. Please try again.',
       fieldErrors: {},
       values: {

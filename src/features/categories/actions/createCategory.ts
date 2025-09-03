@@ -10,9 +10,15 @@ import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
 import { CategoryActionState } from '@/types/api';
+import { getCurrentUser } from '@/features/auth/services/session';
+import { requirePermission } from '@/lib/auth/authorization';
+import { CreateCategoryState } from '@/types/api';
 
-export async function createCategoryAction(prevState: CategoryActionState, formData: FormData): Promise<CategoryActionState> {
+export async function createCategoryAction(prevState: CreateCategoryState, formData: FormData): Promise<CreateCategoryState> {
   try {
+    // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+    await requirePermission('categories', 'create');
+
     // Get client identifier for rate limiting
     const identifier = await getClientIdentifier();
     
@@ -34,6 +40,7 @@ export async function createCategoryAction(prevState: CategoryActionState, formD
     const validation = categorySchema.create.safeParse(sanitizedData);
     if (!validation.success) {
       return {
+        success: false,
         error: '',
         fieldErrors: validation.error.flatten().fieldErrors,
         values: rawData,
@@ -69,16 +76,18 @@ export async function createCategoryAction(prevState: CategoryActionState, formD
       revalidateTag('categories');
 
       return {
+        success: true,
         error: '',
         fieldErrors: {},
         values: {
           name: '',
           description: '',
         },
-        success: true,
+        data: result.data,
       };
     } else {
       return {
+        success: false,
         error: result.error || 'Failed to create category',
         fieldErrors: {},
         values: rawData,
@@ -88,6 +97,7 @@ export async function createCategoryAction(prevState: CategoryActionState, formD
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       return {
+        success: false,
         error: error.message,
         fieldErrors: {},
         values: {
@@ -100,7 +110,22 @@ export async function createCategoryAction(prevState: CategoryActionState, formD
     // Handle CSRF errors
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
+        success: false,
         error: 'Security validation failed. Please refresh the page and try again.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          description: formData.get('description') as string,
+        },
+      };
+    }
+
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      // This is a redirect error, likely due to permission issues
+      return {
+        success: false,
+        error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -119,6 +144,7 @@ export async function createCategoryAction(prevState: CategoryActionState, formD
     });
     
     return {
+      success: false,
       error: 'An unexpected error occurred while creating the category. Please try again.',
       fieldErrors: {},
       values: {

@@ -23,19 +23,33 @@ import { softDeleteCustomerAction } from '@/features/customers/actions/softDelet
 import { restoreCustomerAction } from '@/features/customers/actions/restoreCustomer';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
+import { formatDateShort } from '@/lib/shared/utils/dateUtils';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface CustomerTableProps {
   customers: Customer[];
-  onRefresh: () => void;
+  onDelete?: (customerId: string) => void;
+  onUpdate?: (updatedCustomer: Customer) => void;
 }
 
-export default function CustomerTable({ customers, onRefresh }: CustomerTableProps) {
+export default function CustomerTable({ customers, onDelete, onUpdate }: CustomerTableProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const { csrfToken } = useCSRF();
 
   const handleDelete = async (id: string) => {
+    if (!csrfToken) {
+      toast.error('CSRF token not available. Please refresh the page.');
+      return;
+    }
+
     setIsLoading(id);
     try {
-      const result = await softDeleteCustomerAction(id);
+      // Create FormData with customerId and CSRF token
+      const formData = new FormData();
+      formData.append('customerId', id);
+      formData.append('csrf_token', csrfToken);
+      
+      const result = await softDeleteCustomerAction(null, formData);
       if (result.success) {
         toast.success('Customer deleted successfully!', {
           icon: '✅',
@@ -44,7 +58,7 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
             color: '#ffffff',
           },
         });
-        onRefresh();
+        onDelete?.(id);
       } else {
         toast.error(result.error || 'Failed to delete customer', {
           icon: '❌',
@@ -68,9 +82,19 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
   };
 
   const handleRestore = async (id: string) => {
+    if (!csrfToken) {
+      toast.error('CSRF token not available. Please refresh the page.');
+      return;
+    }
+
     setIsLoading(id);
     try {
-      const result = await restoreCustomerAction(id);
+      // Create FormData with customerId and CSRF token
+      const formData = new FormData();
+      formData.append('customerId', id);
+      formData.append('csrf_token', csrfToken);
+      
+      const result = await restoreCustomerAction(null, formData);
       if (result.success) {
         toast.success('Customer restored successfully!', {
           icon: '✅',
@@ -79,7 +103,7 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
             color: '#ffffff',
           },
         });
-        onRefresh();
+        onUpdate?.(customers.find(c => c.id === id)!);
       } else {
         toast.error(result.error || 'Failed to restore customer', {
           icon: '❌',
@@ -103,15 +127,11 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    return formatDateShort(date);
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm">
+    <div className="bg-background rounded-lg border shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
@@ -130,7 +150,7 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
                 <div>
                   <div className="font-medium">{customer.name}</div>
                   {customer.address && (
-                    <div className="text-sm text-gray-500 truncate max-w-xs">
+                    <div className="text-sm text-muted-foreground truncate max-w-xs">
                       {customer.address}
                     </div>
                   )}
@@ -139,11 +159,11 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
               <TableCell>
                 <div className="space-y-1">
                   <div className="flex items-center text-sm">
-                    <Mail className="w-3 h-3 mr-1 text-gray-400" />
+                    <Mail className="w-3 h-3 mr-1 text-muted-foreground/60" />
                     {customer.email}
                   </div>
                   {customer.phone && (
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-muted-foreground">
                       <Phone className="w-3 h-3 mr-1" />
                       {customer.phone}
                     </div>
@@ -155,7 +175,7 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
                   {customer._count?.appointments || 0} appointments
                 </Badge>
               </TableCell>
-              <TableCell className="text-sm text-gray-500">
+              <TableCell className="text-sm text-muted-foreground">
                 {formatDate(customer.createdAt)}
               </TableCell>
               <TableCell>
@@ -198,7 +218,7 @@ export default function CustomerTable({ customers, onRefresh }: CustomerTablePro
                       <DropdownMenuItem
                         onClick={() => handleDelete(customer.id)}
                         disabled={isLoading === customer.id}
-                        className="text-red-600"
+                        className="text-destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete

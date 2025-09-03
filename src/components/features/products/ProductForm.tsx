@@ -45,9 +45,9 @@ interface ProductFormProps {
 
 // Form validation schema
 const formSchema = z.object({
-  name: z.string().min(1, 'Product name is required'),
+  name: z.string().min(1, 'Le nom du produit est requis'),
   description: z.string().optional(),
-  price: z.string().min(1, 'Price is required'),
+  price: z.string().min(1, 'Le prix est requis'),
   brand: z.string().optional(),
   reference: z.string().optional(),
 });
@@ -101,17 +101,17 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
 
   const handleSubmit = async (data: FormData) => {
     if (csrfLoading) {
-      toast.error('Security token is still loading. Please wait.');
+             toast.error('Le jeton de sécurité est encore en cours de chargement. Veuillez patienter.');
       return;
     }
 
     if (csrfError) {
-      toast.error('Security token error. Please refresh the page.');
+             toast.error('Erreur du jeton de sécurité. Veuillez actualiser la page.');
       return;
     }
 
     if (!csrfToken) {
-      toast.error('Security token not available. Please refresh the page.');
+             toast.error('Jeton de sécurité non disponible. Veuillez actualiser la page.');
       return;
     }
 
@@ -166,11 +166,11 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
       if (mode === 'edit') {
         // For edit mode, call update action directly
         updateProductAction(state, formData);
-        toast.success('Product updated successfully!');
+                 toast.success('Produit mis à jour avec succès !');
       } else {
         // For create mode, use the form action
         formAction(formData);
-        toast.success('Product created successfully!');
+                 toast.success('Produit créé avec succès !');
       }
     });
   };
@@ -178,7 +178,7 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        const message = mode === 'create' ? 'Product created successfully!' : 'Product updated successfully!';
+                 const message = mode === 'create' ? 'Produit créé avec succès !' : 'Produit mis à jour avec succès !';
         toast.success(message, {
           icon: '✅',
           style: {
@@ -188,7 +188,7 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
         });
         router.push('/admin/products');
       } else if (state.error) {
-        toast.error(state.error || `Failed to ${mode} product`, {
+                 toast.error(state.error || `Échec de la ${mode === 'create' ? 'création' : 'mise à jour'} du produit`, {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -215,10 +215,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
 
   if (csrfLoading) {
     return (
-      <Card className="border-0 shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
         <CardContent className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-slate-400" />
-          <p className="text-slate-600">Loading security token...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground/60" />
+          <p className="text-muted-foreground">Chargement du jeton de sécurité...</p>
         </CardContent>
       </Card>
     );
@@ -226,10 +226,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
 
   if (csrfError) {
     return (
-      <Card className="border-0 shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
         <CardContent className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-slate-400" />
-          <p className="text-slate-600">Error loading security token. Please refresh the page.</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground/60" />
+          <p className="text-muted-foreground">Erreur lors du chargement du jeton de sécurité. Veuillez actualiser la page.</p>
         </CardContent>
       </Card>
     );
@@ -237,10 +237,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
 
   if (!csrfToken) {
     return (
-      <Card className="border-0 shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
         <CardContent className="p-12 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-slate-400" />
-          <p className="text-slate-600">Security token not available. Please refresh the page.</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground/60" />
+          <p className="text-muted-foreground">Jeton de sécurité non disponible. Veuillez actualiser la page.</p>
         </CardContent>
       </Card>
     );
@@ -249,17 +249,17 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
   return (
     <div className="space-y-6">
 
-      <Card className="border-0 shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
               {mode === 'create' ? (
-                <Plus className="w-4 h-4 text-white" />
+                <Plus className="w-4 h-4 text-primary-foreground" />
               ) : (
-                <Edit className="w-4 h-4 text-white" />
+                <Edit className="w-4 h-4 text-primary-foreground" />
               )}
             </div>
-            <span>{mode === 'create' ? 'Product Information' : 'Edit Product Information'}</span>
+            <span>{mode === 'create' ? 'Informations du Produit' : 'Modifier les Informations du Produit'}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -271,24 +271,24 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">
-                        Product Name *
+                      <FormLabel className="text-sm font-medium text-foreground">
+                        Nom du Produit *
                       </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Enter product name"
+                          placeholder="Entrez le nom du produit"
                           className={`transition-all duration-200 ${
                             state.fieldErrors?.name 
-                              ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                              : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
+                              ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
+                              : 'border-border focus:border-primary focus:ring-primary'
                           }`}
                           disabled={isPending}
                         />
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.name && (
-                          <div className="flex items-center text-red-600">
+                          <div className="flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
                             {state.fieldErrors.name}
                           </div>
@@ -303,8 +303,8 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">
-                        Price *
+                      <FormLabel className="text-sm font-medium text-foreground">
+                        Prix *
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -315,15 +315,15 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                           placeholder="0.00"
                           className={`transition-all duration-200 ${
                             state.fieldErrors?.price 
-                              ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                              : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
+                              ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
+                              : 'border-border focus:border-primary focus:ring-primary'
                           }`}
                           disabled={isPending}
                         />
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.price && (
-                          <div className="flex items-center text-red-600">
+                          <div className="flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
                             {state.fieldErrors.price}
                           </div>
@@ -338,20 +338,20 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                   name="brand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">
-                        Brand
+                      <FormLabel className="text-sm font-medium text-foreground">
+                        Marque
                       </FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Enter brand name"
-                          className="border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200"
+                          placeholder="Entrez le nom de la marque"
+                          className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                           disabled={isPending}
                         />
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.brand && (
-                          <div className="flex items-center text-red-600">
+                          <div className="flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
                             {state.fieldErrors.brand}
                           </div>
@@ -366,20 +366,20 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                   name="reference"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">
-                        Reference
+                      <FormLabel className="text-sm font-medium text-foreground">
+                        Référence
                       </FormLabel>
                       <FormControl>
                         <Input 
                           {...field} 
-                          placeholder="Enter reference"
-                          className="border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-200"
+                          placeholder="Entrez la référence"
+                          className="border-border focus:border-primary focus:ring-primary transition-all duration-200"
                           disabled={isPending}
                         />
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.reference && (
-                          <div className="flex items-center text-red-600">
+                          <div className="flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
                             {state.fieldErrors.reference}
                           </div>
@@ -395,25 +395,25 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">
+                    <FormLabel className="text-sm font-medium text-foreground">
                       Description
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         rows={3}
-                        placeholder="Enter product description"
+                        placeholder="Entrez la description du produit"
                         className={`transition-all duration-200 ${
                           state.fieldErrors?.description 
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                            : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
+                            ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
+                            : 'border-border focus:border-primary focus:ring-primary'
                         }`}
                         disabled={isPending}
                       />
                     </FormControl>
                     <FormMessage>
                       {state.fieldErrors?.description && (
-                        <div className="flex items-center text-red-600">
+                        <div className="flex items-center text-destructive">
                           <X className="w-4 h-4 mr-1" />
                           {state.fieldErrors.description}
                         </div>
@@ -424,8 +424,8 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
               />
 
               <div>
-                <FormLabel className="text-sm font-medium text-slate-700 mb-3 block">
-                  Categories *
+                <FormLabel className="text-sm font-medium text-foreground mb-3 block">
+                  Catégories *
                 </FormLabel>
                 <CategoryMultiSelect
                   categories={categories}
@@ -433,7 +433,7 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                   onSelectionChange={setSelectedCategoryIds}
                 />
                 {state.fieldErrors?.categoryIds && (
-                  <div className="flex items-center text-red-600 mt-2">
+                  <div className="flex items-center text-destructive mt-2">
                     <X className="w-4 h-4 mr-1" />
                     {state.fieldErrors.categoryIds}
                   </div>
@@ -441,16 +441,16 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
               </div>
 
               <div>
-                <FormLabel className="text-sm font-medium text-slate-700 mb-3 block">
-                  Product Images
+                <FormLabel className="text-sm font-medium text-foreground mb-3 block">
+                  Images du Produit
                 </FormLabel>
                 <ImageUpload images={images} onImagesChange={setImages} maxImages={5} />
               </div>
 
               {state.error && (
-                <Card className="border-red-200 bg-red-50">
+                <Card className="border-destructive/20 bg-destructive/5">
                   <CardContent className="p-4">
-                    <div className="flex items-center text-red-700">
+                    <div className="flex items-center text-destructive">
                       <X className="w-4 h-4 mr-2" />
                       <span className="text-sm font-medium">{state.error}</span>
                     </div>
@@ -458,37 +458,37 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                 </Card>
               )}
 
-              <div className="flex justify-end space-x-3 pt-6 border-t border-slate-100">
+              <div className="flex justify-end space-x-3 pt-6 border-t border-border">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => router.back()}
                   disabled={isPending}
-                  className="bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50"
+                  className="bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
                 >
-                  Cancel
+                  Annuler
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={isPending}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   {isPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {mode === 'create' ? 'Creating...' : 'Updating...'}
+                      {mode === 'create' ? 'Création...' : 'Mise à jour...'}
                     </>
                   ) : (
                     <>
                       {mode === 'create' ? (
                         <>
                           <Plus className="w-4 h-4 mr-2" />
-                          Create Product
+                          Créer le Produit
                         </>
                       ) : (
                         <>
                           <Edit className="w-4 h-4 mr-2" />
-                          Update Product
+                          Mettre à Jour le Produit
                         </>
                       )}
                     </>

@@ -1,31 +1,163 @@
 'use server';
 
+import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
+import { validateCSRFToken } from '@/lib/csrf';
+import { createCustomer } from '@/features/customers/services/createCustomer';
+import { logError } from '@/lib/errorHandling';
+import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
-import { createCustomer } from '../services/createCustomer';
-import { CreateCustomerInput } from '../schema/customerSchema';
+import { customerSchema, CreateCustomerInput } from '@/features/customers/schema/customerSchema';
 
-export async function createCustomerAction(data: CreateCustomerInput) {
+export async function createCustomerAction(prevState: any, formData: FormData) {
   try {
-    const result = await createCustomer(data);
+    // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+    await requirePermission('customers', 'create');
 
-    if (result.success) {
+    // Get client identifier for rate limiting
+    const identifier = await getClientIdentifier();
+    
+    // Apply rate limiting
+    await apiRateLimit(identifier);
+    
+    // Validate CSRF token
+    console.log('FormData contents:', {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      address: formData.get('address'),
+      notes: formData.get('notes'),
+      csrf_token: formData.get('csrf_token'),
+    });
+    
+    await validateCSRFToken(formData);
+
+    // Extract form data
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const address = formData.get('address') as string;
+    const notes = formData.get('notes') as string;
+
+    // Validate input data
+    const validationResult = customerSchema.safeParse({
+      name,
+      email,
+      phone: phone || undefined,
+      address: address || undefined,
+      notes: notes || undefined,
+    });
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error: 'Données invalides',
+        fieldErrors: validationResult.error.flatten().fieldErrors,
+        values: { name, email, phone, address, notes }
+      };
+    }
+
+    // Create the customer
+    const result = await createCustomer(validationResult.data);
+
+    if (result.success && result.data) {
+      // Revalidate relevant paths
       revalidatePath('/admin/customers');
+      revalidatePath('/admin');
+      
       return {
         success: true,
-        message: 'Customer created successfully',
+        message: 'Client créé avec succès !',
         data: result.data,
+        fieldErrors: {},
+        values: {
+          name: '',
+          email: '',
+          phone: '',
+          address: '',
+          notes: ''
+        }
       };
     } else {
       return {
         success: false,
-        message: result.error || 'Failed to create customer',
+        error: result.error || 'Échec de la création du client',
+        fieldErrors: {},
+        values: { name, email, phone, address, notes }
       };
     }
   } catch (error) {
-    console.error('Error in createCustomerAction:', error);
+    // Handle rate limiting errors
+    if (error instanceof Error && error.name === 'RateLimitError') {
+      return {
+        success: false,
+        error: error.message,
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          address: formData.get('address') as string,
+          notes: formData.get('notes') as string,
+        }
+      };
+    }
+    
+    // Handle CSRF errors
+    if (error instanceof Error && error.name === 'CSRFError') {
+      return {
+        success: false,
+        error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          address: formData.get('address') as string,
+          notes: formData.get('notes') as string,
+        }
+      };
+    }
+
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      // This is a redirect error, likely due to permission issues
+      return {
+        success: false,
+        error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
+        fieldErrors: {},
+        values: {
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          phone: formData.get('phone') as string,
+          address: formData.get('address') as string,
+          notes: formData.get('notes') as string,
+        }
+      };
+    }
+
+    // Log and handle other errors
+    logError(error as Error, { 
+      action: 'createCustomer',
+      formData: {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        address: formData.get('address'),
+        notes: formData.get('notes'),
+      }
+    });
+    
     return {
       success: false,
-      message: 'An unexpected error occurred',
+      error: 'Une erreur inattendue est survenue lors de la création du client. Veuillez réessayer.',
+      fieldErrors: {},
+      values: {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+        address: formData.get('address') as string,
+        notes: formData.get('notes') as string,
+      }
     };
   }
-} 
+}

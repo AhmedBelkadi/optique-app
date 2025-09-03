@@ -101,29 +101,29 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
     if (previousIsPending.current && !isPending) {
       if (state.success) {
         // Success - show toast and redirect
-        toast.success('Product updated successfully!');
+        toast.success('Produit mis à jour avec succès !');
         router.push(`/products/${product.id}`);
       } else if (state.error) {
         // Error occurred
-        toast.error(state.error || 'Failed to update product');
+        toast.error(state.error || 'Échec de la mise à jour du produit');
       }
     }
     previousIsPending.current = isPending;
   }, [isPending, state.success, state.error, router, product.id]);
 
   if (!csrfToken) {
-    return <div>Loading security token...</div>;
+    return <div>Chargement du jeton de sécurité...</div>;
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-background rounded-lg shadow-sm p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+        <h1 className="text-2xl font-bold text-foreground">Modifier le Produit</h1>
         <button
           onClick={() => router.back()}
-          className="text-gray-600 hover:text-gray-900"
+          className="text-muted-foreground hover:text-foreground"
         >
-          ← Back
+          ← Retour
         </button>
       </div>
 
@@ -133,8 +133,8 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
         
         {/* Product Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Product Name *
+          <label htmlFor="name" className="block text-sm font-medium text-foreground">
+            Nom du Produit *
           </label>
           <input
             type="text"
@@ -142,17 +142,17 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
             name="name"
             required
             defaultValue={state.values?.name || product.name}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter product name"
+            className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            placeholder="Entrez le nom du produit"
           />
           {state.fieldErrors?.name && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.name}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.name}</p>
           )}
         </div>
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="description" className="block text-sm font-medium text-foreground">
             Description
           </label>
           <textarea
@@ -160,22 +160,22 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
             name="description"
             rows={3}
             defaultValue={state.values?.description || product.description || ''}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter product description"
+            className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            placeholder="Entrez la description du produit"
           />
           {state.fieldErrors?.description && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.description}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.description}</p>
           )}
         </div>
 
         {/* Price */}
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Price *
+          <label htmlFor="price" className="block text-sm font-medium text-foreground">
+            Prix *
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500 sm:text-sm">$</span>
+              <span className="text-muted-foreground sm:text-sm">$</span>
             </div>
             <input
               type="number"
@@ -185,36 +185,36 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
               min="0"
               required
               defaultValue={state.values?.price || product.price.toString()}
-              className="pl-7 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="pl-7 block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
               placeholder="0.00"
             />
           </div>
           {state.fieldErrors?.price && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.price}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.price}</p>
           )}
         </div>
 
         {/* Brand */}
         <div>
-          <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
-            Brand
+          <label htmlFor="brand" className="block text-sm font-medium text-foreground">
+            Marque
           </label>
           <input
             type="text"
             id="brand"
             name="brand"
             defaultValue={state.values?.brand || product.brand || ''}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            placeholder="Enter brand name"
+            className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            placeholder="Entrez le nom de la marque"
           />
           {state.fieldErrors?.brand && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.brand}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.brand}</p>
           )}
         </div>
 
         {/* Reference */}
         <div>
-          <label htmlFor="reference" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="reference" className="block text-sm font-medium text-foreground">
             Reference
           </label>
           <input
@@ -222,17 +222,17 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
             id="reference"
             name="reference"
             defaultValue={state.values?.reference || product.reference || ''}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
             placeholder="Enter product reference"
           />
           {state.fieldErrors?.reference && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.reference}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.reference}</p>
           )}
         </div>
 
         {/* Categories */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Categories
           </label>
           <CategoryMultiSelect
@@ -241,13 +241,13 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
             onSelectionChange={setSelectedCategoryIds}
           />
           {state.fieldErrors?.categoryIds && (
-            <p className="mt-1 text-sm text-red-600">{state.fieldErrors.categoryIds}</p>
+            <p className="mt-1 text-sm text-destructive">{state.fieldErrors.categoryIds}</p>
           )}
         </div>
 
         {/* Images */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Product Images
           </label>
           <ImageUpload
@@ -259,7 +259,7 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
 
         {/* Error Display */}
         {state.error && (
-          <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
+          <div className="text-destructive text-sm text-center bg-destructive/5 p-3 rounded-md">
             {state.error}
           </div>
         )}
@@ -269,16 +269,16 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
           >
-            {isPending ? 'Updating...' : 'Update Product'}
+            {isPending ? 'Mise à jour...' : 'Mettre à Jour le Produit'}
           </button>
         </div>
       </form>

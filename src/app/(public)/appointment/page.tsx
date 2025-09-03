@@ -1,272 +1,162 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Phone, 
-  Mail, 
-  Eye,
-  Glasses,
-  Users,
-  CheckCircle
-} from 'lucide-react';
+import { Clock, Calendar, Users, Shield, Star } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Suspense } from 'react';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { AppointmentFormSkeleton, InformationCardsSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
+import { ResponsiveAppointmentForm } from '@/components/features/appointments/ResponsiveAppointmentForm';
+import { AppointmentInfoCards } from '@/components/features/appointments/AppointmentInfoCards';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { getContactSettings } from '@/features/settings/services/contactSettings';
+
+async function AppointmentContent() {
+  const contactSettings = await getContactSettings();
+  const contactSettingsData = contactSettings.data;
+
+  if (!contactSettings) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">Erreur de chargement</h2>
+          <p className="text-muted-foreground">Impossible de charger les informations de contact.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Breadcrumb */}
+      <div className="bg-background/80 backdrop-blur-sm border-b">
+        {/* <div className="container mx-auto px-4 py-4"> */}
+          <Breadcrumb 
+            items={[
+              { label: 'Accueil', href: '/' },
+              { label: 'Rendez-vous', href: '/appointment' }
+            ]} 
+          />
+        {/* </div> */}
+      </div>
+
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-48 translate-x-48"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full translate-y-40 -translate-x-40"></div>
+        
+        <div className="relative container mx-auto px-4 py-16 max-w-7xl">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+              <Calendar className="h-4 w-4" />
+              Réservation en ligne
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+              Prendre un{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">
+                Rendez-vous
+              </span>
+            </h1>
+            
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
+              Réservez votre consultation avec nos experts en optique. 
+              Choisissez la date et l'heure qui vous conviennent pour une expérience personnalisée.
+            </p>
+
+            {/* Trust Indicators */}
+            <div className="flex flex-wrap justify-center gap-6 mb-12">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="h-4 w-4 text-primary" />
+                <span>+20 clients satisfaits</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Shield className="h-4 w-4 text-primary" />
+                <span>Consultation sécurisée</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Star className="h-4 w-4 text-primary" />
+                <span>Expertise reconnue</span>
+              </div>
+            </div>
+
+          
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-16 max-w-7xl">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Appointment Form - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <ResponsiveAppointmentForm contactSettings={contactSettingsData ?? null} />
+          </div>
+
+          {/* Information Section - Takes 1 column on large screens */}
+          <div className="lg:col-span-1">
+            <AppointmentInfoCards contactSettings={contactSettingsData ?? null} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AppointmentPage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-6">Book Your Appointment</h1>
-          <p className="text-xl max-w-3xl mx-auto">
-            Schedule your eye exam or consultation with our experienced optometrists. 
-            We're here to help you see clearly and look great.
-          </p>
+    <ErrorBoundary>
+      <Suspense fallback={<AppointmentPageSkeleton />}>
+        <AppointmentContent />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function AppointmentPageSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Breadcrumb */}
+      <div className="bg-background/80 backdrop-blur-sm border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-2">
+            <div className="h-6 bg-muted rounded w-20 animate-pulse"></div>
+            <div className="h-4 bg-muted rounded w-2 animate-pulse"></div>
+            <div className="h-6 bg-muted rounded w-32 animate-pulse"></div>
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* Booking Form */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Booking Form */}
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Schedule Your Visit</h2>
-              <Card>
-                <CardContent className="p-6">
-                  <form className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">First Name *</Label>
-                        <Input id="firstName" placeholder="John" required />
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Last Name *</Label>
-                        <Input id="lastName" placeholder="Doe" required />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="email">Email *</Label>
-                        <Input id="email" type="email" placeholder="john@example.com" required />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">Phone *</Label>
-                        <Input id="phone" type="tel" placeholder="(555) 123-4567" required />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="date">Preferred Date *</Label>
-                        <Input id="date" type="date" required />
-                      </div>
-                      <div>
-                        <Label htmlFor="time">Preferred Time *</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="9:00">9:00 AM</SelectItem>
-                            <SelectItem value="10:00">10:00 AM</SelectItem>
-                            <SelectItem value="11:00">11:00 AM</SelectItem>
-                            <SelectItem value="12:00">12:00 PM</SelectItem>
-                            <SelectItem value="1:00">1:00 PM</SelectItem>
-                            <SelectItem value="2:00">2:00 PM</SelectItem>
-                            <SelectItem value="3:00">3:00 PM</SelectItem>
-                            <SelectItem value="4:00">4:00 PM</SelectItem>
-                            <SelectItem value="5:00">5:00 PM</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="service">Service Type *</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="comprehensive">Comprehensive Eye Exam</SelectItem>
-                          <SelectItem value="contact">Contact Lens Fitting</SelectItem>
-                          <SelectItem value="frame">Frame Selection</SelectItem>
-                          <SelectItem value="consultation">Consultation</SelectItem>
-                          <SelectItem value="follow-up">Follow-up Visit</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="notes">Special Notes</Label>
-                      <Input id="notes" placeholder="Any specific concerns or requests?" />
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="new-patient" />
-                        <Label htmlFor="new-patient">I am a new patient</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="insurance" />
-                        <Label htmlFor="insurance">I have vision insurance</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="emergency" />
-                        <Label htmlFor="emergency">This is an urgent/emergency visit</Label>
-                      </div>
-                    </div>
-
-                    <Button type="submit" className="w-full">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Book Appointment
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+      {/* Hero Skeleton */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5"></div>
+        <div className="relative container mx-auto px-4 py-16 max-w-7xl">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="h-8 bg-muted rounded-full w-48 mx-auto mb-6 animate-pulse"></div>
+            <div className="h-16 bg-muted rounded w-3/4 mx-auto mb-6 animate-pulse"></div>
+            <div className="h-6 bg-muted rounded w-2/3 mx-auto mb-8 animate-pulse"></div>
+            <div className="flex flex-wrap justify-center gap-6 mb-12">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-6 bg-muted rounded w-32 animate-pulse"></div>
+              ))}
             </div>
-
-            {/* Information Sidebar */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Clock className="w-5 h-5 mr-2 text-indigo-600" />
-                    Appointment Info
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Duration</h4>
-                      <p className="text-gray-600">30-60 minutes depending on service</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-2">What to Bring</h4>
-                      <ul className="text-gray-600 space-y-1">
-                        <li>• Current glasses/contacts</li>
-                        <li>• Insurance card</li>
-                        <li>• Photo ID</li>
-                        <li>• List of medications</li>
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Eye className="w-5 h-5 mr-2 text-green-600" />
-                    Our Services
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                      <span className="text-sm">Comprehensive Eye Exams</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                      <span className="text-sm">Contact Lens Fittings</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                      <span className="text-sm">Frame Selection</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                      <span className="text-sm">Emergency Care</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                      <span className="text-sm">Follow-up Care</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="w-5 h-5 mr-2 text-purple-600" />
-                    Insurance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm mb-3">
-                    We accept most major vision insurance plans:
-                  </p>
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <div>• VSP</div>
-                    <div>• EyeMed</div>
-                    <div>• Davis Vision</div>
-                    <div>• And many more</div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <div className="h-20 bg-muted rounded w-80 mx-auto animate-pulse"></div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Why Choose Us */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Optique?</h2>
-            <p className="text-xl text-gray-600">
-              Experience the difference of personalized eye care
-            </p>
+      {/* Main Content Skeleton */}
+      <div className="container mx-auto px-4 py-16 max-w-7xl">
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <AppointmentFormSkeleton />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="text-center p-6">
-                <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-8 h-8 text-indigo-600" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Personalized Care</h3>
-                <p className="text-gray-600">
-                  Every patient receives individualized attention and care tailored to their specific needs.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="text-center p-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Glasses className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Expert Staff</h3>
-                <p className="text-gray-600">
-                  Our team of experienced optometrists and optical specialists are here to help.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="text-center p-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-purple-600" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Convenient Hours</h3>
-                <p className="text-gray-600">
-                  Flexible scheduling options to fit your busy lifestyle and commitments.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="lg:col-span-1">
+            <InformationCardsSkeleton count={3} />
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
-} 
+}

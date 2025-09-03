@@ -1,11 +1,14 @@
 
+import { getAllCategoriesAction } from '@/features/categories/actions/getAllCategoriesAction';
 import ProductForm from '@/components/features/products/ProductForm';
-import { getAllCategories } from '@/features/categories/services/getAllCategories';
+import { requirePermission } from '@/lib/auth/authorization';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 
 export default async function NewProductPage() {
-  
-  const result = await getAllCategories();
+  // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+  await requirePermission('products', 'create');
+
+  const result = await getAllCategoriesAction();
   const categories = result.success ? result.data || [] : [];
 
   return (
@@ -22,7 +25,7 @@ export default async function NewProductPage() {
         showNotifications={true}
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-muted/50">
           <ProductForm mode="create" categories={categories} />
       </div>
     </>

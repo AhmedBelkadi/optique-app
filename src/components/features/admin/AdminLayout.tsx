@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Inter } from 'next/font/google';
+import { useRouter } from 'next/navigation';
 import AdminSidebar from './AdminSidebar';
 import AdminMobileSidebar from './AdminMobileSidebar';
 import AdminHeader from './AdminHeader';
 import { AdminPageProvider } from './AdminPageContext';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +22,9 @@ export default function AdminLayout({
   user,
   className = ""
 }: AdminLayoutProps) {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const handleMenuToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -28,6 +32,10 @@ export default function AdminLayout({
 
   const handleSidebarClose = () => {
     setIsSidebarOpen(false);
+  };
+
+  const handleSidebarCollapse = (collapsed: boolean) => {
+    setIsSidebarCollapsed(collapsed);
   };
 
   // Close sidebar on escape key
@@ -57,18 +65,25 @@ export default function AdminLayout({
 
   return (
     <AdminPageProvider>
-      <div className={`min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex ${inter.className} ${className}`}>
+      <div className={`min-h-screen bg-gradient-to-br from-muted/50 to-background flex ${inter.className} ${className}`}>
         {/* Desktop Sidebar - Hidden on mobile */}
-        <AdminSidebar className="hidden lg:block" />
+        <AdminSidebar 
+          className="hidden lg:block" 
+          user={user}
+          onSidebarCollapse={handleSidebarCollapse}
+        />
         
         {/* Mobile Sidebar */}
         <AdminMobileSidebar 
           isOpen={isSidebarOpen} 
           onClose={handleSidebarClose} 
+          user={user}
         />
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col w-full lg:ml-72">
+        <div className={`flex-1 flex flex-col w-full transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+        }`}>
           {/* Header */}
           <AdminHeader
             user={user}

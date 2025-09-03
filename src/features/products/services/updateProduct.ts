@@ -35,7 +35,7 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
     if (!existingProduct) {
       return {
         success: false,
-        error: 'Product not found',
+        error: 'Produit non trouvé',
       };
     }
 
@@ -178,7 +178,7 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
     if (!product) {
       return {
         success: false,
-        error: 'Failed to update product',
+        error: 'Échec de la mise à jour du produit',
       };
     }
 
@@ -207,7 +207,7 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
     console.error('Error updating product:', error);
     return {
       success: false,
-      error: 'Failed to update product',
+      error: 'Échec de la mise à jour du produit',
     };
   }
 } 

@@ -2,27 +2,33 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { Edit, Trash2, MoreVertical, Eye, Calendar } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, Calendar } from 'lucide-react';
 import { Category } from '@/features/categories/schema/categorySchema';
 import EditCategoryModal from '@/components/features/categories/EditCategoryModal';
 import DeleteCategoryModal from '@/components/features/categories/DeleteCategoryModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 
 interface CategoryCardProps {
   category: Category;
-  onCategoryChange?: () => void;
   viewMode?: 'grid' | 'list';
+  onCategoryUpdated: (category: Category) => void;
+  onCategoryDeleted: (id: string) => void;
 }
 
-export default function CategoryCard({ category, onCategoryChange, viewMode = 'grid' }: CategoryCardProps) {
+export default function CategoryCard({ 
+  category, 
+  viewMode = 'grid',
+  onCategoryUpdated,
+  onCategoryDeleted,
+}: CategoryCardProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -61,7 +67,6 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
-                  
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -84,7 +89,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
 
               <div className="flex items-center text-xs text-muted-foreground mt-2">
                 <Calendar className="w-3 h-3 mr-1" />
-                Created {new Date(category.createdAt).toLocaleDateString()}
+                Created {formatDateShort(category.createdAt)}
               </div>
             </div>
           </div>
@@ -97,7 +102,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
           categoryName={category.name}
           categoryDescription={category.description}
           categoryImage={category.image}
-          onSuccess={onCategoryChange}
+          onSuccess={onCategoryUpdated}
         />
 
         <DeleteCategoryModal
@@ -105,7 +110,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
           onClose={() => setDeleteOpen(false)}
           categoryId={category.id}
           categoryName={category.name}
-          onSuccess={onCategoryChange}
+          onSuccess={() => onCategoryDeleted(category.id)}
         />
       </Card>
     );
@@ -160,7 +165,6 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-lg font-semibold text-foreground truncate">{category.name}</h3>
-      
         </div>
 
         {category.description && (
@@ -169,7 +173,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
 
         <div className="flex items-center text-xs text-muted-foreground mb-4">
           <Calendar className="w-4 h-4 mr-1" />
-          Created {new Date(category.createdAt).toLocaleDateString()}
+          Created {formatDateShort(category.createdAt)}
         </div>
 
         {/* Quick Actions */}
@@ -205,7 +209,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
         categoryName={category.name}
         categoryDescription={category.description}
         categoryImage={category.image}
-        onSuccess={onCategoryChange}
+        onSuccess={onCategoryUpdated}
       />
 
       <DeleteCategoryModal
@@ -213,7 +217,7 @@ export default function CategoryCard({ category, onCategoryChange, viewMode = 'g
         onClose={() => setDeleteOpen(false)}
         categoryId={category.id}
         categoryName={category.name}
-        onSuccess={onCategoryChange}
+        onSuccess={() => onCategoryDeleted(category.id)}
       />
     </Card>
   );

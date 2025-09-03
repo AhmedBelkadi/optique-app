@@ -14,6 +14,7 @@ export async function getAppointmentById(id: string) {
             address: true,
           },
         },
+        status: true, // Include the status relation
       },
     });
 

@@ -16,6 +16,6 @@ export async function createCustomer(data: CreateCustomerInput) {
     return { success: true, data: customer };
   } catch (error) {
     console.error('Error creating customer:', error);
-    return { success: false, error: 'Failed to create customer' };
+    return { success: false, error: 'Échec de la création du client' };
   }
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Trash2, AlertTriangle, X, Loader2 } from 'lucide-react';
@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -34,15 +33,20 @@ export default function DeleteCategoryModal({
 }: DeleteCategoryModalProps) {
   const previousIsPending = useRef(false);
   const { csrfToken } = useCSRF();
+  const [isPending, startTransition] = useTransition();
 
-  const [state, formAction, isPending] = useActionState(deleteCategoryAction, {
+  const [state, formAction] = useActionState(deleteCategoryAction, {
     success: false,
     error: '',
+    fieldErrors: {},
   });
 
   useEffect(() => {
+    console.log('DeleteCategoryModal useEffect:', { isPending, state, previousIsPending: previousIsPending.current });
+    
     if (previousIsPending.current && !isPending) {
       if (state.success) {
+        console.log('Showing success toast');
         toast.success('Category deleted successfully!', {
           icon: '✅',
           style: {
@@ -53,6 +57,7 @@ export default function DeleteCategoryModal({
         onSuccess?.();
         onClose();
       } else if (state.error) {
+        console.log('Showing error toast:', state.error);
         toast.error(state.error || 'Failed to delete category', {
           icon: '❌',
           style: {
@@ -65,14 +70,26 @@ export default function DeleteCategoryModal({
     previousIsPending.current = isPending;
   }, [isPending, state.success, state.error, onSuccess, onClose]);
 
-  const handleSubmit = (formData: FormData) => {
-    formData.append('categoryId', categoryId);
-    // Add CSRF token to form data
-    if (csrfToken) {
-      formData.append('csrf_token', csrfToken);
+  // Debug: Log when action state changes
+  useEffect(() => {
+    console.log('Action state changed:', state);
+  }, [state]);
+
+  const handleDelete = () => {
+    if (!csrfToken) {
+      toast.error('Security token not available. Please refresh the page.');
+      return;
     }
-    formAction(formData);
+
+    const formData = new FormData();
+    formData.append('categoryId', categoryId);
+    formData.append('csrf_token', csrfToken);
+
+    startTransition(() => {
+      formAction(formData);
+    });
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -80,13 +97,13 @@ export default function DeleteCategoryModal({
         <DialogHeader className="space-y-3">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
-              <Trash2 className="w-5 h-5 text-white" />
+              <Trash2 className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold text-slate-900">
+              <DialogTitle className="text-xl font-semibold text-foreground">
                 Delete Category
               </DialogTitle>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 This action cannot be undone
               </p>
             </div>
@@ -112,9 +129,9 @@ export default function DeleteCategoryModal({
           </Card>
 
           {state.error && (
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-destructive/20 bg-destructive/5">
               <CardContent className="p-4">
-                <div className="flex items-center text-red-700">
+                <div className="flex items-center text-destructive">
                   <X className="w-4 h-4 mr-2" />
                   <span className="text-sm font-medium">{state.error}</span>
                 </div>
@@ -123,41 +140,38 @@ export default function DeleteCategoryModal({
           )}
         </div>
 
-        <form action={handleSubmit}>
-          <input type="hidden" name="categoryId" value={categoryId} />
-
-          <DialogFooter className="pt-4">
-            <div className="flex space-x-3 w-full">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isPending}
-                className="flex-1 bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="destructive"
-                disabled={isPending}
-                className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Category
-                  </>
-                )}
-              </Button>
-            </div>
-          </DialogFooter>
-        </form>
+        <div className="pt-4">
+          <div className="flex space-x-3 w-full">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isPending}
+              className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isPending}
+              onClick={handleDelete}
+              className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Category
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Mail, Phone, MapPin, Calendar, Edit, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { requirePermission } from '@/lib/auth/authorization';
+import { formatDateShort, formatDateLong, formatTime } from '@/lib/shared/utils/dateUtils';
 
 interface CustomerDetailPageProps {
   params: {
@@ -13,6 +15,9 @@ interface CustomerDetailPageProps {
 }
 
 export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
+  // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+  await requirePermission('customers', 'read');
+
   const result = await getCustomerById(params.id);
 
   if (!result.success || !result.data) {
@@ -21,34 +26,18 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   const customer = result.data;
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/customers">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Customers
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{customer.name}</h1>
-            <p className="text-gray-600 mt-1">Customer Details</p>
+        <div className="flex items-center gap-4"> 
+         <div>
+            <h1 className="text-3xl font-bold text-foreground">{customer.name}</h1>
+            <p className="text-muted-foreground mt-1">Customer Details</p>
           </div>
         </div>
         <Link href={`/admin/customers/${customer.id}/edit`}>
-          <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white">
+          <Button className="bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground">
             <Edit className="w-4 h-4 mr-2" />
             Edit Customer
           </Button>
@@ -68,7 +57,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Mail className="w-4 h-4 mr-2" />
                     Email
                   </div>
@@ -77,7 +66,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
                 
                 {customer.phone && (
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-muted-foreground">
                       <Phone className="w-4 h-4 mr-2" />
                       Phone
                     </div>
@@ -88,7 +77,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
               {customer.address && (
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 mr-2" />
                     Address
                   </div>
@@ -98,8 +87,8 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
               {customer.notes && (
                 <div className="space-y-2">
-                  <div className="text-sm text-gray-500">Notes</div>
-                  <p className="text-gray-700 whitespace-pre-wrap">{customer.notes}</p>
+                  <div className="text-sm text-muted-foreground">Notes</div>
+                  <p className="text-foreground whitespace-pre-wrap">{customer.notes}</p>
                 </div>
               )}
             </CardContent>
@@ -121,18 +110,18 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">{appointment.title}</h4>
-                          <p className="text-sm text-gray-500">
-                            {new Date(appointment.startTime).toLocaleDateString()} at{' '}
-                            {new Date(appointment.startTime).toLocaleTimeString()}
+                          <p className="text-sm text-muted-foreground">
+                            {formatDateShort(appointment.startTime)} at{' '}
+                            {formatTime(appointment.startTime)}
                           </p>
                         </div>
-                        <Badge variant="outline">{appointment.status}</Badge>
+                        <Badge variant="outline">{appointment.status.displayName}</Badge>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-muted-foreground text-center py-8">
                   No appointments found for this customer.
                 </p>
               )}
@@ -163,13 +152,13 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Total Appointments</span>
+                <span className="text-sm text-muted-foreground">Total Appointments</span>
                 <span className="font-medium">{customer._count?.appointments || 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Member Since</span>
+                <span className="text-sm text-muted-foreground">Member Since</span>
                 <span className="font-medium">
-                  {new Date(customer.createdAt).toLocaleDateString()}
+                  {formatDateLong(customer.createdAt)}
                 </span>
               </div>
             </CardContent>
@@ -182,26 +171,26 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="w-4 h-4 mr-2" />
                   Created
                 </div>
-                <p className="text-sm">{formatDate(customer.createdAt)}</p>
+                <p className="text-sm">{formatDateShort(customer.createdAt)}</p>
               </div>
               <div className="space-y-2">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="w-4 h-4 mr-2" />
                   Last Updated
                 </div>
-                <p className="text-sm">{formatDate(customer.updatedAt)}</p>
+                <p className="text-sm">{formatDateShort(customer.updatedAt)}</p>
               </div>
               {customer.deletedAt && (
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Calendar className="w-4 h-4 mr-2" />
                     Deleted
                   </div>
-                  <p className="text-sm">{formatDate(customer.deletedAt)}</p>
+                  <p className="text-sm">{formatDateShort(customer.deletedAt)}</p>
                 </div>
               )}
             </CardContent>

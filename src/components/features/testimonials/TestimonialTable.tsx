@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Trash2, RotateCcw, Eye, EyeOff, MoreHorizontal } from 'lucide-react';
+import { Trash2, RotateCcw, Eye, EyeOff, MoreHorizontal, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { Testimonial } from '@/features/testimonials/schema/testimonialSchema';
 import { softDeleteTestimonialAction } from '@/features/testimonials/actions/softDeleteTestimonial';
@@ -34,13 +34,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useRouter } from 'next/navigation';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface TestimonialTableProps {
   testimonials: Testimonial[];
-  onRefresh: () => void;
+  onDelete?: (testimonialId: string) => void;
+  onUpdate?: (updatedTestimonial: Testimonial) => void;
 }
 
-export default function TestimonialTable({ testimonials, onRefresh }: TestimonialTableProps) {
+export default function TestimonialTable({ testimonials, onDelete, onUpdate }: TestimonialTableProps) {
+  const router = useRouter();
+  const { csrfToken, isLoading: csrfLoading, error: csrfError } = useCSRF();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
@@ -49,14 +54,28 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
   const handleDelete = async () => {
     if (!selectedTestimonial) return;
 
+    if (csrfLoading || csrfError) {
+      toast.error('CSRF token not available');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await softDeleteTestimonialAction(selectedTestimonial.id);
+      // Create FormData for the action
+      const formData = new FormData();
+      formData.append('testimonialId', selectedTestimonial.id);
+      
+      // Add CSRF token
+      if (csrfToken) {
+        formData.append('csrf_token', csrfToken);
+      }
+      
+      const result = await softDeleteTestimonialAction(null, formData);
       if (result.success) {
         toast.success(result.message);
-        onRefresh();
+        onDelete?.(selectedTestimonial.id);
       } else {
-        toast.error(result.message);
+        toast.error(result.error || 'Failed to delete testimonial');
       }
     } catch (error) {
       toast.error('Failed to delete testimonial');
@@ -70,14 +89,28 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
   const handleRestore = async () => {
     if (!selectedTestimonial) return;
 
+    if (csrfLoading || csrfError) {
+      toast.error('CSRF token not available');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await restoreTestimonialAction(selectedTestimonial.id);
+      // Create FormData for the action
+      const formData = new FormData();
+      formData.append('testimonialId', selectedTestimonial.id);
+      
+      // Add CSRF token
+      if (csrfToken) {
+        formData.append('csrf_token', csrfToken);
+      }
+      
+      const result = await restoreTestimonialAction(null, formData);
       if (result.success) {
         toast.success(result.message);
-        onRefresh();
+        onUpdate?.(selectedTestimonial);
       } else {
-        toast.error(result.message);
+        toast.error(result.error || 'Failed to restore testimonial');
       }
     } catch (error) {
       toast.error('Failed to restore testimonial');
@@ -88,15 +121,37 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
     }
   };
 
+  const handleEdit = (testimonial: Testimonial) => {
+    // Navigate to edit page
+    router.push(`/admin/testimonials/${testimonial.id}/edit`);
+  };
+
   const handleToggleStatus = async (testimonial: Testimonial) => {
+    if (csrfLoading || csrfError) {
+      toast.error('CSRF token not available');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await toggleTestimonialStatusAction(testimonial.id);
+      // Create FormData for the action
+      const formData = new FormData();
+      formData.append('testimonialId', testimonial.id);
+      formData.append('newStatus', (!testimonial.isActive).toString());
+      
+      // Add CSRF token
+      if (csrfToken) {
+        formData.append('csrf_token', csrfToken);
+      }
+      
+      const result = await toggleTestimonialStatusAction(null, formData);
       if (result.success) {
         toast.success(result.message);
-        onRefresh();
+        // Update the testimonial with the new status
+        const updatedTestimonial = { ...testimonial, isActive: !testimonial.isActive };
+        onUpdate?.(updatedTestimonial);
       } else {
-        toast.error(result.message);
+        toast.error(result.error || 'Failed to toggle testimonial status');
       }
     } catch (error) {
       toast.error('Failed to toggle testimonial status');
@@ -104,6 +159,7 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
       setIsLoading(false);
     }
   };
+
 
   const openDeleteDialog = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial);
@@ -115,22 +171,45 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
     setRestoreDialogOpen(true);
   };
 
-  const getMessageSnippet = (message: string, maxLength: number = 100) => {
-    if (message.length <= maxLength) return message;
-    return message.substring(0, maxLength) + '...';
+  const getMessageSnippet = (message: string) => {
+    return message.length > 100 ? `${message.substring(0, 100)}...` : message;
   };
 
+  const getRatingDisplay = (rating: number) => {
+    return '⭐'.repeat(rating);
+  };
+
+  const getSourceDisplay = (source: string) => {
+    const sourceMap: Record<string, string> = {
+      internal: 'Interne',
+      facebook: 'Facebook',
+      google: 'Google',
+      trustpilot: 'Trustpilot'
+    };
+    return sourceMap[source] || source;
+  };
+
+  if (testimonials.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Aucun témoignage trouvé</p>
+      </div>
+    );
+  }
+
   return (
-    <>
-             <div className="rounded-lg border bg-background shadow-sm">
+    <div className="space-y-4">
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold text-foreground">Name</TableHead>
+            <TableRow>
+              <TableHead className="font-semibold text-foreground">Client</TableHead>
               <TableHead className="font-semibold text-foreground">Message</TableHead>
-              <TableHead className="font-semibold text-foreground">Title</TableHead>
-              <TableHead className="font-semibold text-foreground">Status</TableHead>
-              <TableHead className="font-semibold text-foreground">Created</TableHead>
+              <TableHead className="font-semibold text-foreground">Note</TableHead>
+              <TableHead className="font-semibold text-foreground">Source</TableHead>
+              <TableHead className="font-semibold text-foreground">Titre</TableHead>
+              <TableHead className="font-semibold text-foreground">Statut</TableHead>
+              <TableHead className="font-semibold text-foreground">Date</TableHead>
               <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -146,6 +225,17 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm">{testimonial.rating}</span>
+                    <span className="text-yellow-400">{getRatingDisplay(testimonial.rating)}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  <Badge variant="outline" className="text-xs">
+                    {getSourceDisplay(testimonial.source)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-muted-foreground">
                   {testimonial.title || '-'}
                 </TableCell>
                 <TableCell>
@@ -154,17 +244,22 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
                       variant={testimonial.isActive ? 'default' : 'secondary'}
                       className={testimonial.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-muted text-muted-foreground'}
                     >
-                      {testimonial.isActive ? 'Published' : 'Hidden'}
+                      {testimonial.isActive ? 'Publié' : 'Masqué'}
                     </Badge>
+                    {testimonial.isVerified && (
+                      <Badge variant="outline" className="bg-blue-100 text-blue-800 text-xs">
+                        Vérifié
+                      </Badge>
+                    )}
                     {testimonial.isDeleted && (
                       <Badge variant="destructive" className="bg-destructive/10 text-destructive">
-                        Deleted
+                        Supprimé
                       </Badge>
                     )}
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {format(new Date(testimonial.createdAt), 'MMM dd, yyyy')}
+                  {format(new Date(testimonial.createdAt), 'dd/MM/yyyy')}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -174,20 +269,31 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
+                                            {!testimonial.isDeleted && (
+                        <DropdownMenuItem
+                          onClick={() => handleEdit(testimonial)}
+                          disabled={isLoading || csrfLoading}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Modifier
+                        </DropdownMenuItem>
+                      )}
+                      
                       <DropdownMenuItem
                         onClick={() => handleToggleStatus(testimonial)}
-                        disabled={isLoading}
+                        disabled={isLoading || csrfLoading}
                         className="cursor-pointer"
                       >
                         {testimonial.isActive ? (
                           <>
                             <EyeOff className="mr-2 h-4 w-4" />
-                            Hide
+                            Masquer
                           </>
                         ) : (
                           <>
                             <Eye className="mr-2 h-4 w-4" />
-                            Show
+                            Afficher
                           </>
                         )}
                       </DropdownMenuItem>
@@ -195,22 +301,22 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
                       {!testimonial.isDeleted && (
                         <DropdownMenuItem
                           onClick={() => openDeleteDialog(testimonial)}
-                          disabled={isLoading}
+                          disabled={isLoading || csrfLoading}
                           className="cursor-pointer text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          Supprimer
                         </DropdownMenuItem>
                       )}
                       
                       {testimonial.isDeleted && (
                         <DropdownMenuItem
                           onClick={() => openRestoreDialog(testimonial)}
-                          disabled={isLoading}
+                          disabled={isLoading || csrfLoading}
                           className="cursor-pointer text-emerald-600 focus:text-emerald-600"
                         >
                           <RotateCcw className="mr-2 h-4 w-4" />
-                          Restore
+                          Restaurer
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -226,20 +332,20 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Testimonial</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer le témoignage</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{selectedTestimonial?.name}"? This action cannot be undone.
+              Êtes-vous sûr de vouloir supprimer "{selectedTestimonial?.name}" ? Cette action ne peut pas être annulée.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-                         <AlertDialogAction
-               onClick={handleDelete}
-               disabled={isLoading}
-               className="bg-destructive hover:bg-destructive/90"
-             >
-               {isLoading ? 'Deleting...' : 'Delete'}
-             </AlertDialogAction>
+            <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isLoading}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isLoading ? 'Suppression...' : 'Supprimer'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -248,23 +354,23 @@ export default function TestimonialTable({ testimonials, onRefresh }: Testimonia
       <AlertDialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Restore Testimonial</AlertDialogTitle>
+            <AlertDialogTitle>Restaurer le témoignage</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to restore "{selectedTestimonial?.name}"? This will make it available again.
+              Êtes-vous sûr de vouloir restaurer "{selectedTestimonial?.name}" ? Il sera à nouveau disponible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-                         <AlertDialogAction
-               onClick={handleRestore}
-               disabled={isLoading}
-               className="bg-emerald-600 hover:bg-emerald-700"
-             >
-               {isLoading ? 'Restoring...' : 'Restore'}
-             </AlertDialogAction>
+            <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRestore}
+              disabled={isLoading}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {isLoading ? 'Restauration...' : 'Restaurer'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 } 

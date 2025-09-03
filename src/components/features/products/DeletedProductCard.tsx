@@ -4,7 +4,9 @@ import { useEffect, useRef, startTransition } from 'react';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { restoreProductAction } from '@/features/products/actions/restoreProduct';
+import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 import { Product } from '@/features/products/schema/productSchema';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface DeletedProductCardProps {
   product: Product;
@@ -13,6 +15,7 @@ interface DeletedProductCardProps {
 
 export default function DeletedProductCard({ product, onSuccess }: DeletedProductCardProps) {
   const previousIsPending = useRef(false);
+  const { csrfToken } = useCSRF();
 
   const [state, formAction, isPending] = useActionState(restoreProductAction, {
     success: false,
@@ -33,26 +36,32 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
   }, [isPending, state.success, state.error, onSuccess]);
 
   const handleRestore = () => {
+    if (!csrfToken) {
+      toast.error('Security token not available. Please refresh the page.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('productId', product.id);
+    formData.append('csrf_token', csrfToken);
     startTransition(() => {
       formAction(formData);
     });
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+    <div className="bg-background rounded-lg shadow-sm p-6 border border-border">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">{product.name}</h3>
           {product.description && (
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{product.description}</p>
           )}
           
-          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
-            <span>Price: ${product.price.toFixed(2)}</span>
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-4">
+            <span>Price: {product.price.toFixed(2)} MAD</span>
             {product.brand && <span>Brand: {product.brand}</span>}
-            <span>Deleted: {new Date(product.deletedAt!).toLocaleDateString()}</span>
+            <span>Deleted: {formatDateShort(product.deletedAt!)}</span>
           </div>
 
           {product.categories && product.categories.length > 0 && (
@@ -60,7 +69,7 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
               {product.categories.map((category) => (
                 <span
                   key={category.id}
-                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-foreground"
                 >
                   {category.name}
                 </span>
@@ -73,7 +82,7 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
           <button
             onClick={handleRestore}
             disabled={isPending}
-            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
+            className="px-3 py-1 bg-emerald-600 text-primary-foreground text-sm rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50"
           >
             {isPending ? 'Restoring...' : 'Restore'}
           </button>
@@ -84,7 +93,7 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
         <div className="mt-4">
           <div className="flex space-x-2 overflow-x-auto">
             {product.images.slice(0, 3).map((image) => (
-              <div key={image.id} className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md overflow-hidden">
+              <div key={image.id} className="flex-shrink-0 w-16 h-16 bg-muted rounded-md overflow-hidden">
                 <img
                   src={image.path}
                   alt={image.alt || product.name}
@@ -93,7 +102,7 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
               </div>
             ))}
             {product.images.length > 3 && (
-              <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-500">
+              <div className="flex-shrink-0 w-16 h-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
                 +{product.images.length - 3}
               </div>
             )}

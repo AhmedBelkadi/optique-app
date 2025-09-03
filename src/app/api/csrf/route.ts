@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
     
     const response = NextResponse.json({ token });
     
-    // Set CSRF token in httpOnly cookie
+    // Set CSRF token in non-httpOnly cookie so client can read it
     response.cookies.set('csrf_token', token, {
-      httpOnly: true,
+      httpOnly: false, // Allow client to read the token
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24, // 24 hours
@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
     
     return response;
   } catch (error) {
+    console.error('CSRF API: Error generating token:', error);
     return NextResponse.json(
       { error: 'Failed to generate CSRF token' },
       { status: 500 }

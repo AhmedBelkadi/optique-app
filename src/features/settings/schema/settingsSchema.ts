@@ -1,23 +1,111 @@
 import { z } from 'zod';
 
-export const settingsSchema = z.object({
-  siteName: z.string().nullable().optional(),
-  slogan: z.string().nullable().optional(),
-  logoUrl: z.string().nullable().optional(),
-  heroImageUrl: z.string().nullable().optional(),
-  primaryColor: z.string().nullable().optional(),
-  secondaryColor: z.string().nullable().optional(),
-  contactEmail: z.string().email('Invalid email address').nullable().optional().or(z.literal('')),
-  phone: z.string().nullable().optional(),
-  whatsapp: z.string().nullable().optional(),
-  address: z.string().nullable().optional(),
-  openingHours: z.string().nullable().optional(),
+// Site Settings Schema
+export const siteSettingsSchema = z.object({
+  siteName: z.string().optional(),
+  slogan: z.string().optional(),
+  logoUrl: z.string().optional(),
+  heroBackgroundImg: z.string().optional(),
 });
 
-export type Settings = z.infer<typeof settingsSchema>;
+export type SiteSettings = z.infer<typeof siteSettingsSchema>;
 
-export interface SettingsWithTimestamps extends Settings {
-  id: string;
+// Contact Settings Schema
+export const contactSettingsSchema = z.object({
+  contactEmail: z.string().email('Invalid email address').optional().or(z.literal('')),
+  phone: z.string().optional(),
+  whatsapp: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  openingHours: z.string().optional(),
+  googleMapsApiKey: z.string().optional(),
+  whatsappChatLink: z.string().url('Invalid WhatsApp chat link').optional().or(z.literal('')),
+  googleMapEmbed: z.string().optional(),
+  googleMapLink: z.string().url('Invalid Google Maps link').optional().or(z.literal('')),
+  instagramLink: z.string().url('Invalid Instagram link').optional().or(z.literal('')),
+  facebookLink: z.string().url('Invalid Facebook link').optional().or(z.literal('')),
+});
+
+export type ContactSettings = z.infer<typeof contactSettingsSchema>;
+
+// SEO Settings Schema
+export const seoSettingsSchema = z.object({
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  productMetaTitle: z.string().optional(),
+  productMetaDescription: z.string().optional(),
+  categoryMetaTitle: z.string().optional(),
+  categoryMetaDescription: z.string().optional(),
+  ogImage: z.string().optional(),
+  googleAnalyticsId: z.string().optional(),
+  facebookPixelId: z.string().optional(),
+});
+
+export type SEOSettings = z.infer<typeof seoSettingsSchema>;
+
+// Theme Settings Schema
+export const themeSettingsSchema = z.object({
+  primaryColor: z.string().optional(),
+  secondaryColor: z.string().optional(),
+});
+
+export type ThemeSettings = z.infer<typeof themeSettingsSchema>;
+
+// Operational Settings Schema
+export const operationalSettingsSchema = z.object({
+  maintenanceMode: z.boolean().optional(),
+});
+
+export type OperationalSettings = z.infer<typeof operationalSettingsSchema>;
+
+// Combined Settings Schema (for form submission)
+export const combinedSettingsSchema = z.object({
+  // Site Settings
+  ...siteSettingsSchema.shape,
+  
+  // Contact Settings
+  ...contactSettingsSchema.shape,
+  
+  // SEO Settings
+  ...seoSettingsSchema.shape,
+  
+  // Theme Settings
+  ...themeSettingsSchema.shape,
+  
+  // Operational Settings
+  ...operationalSettingsSchema.shape,
+});
+
+export type CombinedSettings = z.infer<typeof combinedSettingsSchema>;
+
+// Settings with timestamps for database operations
+export type SiteSettingsWithTimestamps = SiteSettings & {
   createdAt: Date;
   updatedAt: Date;
-} 
+};
+
+export type ContactSettingsWithTimestamps = ContactSettings & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type SEOSettingsWithTimestamps = SEOSettings & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ThemeSettingsWithTimestamps = ThemeSettings & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type OperationalSettingsWithTimestamps = OperationalSettings & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Legacy type for backward compatibility (can be removed later)
+export type SettingsWithTimestamps = CombinedSettings & {
+  createdAt: Date;
+  updatedAt: Date;
+}; 

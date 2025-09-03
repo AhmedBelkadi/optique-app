@@ -1,37 +1,48 @@
 import { prisma } from '@/lib/prisma';
+import { sanitizeTestimonialData } from '../utils/testimonialValidation';
 
-export async function toggleTestimonialStatus(id: string) {
+export async function toggleTestimonialStatus(id: string, newStatus: boolean) {
   try {
-    // Get current status
-    const current = await prisma.testimonial.findUnique({
+    // First, get the current testimonial to check if it's deleted
+    const currentTestimonial = await prisma.testimonial.findUnique({
       where: { id },
-      select: { isActive: true },
     });
 
-    if (!current) {
+    if (!currentTestimonial) {
       return {
         success: false,
-        error: 'Testimonial not found',
+        error: 'Témoignage non trouvé',
       };
     }
 
-    // Toggle status
-    const testimonial = await prisma.testimonial.update({
-      where: { id },
-      data: {
-        isActive: !current.isActive,
-      },
+    // Cannot activate a deleted testimonial
+    if (currentTestimonial.isDeleted && newStatus) {
+      return {
+        success: false,
+        error: 'Impossible d\'activer un témoignage supprimé. Restaurez-le d\'abord.',
+      };
+    }
+
+    // Sanitize the data to ensure consistency
+    const sanitizedData = sanitizeTestimonialData({
+      isActive: newStatus,
+      updatedAt: new Date(),
     });
 
-    return {
-      success: true,
-      data: testimonial,
+    const testimonial = await prisma.testimonial.update({
+      where: { id },
+      data: sanitizedData,
+    });
+
+    return { 
+      success: true, 
+      data: testimonial 
     };
   } catch (error) {
     console.error('Error toggling testimonial status:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to toggle testimonial status',
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Échec de la modification du statut du témoignage' 
     };
   }
 } 

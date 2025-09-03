@@ -20,8 +20,8 @@ export default function AdminPageConfig({
   subtitle,
   breadcrumbs,
   searchPlaceholder,
-  showSearch = true,
-  showNotifications = true,
+  showSearch = false,
+  showNotifications = false,
 }: AdminPageConfigProps) {
   const { setPageInfo } = useAdminPage();
 

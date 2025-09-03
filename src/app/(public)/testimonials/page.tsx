@@ -1,257 +1,243 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, Quote } from 'lucide-react';
+import { getPublicTestimonials } from '@/features/testimonials/services/getPublicTestimonials';
+import { getSiteSettings } from '@/features/settings/services/siteSettings';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Star, Quote, Users, User, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import Image from 'next/image';
+import { PageHeader } from '@/components/ui/page-header';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Suspense } from 'react';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { TestimonialsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
+import { MobileTestimonialsGrid } from '@/components/features/testimonials/MobileTestimonialsGrid';
 
-export default function TestimonialsPage() {
+interface TestimonialsPageProps {
+  searchParams: Promise<{
+    search?: string;
+    page?: string;
+  }>;
+}
+
+async function TestimonialsContent({ searchParams }: TestimonialsPageProps) {
+  const params = await searchParams;
+  const search = params.search || '';
+  const page = parseInt(params.page || '1');
+  
+  // Fetch testimonials and site settings
+  const [testimonialsResult, siteSettingsResult] = await Promise.all([
+    getPublicTestimonials({
+      search,
+      page,
+      limit: 12,
+    }),
+    getSiteSettings()
+  ]);
+
+  const testimonials = (testimonialsResult.data || []) as any[];
+  const pagination = testimonialsResult.pagination;
+  const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null;
+
+  // Calculate average rating from actual testimonial ratings
+  const averageRating = testimonials.length > 0 
+    ? testimonials.reduce((sum, t) => sum + (t.rating || 5), 0) / testimonials.length 
+    : 5;
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-6">What Our Patients Say</h1>
-          <p className="text-xl max-w-3xl mx-auto">
-            Real experiences from our valued patients who trust us with their vision care.
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Breadcrumb */}
+      <Breadcrumb 
+        items={[
+          { label: 'Témoignages', href: '/testimonials' }
+        ]} 
+      />
+
+      {/* Page Header */}
+      <div className="container mx-auto px-4 py-16">
+        <PageHeader
+          title="Ils nous font confiance"
+          description={`Découvrez ce que nos clients disent de leur expérience chez ${siteSettings?.siteName || 'nous'}. Des témoignages authentiques de nos clients satisfaits.`}
+        >
+          {/* Rating Summary */}
+          {testimonials.length > 0 && (
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-6 w-6 ${i < Math.floor(averageRating) ? "text-warning fill-current" : "text-muted"}`}
+                  />
+                ))}
+              </div>
+              <span className="text-2xl font-bold text-foreground">{averageRating.toFixed(1)}</span>
+              <span className="text-muted-foreground">({testimonials.length} avis)</span>
+            </div>
+          )}
+        </PageHeader>
+
+        {/* Mobile-Optimized Testimonials Grid - Only on Mobile */}
+        <div className="md:hidden max-w-7xl mx-auto px-4">
+          <MobileTestimonialsGrid 
+            testimonials={testimonials} 
+            pagination={pagination || { page: 1, totalPages: 1, total: 0 }}
+            searchParams={params}
+          />
         </div>
-      </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
+        {/* Desktop Testimonials Grid - Original Layout */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4">
+          {/* Search and Filter */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex-1 max-w-md">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Rechercher un témoignage..."
+                    className="pl-10"
+                    defaultValue={search}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Select defaultValue={page.toString()}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: pagination?.totalPages || 1 }, (_, i) => (
+                      <SelectItem key={i + 1} value={(i + 1).toString()}>
+                        Page {i + 1}
+                      </SelectItem>
                     ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-indigo-600" />
-                  Exceptional Service
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "Dr. Johnson and the entire team at Optique provided exceptional care during my recent visit. 
-                  They took the time to explain everything clearly and helped me find the perfect frames. 
-                  Highly recommend!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">Sarah M.</p>
-                    <p className="text-sm text-gray-500">Patient since 2020</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-green-600" />
-                  Professional & Caring
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "The staff is incredibly professional and caring. They made my children feel comfortable 
-                  during their eye exams, and the selection of frames for kids is excellent. 
-                  We've been coming here for years."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">Michael R.</p>
-                    <p className="text-sm text-gray-500">Patient since 2018</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-purple-600" />
-                  Great Selection
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "I love the variety of frames they carry. From designer brands to affordable options, 
-                  there's something for everyone. The optical specialist helped me find the perfect style 
-                  that suits my face shape."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">Jennifer L.</p>
-                    <p className="text-sm text-gray-500">Patient since 2021</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-orange-600" />
-                  Thorough Eye Care
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "The comprehensive eye exam was thorough and professional. They caught an early sign 
-                  of a condition that could have been serious. I'm grateful for their attention to detail 
-                  and care for my eye health."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">David K.</p>
-                    <p className="text-sm text-gray-500">Patient since 2019</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-indigo-600" />
-                  Excellent Staff
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "The entire staff is friendly and knowledgeable. They took the time to explain my 
-                  options and helped me understand my prescription. The follow-up care has been excellent too."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">Lisa T.</p>
-                    <p className="text-sm text-gray-500">Patient since 2022</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="flex items-center">
-                  <Quote className="w-5 h-5 mr-2 text-green-600" />
-                  Convenient & Reliable
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  "Convenient location, flexible hours, and reliable service. They always accommodate 
-                  my schedule and the quality of their work is consistently excellent. 
-                  I recommend them to everyone."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold">Robert P.</p>
-                    <p className="text-sm text-gray-500">Patient since 2017</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Trusted by Thousands
-            </h2>
-            <p className="text-xl text-gray-600">
-              Our commitment to excellence has earned us the trust of our community
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-indigo-600 mb-2">5,000+</div>
-              <p className="text-gray-600">Happy Patients</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">20+</div>
-              <p className="text-gray-600">Years of Experience</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">4.9</div>
-              <p className="text-gray-600">Average Rating</p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-600 mb-2">98%</div>
-              <p className="text-gray-600">Patient Satisfaction</p>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="bg-indigo-600 text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Join Our Happy Patients
-          </h2>
-          <p className="text-xl mb-8">
-            Experience the Optique difference for yourself. Book your appointment today.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/appointment" className="bg-white text-indigo-600 px-6 py-3 rounded-md text-lg font-medium hover:bg-gray-100 transition-colors">
-              Book Appointment
-            </a>
-            <a href="/contact" className="bg-transparent text-white px-6 py-3 rounded-md text-lg font-medium border border-white hover:bg-white hover:text-indigo-600 transition-colors">
-              Contact Us
-            </a>
+          {/* Testimonials Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {testimonials.map((testimonial) => (
+              <Card key={testimonial.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < testimonial.rating ? "text-warning fill-current" : "text-muted"}`}
+                      />
+                    ))}
+                  </div>
+                  <blockquote className="text-muted-foreground mb-4 italic">
+                    "{testimonial.message}"
+                  </blockquote>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{testimonial.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(testimonial.createdAt).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+          {/* Pagination */}
+          {(pagination?.totalPages || 1) > 1 && (
+            <div className="flex justify-center items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1}
+                asChild
+              >
+                <a href={`/testimonials?${new URLSearchParams({
+                  ...(search && { search }),
+                  page: (page - 1).toString()
+                })}`}>
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Précédent
+                </a>
+              </Button>
+              
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(5, pagination?.totalPages || 1) }, (_, i) => {
+                  const pageNum = i + 1;
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={page === pageNum ? "default" : "outline"}
+                      size="sm"
+                      asChild
+                    >
+                      <a href={`/testimonials?${new URLSearchParams({
+                        ...(search && { search }),
+                        page: pageNum.toString()
+                      })}`}>
+                        {pageNum}
+                      </a>
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === (pagination?.totalPages || 1)}
+                asChild
+              >
+                <a href={`/testimonials?${new URLSearchParams({
+                  ...(search && { search }),
+                  page: (page + 1).toString()
+                })}`}>
+                  Suivant
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
-      </section>
+      </div>
+    </div>
+  );
+}
+
+export default function TestimonialsPage({ searchParams }: TestimonialsPageProps) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<TestimonialsPageSkeleton />}>
+        <TestimonialsContent searchParams={searchParams} />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function TestimonialsPageSkeleton() {
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-6 bg-muted rounded w-24 animate-pulse"></div>
+      </div>
+
+      {/* Page Header */}
+      <div className="container mx-auto px-4 py-16">
+        <PageHeaderSkeleton />
+      </div>
+
+      {/* Testimonials Grid */}
+      <div className="container mx-auto px-4 py-8">
+        <TestimonialsGridSkeleton count={12} />
+      </div>
     </div>
   );
 } 

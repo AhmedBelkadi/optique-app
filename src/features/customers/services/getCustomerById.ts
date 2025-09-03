@@ -8,6 +8,9 @@ export async function getCustomerById(id: string) {
         appointments: {
           orderBy: { startTime: 'desc' },
           where: { isDeleted: false },
+          include: {
+            status: true, // Include the status relation
+          },
         },
         _count: {
           select: {

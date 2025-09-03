@@ -5,8 +5,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Plus, X, Loader2 } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { createCategoryAction } from '@/features/categories/actions/createCategory';
+import { CreateCategoryState } from '@/types/api';
 import {
   Dialog,
   DialogContent,
@@ -18,20 +19,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import CategoryImageUpload from './CategoryImageUpload';
 
 interface CreateCategoryModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess: (category: any) => void;
 }
 
 export default function CreateCategoryModal({ open, onClose, onSuccess }: CreateCategoryModalProps) {
   const previousIsPending = useRef(false);
   const { csrfToken } = useCSRF();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, formAction, isPending] = useActionState(createCategoryAction, {
     success: false,
@@ -43,9 +44,33 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
     },
   });
 
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (open) {
+      // Reset form when opening
+      setSelectedImage(null);
+    }
+  }, [open]);
+
+  // Update hidden file input when selectedImage changes
+  useEffect(() => {
+    if (fileInputRef.current) {
+      if (selectedImage) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(selectedImage);
+        fileInputRef.current.files = dataTransfer.files;
+      } else {
+        // Clear the file input when no image is selected
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [selectedImage]);
+
+  // Handle action completion
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
+        // Show success toast
         toast.success('Category created successfully!', {
           icon: '✅',
           style: {
@@ -53,11 +78,16 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
             color: '#ffffff',
           },
         });
-        onSuccess?.();
+
+        // Call success callback with the created category
+        if (state.data) {
+          onSuccess(state.data);
+        }
+
+        // Close modal
         onClose();
-        // Reset form
-        setSelectedImage(null);
       } else if (state.error) {
+        // Show error toast
         toast.error(state.error || 'Failed to create category', {
           icon: '❌',
           style: {
@@ -68,127 +98,100 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
       }
     }
     previousIsPending.current = isPending;
-  }, [isPending, state.success, state.error, onSuccess, onClose]);
+  }, [isPending, state.success, state.error, state.data, onSuccess, onClose]);
 
-  const handleSubmit = (formData: FormData) => {
-    // Add CSRF token to form data
-    if (csrfToken) {
-      formData.append('csrf_token', csrfToken);
+  const handleClose = () => {
+    if (!isPending) {
+      onClose();
     }
-    
-    // Add image if selected
-    if (selectedImage) {
-      formData.append('image', selectedImage);
-    }
-    
-    formAction(formData);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="space-y-3">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Plus className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+              <Plus className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold text-slate-900">
+              <DialogTitle className="text-xl font-semibold text-foreground">
                 Create New Category
               </DialogTitle>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Add a new category to organize your products
               </p>
             </div>
           </div>
         </DialogHeader>
 
-        <form action={handleSubmit} className="space-y-6">
+        <form action={formAction} className="space-y-4">
+          {/* Hidden CSRF token */}
+          <input type="hidden" name="csrf_token" value={csrfToken || ''} />
+          
+          {/* Hidden file input for image */}
+          <input
+            type="file"
+            name="image"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+          />
+          
           <div className="space-y-4">
-            {/* Image Upload */}
-            <CategoryImageUpload
-              currentImage={null}
-              onImageChange={setSelectedImage}
-            />
-
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-slate-700">
-                Category Name *
-              </Label>
+            <div>
+              <Label htmlFor="name">Category Name *</Label>
               <Input
                 id="name"
-                type="text"
                 name="name"
-                required
-                defaultValue={state.values?.name || ''}
-                className={`transition-all duration-200 ${
-                  state.fieldErrors?.name 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-                placeholder="e.g., Sunglasses, Frames, Contact Lenses"
+                placeholder="Enter category name"
                 disabled={isPending}
+                required
+                className={state.fieldErrors?.name ? 'border-destructive' : ''}
               />
               {state.fieldErrors?.name && (
-                <p className="text-sm text-red-600 flex items-center">
-                  <X className="w-4 h-4 mr-1" />
-                  {state.fieldErrors.name}
-                </p>
+                <p className="text-sm text-destructive mt-1">{state.fieldErrors.name}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium text-slate-700">
-                Description
-              </Label>
+            <div>
+              <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 name="description"
-                rows={3}
-                defaultValue={state.values?.description || ''}
-                className={`transition-all duration-200 ${
-                  state.fieldErrors?.description 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-                placeholder="Describe this category (optional)"
+                placeholder="Enter category description (optional)"
                 disabled={isPending}
+                rows={3}
+                className={state.fieldErrors?.description ? 'border-destructive' : ''}
               />
               {state.fieldErrors?.description && (
-                <p className="text-sm text-red-600 flex items-center">
-                  <X className="w-4 h-4 mr-1" />
-                  {state.fieldErrors.description}
-                </p>
+                <p className="text-sm text-destructive mt-1">{state.fieldErrors.description}</p>
               )}
             </div>
-          </div>
 
-          {state.error && (
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <div className="flex items-center text-red-700">
-                  <X className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">{state.error}</span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+            <div>
+              <Label>Category Image</Label>
+              <CategoryImageUpload
+                currentImage={null}
+                onImageChange={setSelectedImage}
+              />
+            </div>
+          </div>
 
           <DialogFooter className="pt-4">
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
                 variant="outline"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={isPending}
-                className="flex-1 bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50"
+                className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isPending}
-                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {isPending ? (
                   <>

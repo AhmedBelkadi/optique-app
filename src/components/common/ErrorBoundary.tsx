@@ -29,20 +29,20 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-muted/50 flex items-center justify-center">
           <div className="max-w-md mx-auto text-center">
-            <div className="text-red-600 text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
+            <div className="text-destructive text-6xl mb-4">⚠️</div>
+            <h1 className="text-2xl font-bold text-foreground mb-4">
+              Quelque chose s'est mal passé
             </h1>
-            <p className="text-gray-600 mb-6">
-              We're sorry, but something unexpected happened. Please try refreshing the page.
+            <p className="text-muted-foreground mb-6">
+              Nous sommes désolés, mais quelque chose d'inattendu s'est produit. Veuillez essayer d'actualiser la page.
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
             >
-              Refresh Page
+              Actualiser la Page
             </button>
           </div>
         </div>

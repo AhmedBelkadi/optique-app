@@ -6,10 +6,15 @@ import { createProduct } from '@/features/products/services/createProduct';
 import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
+import { getCurrentUser } from '@/features/auth/services/session';
+import { requirePermission } from '@/lib/auth/authorization';
 import { CreateProductState } from '@/types/api';
 
 export async function createProductAction(prevState: CreateProductState, formData: FormData): Promise<CreateProductState> {
   try {
+    // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+    await requirePermission('products', 'create');
+
     // Get client identifier for rate limiting
     const identifier = await getClientIdentifier();
     
@@ -119,16 +124,18 @@ export async function createProductAction(prevState: CreateProductState, formDat
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
         success: false,
-        error: 'Security validation failed. Please refresh the page and try again.',
-        fieldErrors: {},
-        values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          price: formData.get('price') as string,
-          brand: formData.get('brand') as string,
-          reference: formData.get('reference') as string,
-          categoryIds: formData.getAll('categoryIds') as string[],
-        },
+        error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
+        fieldErrors: {}
+      };
+    }
+
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      // This is a redirect error, likely due to permission issues
+      return {
+        success: false,
+        error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
+        fieldErrors: {}
       };
     }
 

@@ -86,21 +86,21 @@ export async function createProduct(productData: CreateProductInput): Promise<Cr
       if (error.message.includes('Unique constraint')) {
         return {
           success: false,
-          error: 'A product with this reference already exists.',
+          error: 'Un produit avec cette référence existe déjà.',
         };
       }
       
       if (error.message.includes('Foreign key constraint')) {
         return {
           success: false,
-          error: 'One or more selected categories do not exist.',
+          error: 'Une ou plusieurs catégories sélectionnées n\'existent pas.',
         };
       }
     }
     
     return {
       success: false,
-      error: 'Failed to create product. Please try again.',
+              error: 'Échec de la création du produit. Veuillez réessayer.',
     };
   }
 } 

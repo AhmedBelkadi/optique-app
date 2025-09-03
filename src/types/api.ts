@@ -18,20 +18,51 @@ export interface RegisterState {
   success?: boolean;
 }
 
+// Consistent action result types for all operations
+export type ActionResult<T> = 
+  | { success: true; data: T } 
+  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+
+// Category-specific types
 export interface CategoryActionState {
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-  values?: {
+  success: boolean;
+  error: string;
+  fieldErrors: Record<string, string[]>;
+  data?: any;
+}
+
+export interface CreateCategoryState {
+  success: boolean;
+  error: string;
+  fieldErrors: Record<string, string[]>;
+  values: {
     name: string;
     description: string;
   };
-  success?: boolean;
+  data?: any;
+}
+
+export interface UpdateCategoryState {
+  success: boolean;
+  error: string;
+  fieldErrors: Record<string, string[]>;
+  values: {
+    name: string;
+    description: string;
+  };
+  data?: any;
+}
+
+export interface DeleteCategoryState {
+  success: boolean;
+  error: string;
+  data?: any;
 }
 
 export interface CreateProductState {
   error?: string;
   fieldErrors?: Record<string, string[]>;
-  values?: {
+  values: {
     name: string;
     description: string;
     price: string;
@@ -46,7 +77,7 @@ export interface CreateProductState {
 export interface UpdateProductState {
   error?: string;
   fieldErrors?: Record<string, string[]>;
-  values?: {
+  values: {
     name: string;
     description: string;
     price: string;
@@ -68,6 +99,25 @@ export interface RestoreProductState {
 }
 
 export interface LogoutState {
+  success?: boolean;
+  error?: string;
+}
+
+export interface CreateUserState {
+  error?: string;
+  fieldErrors?: Record<string, string[]>;
+  values: {
+    name: string;
+    email: string;
+    role: string;
+    notes: string;
+  };
+  success?: boolean;
+  userId?: string;
+  warning?: string;
+}
+
+export interface DeleteUserState {
   success?: boolean;
   error?: string;
 } 

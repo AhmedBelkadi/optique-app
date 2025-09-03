@@ -20,7 +20,7 @@ export async function createTestimonial(data: CreateTestimonialInput) {
     console.error('Error creating testimonial:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create testimonial',
+      error: error instanceof Error ? error.message : 'Échec de la création du témoignage',
     };
   }
 } 

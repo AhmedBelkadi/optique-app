@@ -1,17 +1,26 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { X } from 'lucide-react';
+import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { X, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import AdminLogo from './AdminLogo';
 import AdminNavItem from './AdminNavItem';
 import {
   LayoutDashboard,
   Package,
   FolderOpen,
-  Trash2,
   Settings,
   MessageSquare,
+  Users,
+  Calendar,
+  Home,
+  User,
+  HelpCircle,
+  Image,
+  Shield,
+  UserCheck,
+  Info,
+  Search,
 } from 'lucide-react';
 
 interface NavItem {
@@ -22,93 +31,272 @@ interface NavItem {
     count: number;
     variant?: 'secondary' | 'destructive';
   };
+  description?: string;
+  adminOnly?: boolean;
+  staffAccessible?: boolean;
 }
 
-const navItems: NavItem[] = [
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+  defaultCollapsed?: boolean;
+  adminOnly?: boolean;
+}
+
+const navGroups: NavGroup[] = [
   {
-    href: '/admin',
-    label: 'Dashboard',
-    icon: LayoutDashboard,
+    title: 'Mon Compte',
+    items: [
+      {
+        href: '/admin/profile',
+        label: 'Mon Profil',
+        icon: User,
+        description: 'Gérer mon profil et mot de passe',
+        staffAccessible: true
+      }
+    ],
+    defaultCollapsed: false
   },
   {
-    href: '/admin/products',
-    label: 'Products',
-    icon: Package,
+    title: 'Activité Principale',
+    items: [
+      {
+        href: '/admin',
+        label: 'Tableau de Bord',
+        icon: LayoutDashboard,
+        description: 'Aperçu et analyses',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/products',
+        label: 'Produits',
+        icon: Package,
+        description: 'Gérer le catalogue de produits',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/categories',
+        label: 'Catégories',
+        icon: FolderOpen,
+        description: 'Organiser les produits',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/customers',
+        label: 'Clients',
+        icon: Users,
+        description: 'Base de données clients',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/appointments',
+        label: 'Rendez-vous',
+        icon: Calendar,
+        description: 'Gestion des rendez-vous',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/testimonials',
+        label: 'Témoignages',
+        icon: MessageSquare,
+        description: 'Avis clients',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/content/banners',
+        label: 'Bannières',
+        icon: Image,
+        description: 'Gérer les bannières du site',
+        staffAccessible: true
+      }
+    ],
+    defaultCollapsed: false
   },
   {
-    href: '/admin/categories',
-    label: 'Categories',
-    icon: FolderOpen,
+    title: 'Administration',
+    items: [
+      {
+        href: '/admin/users',
+        label: 'Utilisateurs',
+        icon: UserCheck,
+        description: 'Gérer les comptes utilisateurs',
+        adminOnly: true
+      },
+      {
+        href: '/admin/roles',
+        label: 'Rôles & Permissions',
+        icon: Shield,
+        description: 'Gérer les rôles et permissions',
+        adminOnly: true
+      },
+      {
+        href: '/admin/settings',
+        label: 'Paramètres',
+        icon: Settings,
+        description: 'Configuration du système',
+        adminOnly: true
+      }
+    ],
+    adminOnly: true,
+    defaultCollapsed: true
   },
   {
-    href: '/admin/testimonials',
-    label: 'Testimonials',
-    icon: MessageSquare,
-  },
-  {
-    href: '/admin/settings',
-    label: 'Settings',
-    icon: Settings,
-  },
+    title: 'Contenu & CMS',
+    items: [
+      {
+        href: '/admin/content/home',
+        label: 'Accueil',
+        icon: Home,
+        description: 'Page d\'accueil',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/content/about',
+        label: 'A propos',
+        icon: Info,
+        description: 'A propos de nous',
+        staffAccessible: true
+      },
+      {
+        href: '/admin/content/faq',
+        label: 'FAQ',
+        icon: Info,
+        description: 'Questions fréquentes',
+        staffAccessible: true
+      },
+      // {
+      //   href: '/admin/content/seo',
+      //   label: 'SEO',
+      //   icon: Search,
+      //   description: 'Gérer le SEO du site',
+      //   staffAccessible: true
+      // },
+      {
+        href: '/admin/content/operations',
+        label: 'Opérations',
+        icon: Settings,
+        description: 'Gérer les opérations du site',
+        staffAccessible: true
+      }
+    ],
+    defaultCollapsed: true
+  }
 ];
 
 interface AdminMobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  user?: any;
 }
 
-export default function AdminMobileSidebar({ isOpen, onClose }: AdminMobileSidebarProps) {
+export default function AdminMobileSidebar({ isOpen, onClose, user }: AdminMobileSidebarProps) {
   const pathname = usePathname();
+  
+  // Initialize collapsed state based on defaultCollapsed property
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    navGroups.forEach(group => {
+      if (group.defaultCollapsed) {
+        initial.add(group.title);
+      }
+    });
+    return initial;
+  });
+
+  const toggleGroup = (groupTitle: string) => {
+    setCollapsedGroups(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(groupTitle)) {
+        newSet.delete(groupTitle);
+      } else {
+        newSet.add(groupTitle);
+      }
+      return newSet;
+    });
+  };
+
+  // Simple role-based filtering
+  const isAdmin = user?.isAdmin || false;
+  const isStaff = user?.isStaff || false;
+
+  const filteredNavGroups = navGroups.filter(group => {
+    if (group.adminOnly && !isAdmin) return false;
+    
+    const filteredItems = group.items.filter(item => {
+      if (item.adminOnly && !isAdmin) return false;
+      if (item.staffAccessible) return true;
+      return isAdmin;
+    });
+
+    return filteredItems.length > 0;
+  });
 
   if (!isOpen) return null;
 
   return (
-    <>
+    <div className="fixed inset-0 z-50 lg:hidden">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
         onClick={onClose}
       />
       
-      {/* Mobile Sidebar */}
-      <div className="fixed inset-y-0 left-0 z-50 w-80 lg:hidden mobile-sidebar">
-        <div className="h-full bg-white/95 backdrop-blur-xl shadow-xl border-r border-slate-200/60 animate-in slide-in-from-left duration-300">
-          {/* Header with close button */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-200/60">
-            <AdminLogo showSubtitle={false} />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="hover:bg-slate-100 rounded-lg"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-          
-          {/* Navigation */}
-          <nav className="px-4 py-4">
-            <div className="space-y-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-
-                return (
-                  <AdminNavItem
-                    key={item.href}
-                    href={item.href}
-                    label={item.label}
-                    icon={Icon}
-                    isActive={isActive}
-                    badge={item.badge}
-                    onClick={onClose} // Close sidebar when item is clicked
-                  />
-                );
-              })}
-            </div>
-          </nav>
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 h-full w-80 bg-background/95 backdrop-blur-xl border-r border-border/60 shadow-2xl mobile-sidebar">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border/60">
+          <h2 className="text-lg font-semibold text-foreground">Administration</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-4">
+          {filteredNavGroups.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <button
+                onClick={() => toggleGroup(group.title)}
+                className="flex items-center justify-between w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded-md hover:bg-muted/50"
+              >
+                <span className="uppercase tracking-wider">{group.title}</span>
+                {collapsedGroups.has(group.title) ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronUp className="h-4 w-4" />
+                )}
+              </button>
+              
+              {!collapsedGroups.has(group.title) && (
+                <div className="space-y-1 ml-2">
+                  {group.items
+                    .filter(item => {
+                      if (item.adminOnly && !isAdmin) return false;
+                      if (item.staffAccessible) return true;
+                      return isAdmin;
+                    })
+                    .map((item) => (
+                      <AdminNavItem
+                        key={item.href}
+                        href={item.href}
+                        label={item.label}
+                        icon={item.icon}
+                        description={item.description}
+                        badge={item.badge}
+                        isActive={pathname === item.href}
+                      />
+                    ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
       </div>
-    </>
+    </div>
   );
 } 

@@ -10,7 +10,7 @@ export async function deleteCategory(id: string) {
     if (productsCount > 0) {
       return { 
         success: false, 
-        error: `Cannot delete category. It is used by ${productsCount} product(s).` 
+        error: `Impossible de supprimer la catégorie. Elle est utilisée par ${productsCount} produit(s).` 
       };
     }
 
@@ -26,10 +26,10 @@ export async function deleteCategory(id: string) {
     return { success: true, data: category };
   } catch (error: any) {
     if (error.code === 'P2025') {
-      return { success: false, error: 'Category not found.' };
+      return { success: false, error: 'Catégorie non trouvée.' };
     }
     
     console.error('Error deleting category:', error);
-    return { success: false, error: 'Failed to delete category.' };
+    return { success: false, error: 'Échec de la suppression de la catégorie.' };
   }
 } 

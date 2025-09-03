@@ -2,8 +2,12 @@ import Link from 'next/link';
 import { getDeletedProducts } from '@/features/products/queries/getDeletedProducts';
 import DeletedProductsContainer from '@/components/features/products/DeletedProductsContainer';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
+import { requirePermission } from '@/lib/auth/authorization';
 
 export default async function TrashPage() {
+  // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+  await requirePermission('products', 'read');
+
   const result = await getDeletedProducts();
   const deletedProducts = result.success ? result.data || [] : [];
 
@@ -21,13 +25,13 @@ export default async function TrashPage() {
         showNotifications={true}
       />
 
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-muted/50 py-8">
+        <div className="">
           {deletedProducts.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">🗑️</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No deleted products</h3>
-              <p className="text-gray-500">Deleted products will appear here and can be restored.</p>
+              <div className="text-muted-foreground/60 text-6xl mb-4">🗑️</div>
+              <h3 className="text-lg font-medium text-foreground mb-2">No deleted products</h3>
+              <p className="text-muted-foreground">Deleted products will appear here and can be restored.</p>
             </div>
           ) : (
             <DeletedProductsContainer initialDeletedProducts={deletedProducts} />

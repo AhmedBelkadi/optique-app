@@ -26,7 +26,8 @@ import { toast } from 'react-hot-toast';
 
 interface AppointmentTableProps {
   appointments: Appointment[];
-  onRefresh: () => void;
+  onDelete?: (appointmentId: string) => void;
+  onUpdate?: (updatedAppointment: Appointment) => void;
 }
 
 const statusConfig = {
@@ -38,7 +39,7 @@ const statusConfig = {
   NO_SHOW: { label: 'No Show', variant: 'destructive' as const },
 };
 
-export default function AppointmentTable({ appointments, onRefresh }: AppointmentTableProps) {
+export default function AppointmentTable({ appointments, onDelete, onUpdate }: AppointmentTableProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -53,7 +54,7 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
             color: '#ffffff',
           },
         });
-        onRefresh();
+        onDelete?.(id);
       } else {
         toast.error(result.error || 'Failed to delete appointment', {
           icon: '❌',
@@ -88,7 +89,7 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
             color: '#ffffff',
           },
         });
-        onRefresh();
+        onUpdate?.(appointments.find(a => a.id === id)!);
       } else {
         toast.error(result.error || 'Failed to restore appointment', {
           icon: '❌',
@@ -128,13 +129,16 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
     });
   };
 
-  const getStatusBadge = (status: AppointmentStatus) => {
-    const config = statusConfig[status];
+  const getStatusBadge = (status: { name: string; displayName: string; color: string }) => {
+    const config = statusConfig[status.name as keyof typeof statusConfig];
+    if (!config) {
+      return <Badge variant="secondary">{status.displayName}</Badge>;
+    }
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm">
+    <div className="bg-background rounded-lg border shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
@@ -163,7 +167,7 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
                   <div>
                     <div className="font-medium">{appointment.title}</div>
                     {appointment.description && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                      <div className="text-sm text-muted-foreground truncate max-w-xs">
                         {appointment.description}
                       </div>
                     )}
@@ -172,16 +176,16 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
                 <TableCell>
                   <div>
                     <div className="font-medium">{appointment.customer?.name}</div>
-                    <div className="text-sm text-gray-500">{appointment.customer?.email}</div>
+                    <div className="text-sm text-muted-foreground">{appointment.customer?.email}</div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="space-y-1">
                     <div className="flex items-center text-sm">
-                      <Calendar className="w-3 h-3 mr-1 text-gray-400" />
+                      <Calendar className="w-3 h-3 mr-1 text-muted-foreground/60" />
                       {formatDateTime(startTime)}
                     </div>
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="w-3 h-3 mr-1" />
                       {formatTime(startTime)} - {formatTime(endTime)}
                     </div>
@@ -226,7 +230,7 @@ export default function AppointmentTable({ appointments, onRefresh }: Appointmen
                         <DropdownMenuItem
                           onClick={() => handleDelete(appointment.id)}
                           disabled={isLoading === appointment.id}
-                          className="text-red-600"
+                          className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete

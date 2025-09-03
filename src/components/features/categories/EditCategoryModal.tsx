@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import CategoryImageUpload from './CategoryImageUpload';
+import { startTransition } from 'react';
 
 interface EditCategoryModalProps {
   open: boolean;
@@ -27,7 +28,7 @@ interface EditCategoryModalProps {
   categoryName: string;
   categoryDescription?: string | null;
   categoryImage?: string | null;
-  onSuccess?: () => void;
+  onSuccess?: (updatedCategory: any) => void;
 }
 
 export default function EditCategoryModal({
@@ -56,19 +57,42 @@ export default function EditCategoryModal({
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        toast.success('Category updated successfully!', {
+        console.log('EditCategoryModal: Success, state:', state);
+        
+        toast.success('Catégorie mise à jour avec succès !', {
           icon: '✅',
           style: {
             background: '#10b981',
             color: '#ffffff',
           },
         });
-        onSuccess?.();
+        
+        // Pass the updated category data to the success callback
+        if (state.data) {
+          console.log('EditCategoryModal: Calling onSuccess with data:', state.data);
+          onSuccess?.(state.data);
+        } else {
+          // If no data returned, create a temporary updated object
+          const updatedCategory = {
+            id: categoryId,
+            name: state.values.name,
+            description: state.values.description,
+            image: selectedImage ? null : categoryImage, // Keep existing image if no new one selected
+            createdAt: new Date(), // These will be updated when the page refreshes
+            updatedAt: new Date(),
+            deletedAt: null,
+            isDeleted: false,
+          };
+          console.log('EditCategoryModal: Calling onSuccess with temp data:', updatedCategory);
+          onSuccess?.(updatedCategory);
+        }
+        
         onClose();
         // Reset form
         setSelectedImage(null);
       } else if (state.error) {
-        toast.error(state.error || 'Failed to update category', {
+        console.log('EditCategoryModal: Error:', state.error);
+        toast.error(state.error || 'Échec de la mise à jour de la catégorie', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -78,7 +102,7 @@ export default function EditCategoryModal({
       }
     }
     previousIsPending.current = isPending;
-  }, [isPending, state.success, state.error, onSuccess, onClose]);
+  }, [isPending, state.success, state.error, state.data, state.values, onSuccess, onClose, categoryId, selectedImage, categoryImage]);
 
   const handleSubmit = (formData: FormData) => {
     formData.append('categoryId', categoryId);
@@ -92,7 +116,9 @@ export default function EditCategoryModal({
       formData.append('image', selectedImage);
     }
     
-    formAction(formData);
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   return (
@@ -100,15 +126,15 @@ export default function EditCategoryModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="space-y-3">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <Edit className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
+              <Edit className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold text-slate-900">
-                Edit Category
+              <DialogTitle className="text-xl font-semibold text-foreground">
+                Modifier la Catégorie
               </DialogTitle>
-              <p className="text-sm text-slate-500 mt-1">
-                Update category information
+              <p className="text-sm text-muted-foreground mt-1">
+                Mettre à jour les informations de la catégorie
               </p>
             </div>
           </div>
@@ -123,8 +149,8 @@ export default function EditCategoryModal({
             />
 
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-slate-700">
-                Category Name *
+              <Label htmlFor="name" className="text-sm font-medium text-foreground">
+                Nom de la Catégorie *
               </Label>
               <Input
                 id="name"
@@ -134,14 +160,14 @@ export default function EditCategoryModal({
                 defaultValue={state.values?.name || categoryName}
                 className={`transition-all duration-200 ${
                   state.fieldErrors?.name 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
+                    ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
+                    : 'border-border focus:border-primary focus:ring-primary'
                 }`}
-                placeholder="e.g., Sunglasses, Frames, Contact Lenses"
+                placeholder="ex: Lunettes de soleil, Montures, Lentilles de contact"
                 disabled={isPending}
               />
               {state.fieldErrors?.name && (
-                <p className="text-sm text-red-600 flex items-center">
+                <p className="text-sm text-destructive flex items-center">
                   <X className="w-4 h-4 mr-1" />
                   {state.fieldErrors.name}
                 </p>
@@ -149,7 +175,7 @@ export default function EditCategoryModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium text-slate-700">
+              <Label htmlFor="description" className="text-sm font-medium text-foreground">
                 Description
               </Label>
               <Textarea
@@ -159,14 +185,14 @@ export default function EditCategoryModal({
                 defaultValue={state.values?.description || categoryDescription || ''}
                 className={`transition-all duration-200 ${
                   state.fieldErrors?.description 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500'
+                    ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
+                    : 'border-border focus:border-primary focus:ring-primary'
                 }`}
-                placeholder="Describe this category (optional)"
+                placeholder="Décrivez cette catégorie (optionnel)"
                 disabled={isPending}
               />
               {state.fieldErrors?.description && (
-                <p className="text-sm text-red-600 flex items-center">
+                <p className="text-sm text-destructive flex items-center">
                   <X className="w-4 h-4 mr-1" />
                   {state.fieldErrors.description}
                 </p>
@@ -175,9 +201,9 @@ export default function EditCategoryModal({
           </div>
 
           {state.error && (
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-destructive/20 bg-destructive/5">
               <CardContent className="p-4">
-                <div className="flex items-center text-red-700">
+                <div className="flex items-center text-destructive">
                   <X className="w-4 h-4 mr-2" />
                   <span className="text-sm font-medium">{state.error}</span>
                 </div>
@@ -192,24 +218,24 @@ export default function EditCategoryModal({
                 variant="outline"
                 onClick={onClose}
                 disabled={isPending}
-                className="flex-1 bg-white/50 backdrop-blur-sm border-slate-200 hover:bg-slate-50"
+                className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
               >
-                Cancel
+                Annuler
               </Button>
               <Button
                 type="submit"
                 disabled={isPending}
-                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="flex-1 bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Updating...
+                    Mise à jour...
                   </>
                 ) : (
                   <>
                     <Edit className="w-4 h-4 mr-2" />
-                    Update Category
+                    Mettre à Jour la Catégorie
                   </>
                 )}
               </Button>

@@ -4,7 +4,7 @@ export default function TestimonialsSkeleton() {
   return (
     <div className="space-y-6">
       {/* Filters Skeleton */}
-      <div className="bg-white rounded-lg border p-4 shadow-sm">
+      <div className="bg-background rounded-lg border p-4 shadow-sm">
         <div className="flex flex-col sm:flex-row gap-4">
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-48" />
@@ -21,7 +21,7 @@ export default function TestimonialsSkeleton() {
       </div>
 
       {/* Table Skeleton */}
-      <div className="rounded-lg border bg-white shadow-sm">
+      <div className="rounded-lg border bg-background shadow-sm">
         <div className="p-6">
           <div className="space-y-4">
             {/* Header */}

@@ -9,15 +9,22 @@ export const appointmentStatusSchema = z.enum([
   'NO_SHOW'
 ]);
 
-export const appointmentSchema = z.object({
+const baseAppointmentSchema = z.object({
   customerId: z.string().min(1, 'Customer is required'),
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   description: z.string().optional(),
   startTime: z.string().min(1, 'Start time is required'),
   endTime: z.string().min(1, 'End time is required'),
-  status: appointmentStatusSchema.default('SCHEDULED'),
+  status: z.object({
+    id: z.string(),
+    name: z.string(),
+    displayName: z.string(),
+    color: z.string(),
+  }),
   notes: z.string().optional(),
-}).refine((data) => {
+});
+
+export const appointmentSchema = baseAppointmentSchema.refine((data) => {
   const start = new Date(data.startTime);
   const end = new Date(data.endTime);
   return end > start;
@@ -26,7 +33,7 @@ export const appointmentSchema = z.object({
   path: ['endTime'],
 });
 
-export const updateAppointmentSchema = appointmentSchema.partial();
+export const updateAppointmentSchema = baseAppointmentSchema.partial();
 
 export type AppointmentStatus = z.infer<typeof appointmentStatusSchema>;
 
@@ -37,7 +44,12 @@ export type Appointment = {
   description?: string | null;
   startTime: Date;
   endTime: Date;
-  status: AppointmentStatus;
+  status: {
+    id: string;
+    name: string;
+    displayName: string;
+    color: string;
+  };
   notes?: string | null;
   createdAt: Date;
   updatedAt: Date;

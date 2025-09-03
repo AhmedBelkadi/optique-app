@@ -18,6 +18,6 @@ export async function updateCustomer(id: string, data: UpdateCustomerInput) {
     return { success: true, data: customer };
   } catch (error) {
     console.error('Error updating customer:', error);
-    return { success: false, error: 'Failed to update customer' };
+    return { success: false, error: 'Échec de la mise à jour du client' };
   }
 } 

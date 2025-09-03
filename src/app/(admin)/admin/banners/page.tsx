@@ -1,0 +1,52 @@
+import { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
+import BannerScheduler from '@/components/features/banners/BannerScheduler';
+import { getAllBannersAction } from '@/features/banners/actions/getAllBannersAction';
+import { requirePermission } from '@/lib/auth/authorization';
+
+export default async function ContentBannersPage() {
+
+  await requirePermission('banners', 'read');
+  const bannersResult = await getAllBannersAction();
+  const banners = bannersResult.success ? bannersResult.data || [] : [];
+
+  return (
+    <>
+      <AdminPageConfig
+        title="Banners & Promotions"
+        subtitle="Manage marketing materials, promotional banners, and announcements"
+        breadcrumbs={[
+          { label: 'Content Management', href: '/admin/content' },
+          { label: 'Banners & Promotions' }
+        ]}
+        showSearch={false}
+        showNotifications={true}
+      />
+
+      <div className="space-y-6">
+        <Suspense fallback={<BannersSkeleton />}>
+          <BannerScheduler banners={banners} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+function BannersSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Page Overview Skeleton */}
+      <Skeleton className="h-32 w-full" />
+      
+      {/* Content Breakdown Skeleton */}
+      <Skeleton className="h-24 w-full" />
+      
+      {/* Tabs Skeleton */}
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    </div>
+  );
+}

@@ -71,7 +71,7 @@ export default function AdminFormWrapper({
              <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-                         <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center">
+                         <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
               {icon}
             </div>
             <span>Form Information</span>
@@ -97,7 +97,7 @@ export default function AdminFormWrapper({
                    type="submit" 
                    onClick={onSubmit}
                    disabled={isPending}
-                   className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                   className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
                  >
                   {isPending ? (
                     <>

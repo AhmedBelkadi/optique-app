@@ -13,6 +13,48 @@ interface ColorPickerProps {
   placeholder?: string;
 }
 
+// Helper function to convert hex to HSL
+function hexToHsl(hex: string): string {
+  // Remove # if present
+  hex = hex.replace('#', '');
+  
+  // Parse hex values
+  const r = parseInt(hex.substr(0, 2), 16) / 255;
+  const g = parseInt(hex.substr(2, 2), 16) / 255;
+  const b = parseInt(hex.substr(4, 2), 16) / 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  
+  // Convert to degrees and percentages
+  const hue = Math.round(h * 360);
+  const saturation = Math.round(s * 100);
+  const lightness = Math.round(l * 100);
+  
+  return `${hue} ${saturation}% ${lightness}%`;
+}
+
 export default function ColorPicker({
   label,
   value,
@@ -26,11 +68,10 @@ export default function ColorPicker({
   };
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Convert hex to HSL (simplified)
+    // Convert hex to HSL and save in HSL format
     const hex = event.target.value;
-    // For now, just use the hex value
-    // In a real implementation, you'd convert hex to HSL
-    onChange(hex);
+    const hsl = hexToHsl(hex);
+    onChange(hsl);
   };
 
   const getBackgroundColor = () => {
@@ -47,6 +88,24 @@ export default function ColorPicker({
     }
     
     return 'transparent';
+  };
+
+  // Convert current value to hex for the color picker
+  const getHexValue = () => {
+    if (!value) return '#000000';
+    
+    // If it's HSL, we'd need to convert back to hex
+    // For simplicity, just use a default
+    if (value.includes(' ')) {
+      return '#000000'; // We'll improve this later
+    }
+    
+    // If it's already hex, use as is
+    if (value.startsWith('#')) {
+      return value;
+    }
+    
+    return '#000000';
   };
 
   return (
@@ -76,7 +135,7 @@ export default function ColorPicker({
         <div className="flex gap-2 items-center">
           <Input
             type="color"
-            value={value?.startsWith('#') ? value : '#000000'}
+            value={getHexValue()}
             onChange={handleColorChange}
             className="w-12 h-10 p-1"
           />

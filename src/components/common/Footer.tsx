@@ -1,71 +1,251 @@
-import { Facebook, Instagram, MapPin, Phone, Mail, X } from "lucide-react";
-import Link from "next/link";
+"use client"
 
-export default function Footer() {
-    return (
-    <footer className="bg-gray-900 text-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div>
-        <h3 className="text-lg font-semibold mb-4">Optique</h3>
-        <p className="text-gray-400 mb-4">
-            Your vision is our expertise. Professional eyewear and optical services for all your needs.
-        </p>
-        <div className="flex space-x-4">
-            <Link href="#" className="text-gray-400 hover:text-white">
-            <Facebook className="w-5 h-5" />
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white">
-                <X className="w-5 h-5" />
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white">
-            <Instagram className="w-5 h-5" />
-            </Link>
-        </div>
-        </div>
-        
-        <div>
-        <h4 className="text-sm font-semibold mb-4">Quick Links</h4>
-        <ul className="space-y-2">
-            <li><Link href="/" className="text-gray-400 hover:text-white">Home</Link></li>
-            <li><Link href="/products" className="text-gray-400 hover:text-white">Products</Link></li>
-            <li><Link href="/about" className="text-gray-400 hover:text-white">About Us</Link></li>
-            <li><Link href="/faq" className="text-gray-400 hover:text-white">FAQ</Link></li>
-        </ul>
-        </div>
-        
-        <div>
-        <h4 className="text-sm font-semibold mb-4">Services</h4>
-        <ul className="space-y-2">
-            <li><Link href="/appointment" className="text-gray-400 hover:text-white">Book Appointment</Link></li>
-            <li><Link href="/testimonials" className="text-gray-400 hover:text-white">Testimonials</Link></li>
-            <li><Link href="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
-        </ul>
-        </div>
-        
-        <div>
-        <h4 className="text-sm font-semibold mb-4">Contact Info</h4>
-        <div className="space-y-2 text-gray-400">
-            <div className="flex items-center">
-            <MapPin className="w-4 h-4 mr-2" />
-            <span>123 Main St, City, State</span>
+import Link from 'next/link';
+import { MapPin, Phone, Mail, Clock, Globe, Shield, Award, Instagram, Facebook, Twitter, Linkedin, Youtube, ArrowUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+interface FooterProps {
+  siteSettings?: {
+    siteName?: string;
+    slogan?: string;
+  } | null;
+  contactSettings?: {
+    address?: string;
+    phone?: string;
+    contactEmail?: string;
+    openingHours?: string;
+    instagramLink?: string;
+    facebookLink?: string;
+  } | null;
+}
+
+export default function Footer({ siteSettings, contactSettings }: FooterProps) {
+  return (  
+    <footer className="relative">
+      {/* Main Footer */}
+      <div className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
+            {/* Company Info */}
+            <div className="lg:col-span-2 space-y-4">
+              <div className="flex items-center space-x-3 mb-4 md:mb-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-xl md:text-2xl font-bold text-white">O</span>
+                </div>
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white">{siteSettings?.siteName || 'Notre Boutique'}</h3>
+                  <p className="text-white/80 text-sm">{siteSettings?.slogan || 'Votre vision, notre passion'}</p>
+                </div>
+              </div>
+              <p className="text-white/90 text-sm md:text-base leading-relaxed max-w-md">
+                {siteSettings?.slogan || 'Votre vision, notre passion. Nous fournissons des soins oculaires exceptionnels et des solutions de lunettes premium avec une technologie de pointe et un service personnalisé.'}
+              </p>
+              
+              {/* Social Media */}
+              <div className="flex space-x-3 md:space-x-4 pt-3 md:pt-4">
+                {contactSettings?.instagramLink && (
+                  <Link
+                    href={contactSettings.instagramLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                  >
+                    <Instagram className="w-5 h-5 text-white" />
+                  </Link>
+                )}
+                {contactSettings?.facebookLink && (
+                  <Link 
+                    href={contactSettings.facebookLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                  >
+                    <Facebook className="w-5 h-5 text-white" />
+                  </Link>
+                )}
+                {(!contactSettings?.instagramLink && !contactSettings?.facebookLink) && (
+                  <div className="flex space-x-3 md:space-x-4">
+                    <div className="w-12 h-12 md:w-10 md:h-10 bg-white/10 rounded-full flex items-center justify-center">
+                      <Instagram className="w-5 h-5 text-white/50" />
+                    </div>
+                    <div className="w-12 h-12 md:w-10 md:h-10 bg-white/10 rounded-full flex items-center justify-center">
+                      <Facebook className="w-5 h-5 text-white/50" />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex items-center">
-            <Phone className="w-4 h-4 mr-2" />
-            <span>(555) 123-4567</span>
+            
+            {/* Services */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-white border-b-2 border-white/30 pb-3">Nos Services</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    href="/appointment" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Prendre Rendez-vous
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/eye-exam" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Examen de la Vue
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/contact-lenses" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Lentilles de Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/glasses" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Lunettes de Designer
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/testimonials" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Témoignages
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <div className="flex items-center">
-            <Mail className="w-4 h-4 mr-2" />
-            <span>info@optique.com</span>
+            
+            {/* Quick Links */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-white border-b-2 border-white/30 pb-3">Liens Rapides</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    href="/about" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    À Propos de Nous
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/products" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Produits
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/faq" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/blog" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Blog & Actualités
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/careers" 
+                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                  >
+                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                    Carrières
+                  </Link>
+                </li>
+              </ul>
             </div>
+            
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-white border-b-2 border-white/30 pb-3">Informations de Contact</h4>
+              <div className="space-y-4">
+                {contactSettings?.address && (
+                  <div className="flex items-start group">
+                    <MapPin className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-white/80 group-hover:text-white transition-colors" />
+                    <span className="text-sm text-white/80 group-hover:text-white transition-colors">{contactSettings.address}</span>
+                  </div>
+                )}
+                {contactSettings?.phone && (
+                  <div className="flex items-center group">
+                    <Phone className="w-5 h-5 mr-3 flex-shrink-0 text-white/80 group-hover:text-white transition-colors" />
+                    <span className="text-sm text-white/80 group-hover:text-white transition-colors">{contactSettings.phone}</span>
+                  </div>
+                )}
+                {contactSettings?.contactEmail && (
+                  <div className="flex items-center group">
+                    <Mail className="w-5 h-5 mr-3 flex-shrink-0 text-white/80 group-hover:text-white transition-colors" />
+                    <span className="text-sm text-white/80 group-hover:text-white transition-colors">{contactSettings.contactEmail}</span>
+                  </div>
+                )}
+                
+                {/* Business Hours */}
+                {contactSettings?.openingHours && (
+                  <div className="flex items-center pt-2 group">
+                    <Clock className="w-5 h-5 mr-3 flex-shrink-0 text-white/80 group-hover:text-white transition-colors" />
+                    <div className="text-sm text-white/80 group-hover:text-white transition-colors">
+                      <div>
+                        {contactSettings.openingHours}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          
+  
+          {/* Separator */}
+          <div className="border-t-2 border-white/20 mt-8 md:mt-12 pt-6 md:pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+              {/* Copyright */}
+              <div className="text-center md:text-left">
+                <p className="text-white/80 text-sm">
+                  &copy; 2025 {siteSettings?.siteName || 'Notre Boutique'}. Tous droits réservés.
+                </p>
+              </div>
+              
+              {/* Back to Top Button */}
+              <div className="flex items-center">
+                <Button
+                  size="sm"
+                  className="bg-yellow-500 hover:bg-yellow-600 border-white/30 text-black transition-all duration-300 h-10 px-4"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
+                  <ArrowUp className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Retour en haut</span>
+                  <span className="sm:hidden">Haut</span>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-        </div>
-    </div>
-    
-    <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; 2024 Optique. All rights reserved.</p>
-    </div>
-    </div>
+      </div>
     </footer>
-    )
+  )
 }

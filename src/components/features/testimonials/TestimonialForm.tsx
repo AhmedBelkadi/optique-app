@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'react-hot-toast';
-import { Plus, ArrowLeft, Loader2, X, Edit } from 'lucide-react';
+import { Plus, ArrowLeft, Loader2, X, Edit, Star } from 'lucide-react';
 import { createTestimonialAction } from '@/features/testimonials/actions/createTestimonial';
 import { updateTestimonialAction } from '@/features/testimonials/actions/updateTestimonial';
 import { Testimonial } from '@/features/testimonials/schema/testimonialSchema';
@@ -23,6 +23,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import TestimonialImageUpload from './TestimonialImageUpload';
 import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface TestimonialFormProps {
@@ -32,11 +34,16 @@ interface TestimonialFormProps {
 
 // Form validation schema
 const formSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  message: z.string().min(10, 'Le message doit contenir au moins 10 caractères'),
+  rating: z.number().min(1, 'La note doit être comprise entre 1 et 5').max(5, 'La note doit être comprise entre 1 et 5'),
+  source: z.enum(['internal', 'facebook', 'google', 'trustpilot']),
+  externalId: z.string().optional(),
+  externalUrl: z.string().url('L\'URL externe doit être valide').optional().or(z.literal('')),
   title: z.string().optional(),
   image: z.string().optional(),
   isActive: z.boolean(),
+  isVerified: z.boolean(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -54,25 +61,61 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
     defaultValues: {
       name: testimonial?.name || '',
       message: testimonial?.message || '',
+      rating: testimonial?.rating || 5,
+      source: testimonial?.source || 'internal',
+      externalId: testimonial?.externalId || '',
+      externalUrl: testimonial?.externalUrl || '',
       title: testimonial?.title || '',
       image: testimonial?.image || '',
       isActive: testimonial?.isActive ?? true,
+      isVerified: testimonial?.isVerified ?? false,
     },
   });
 
+  // Handle form errors from server action
+  useEffect(() => {
+    if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+      Object.entries(fieldErrors).forEach(([field, error]) => {
+        if (error) {
+          form.setError(field as keyof FormData, {
+            type: 'server',
+            message: error,
+          });
+        }
+      });
+    }
+  }, [fieldErrors, form]);
+
+  // Handle general error
+  useEffect(() => {
+    if (generalError) {
+      toast.error(generalError);
+    }
+  }, [generalError]);
+
+  // Show loading state
+  useEffect(() => {
+    if (isPending && !previousIsPending.current) {
+      toast.loading('Enregistrement en cours...', { id: 'form-submit' });
+    } else if (!isPending && previousIsPending.current) {
+      toast.dismiss('form-submit');
+    }
+    previousIsPending.current = isPending;
+  }, [isPending]);
+
   const handleSubmit = async (data: FormData) => {
     if (csrfLoading) {
-      toast.error('Security token is still loading. Please wait.');
+      toast.error('Le jeton de sécurité est encore en cours de chargement. Veuillez patienter.');
       return;
     }
 
     if (csrfError) {
-      toast.error('Security token error. Please refresh the page.');
+      toast.error('Erreur du jeton de sécurité. Veuillez actualiser la page.');
       return;
     }
 
     if (!csrfToken) {
-      toast.error('Security token not available. Please refresh the page.');
+      toast.error('Jeton de sécurité non disponible. Veuillez actualiser la page.');
       return;
     }
 
@@ -82,16 +125,32 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
 
     startTransition(async () => {
       try {
+        // Create FormData for server action
+        const formData = new FormData();
+        formData.append('csrf_token', csrfToken);
+        
+        // Add form fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            formData.append(key, value.toString());
+          }
+        });
+
+        // Add ID for edit mode
+        if (mode === 'edit' && testimonial) {
+          formData.append('id', testimonial.id);
+        }
+
         let result;
         
         if (mode === 'edit' && testimonial) {
-          result = await updateTestimonialAction(testimonial.id, data);
+          result = await updateTestimonialAction(null, formData);
         } else {
-          result = await createTestimonialAction(data);
+          result = await createTestimonialAction(null, formData);
         }
 
         if (result.success) {
-          const message = mode === 'create' ? 'Testimonial created successfully!' : 'Testimonial updated successfully!';
+          const message = mode === 'create' ? 'Témoignage créé avec succès !' : 'Témoignage mis à jour avec succès !';
           toast.success(message, {
             icon: '✅',
             style: {
@@ -99,150 +158,125 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
               color: '#ffffff',
             },
           });
+
+          // Redirect to testimonials list
           router.push('/admin/testimonials');
         } else {
-          setGeneralError(result.message || `Failed to ${mode} testimonial`);
-          toast.error(result.message || `Failed to ${mode} testimonial`, {
-            icon: '❌',
-            style: {
-              background: '#ef4444',
-              color: '#ffffff',
-            },
-          });
+          // Handle validation errors
+          if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+            setFieldErrors(result.fieldErrors);
+          }
+          
+          // Handle general error
+          if (result.error) {
+            setGeneralError(result.error);
+            toast.error(result.error);
+          }
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        setGeneralError(errorMessage);
-        toast.error(errorMessage, {
-          icon: '❌',
-          style: {
-            background: '#ef4444',
-            color: '#ffffff',
-          },
-        });
+        console.error('Form submission error:', error);
+        toast.error('Une erreur inattendue est survenue');
       }
     });
   };
 
-  useEffect(() => {
-    if (previousIsPending.current && !isPending) {
-      // Handle any post-submission logic here if needed
-    }
-    previousIsPending.current = isPending;
-  }, [isPending]);
-
+  // Render loading state
   if (csrfLoading) {
     return (
-      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
-        <CardContent className="p-12 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">Loading security token...</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Chargement du jeton de sécurité...</span>
+      </div>
     );
   }
 
+  // Render error state
   if (csrfError) {
     return (
-      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
-        <CardContent className="p-12 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">Error loading security token. Please refresh the page.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!csrfToken) {
-    return (
-      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
-        <CardContent className="p-12 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">Security token not available. Please refresh the page.</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <X className="h-8 w-8 text-destructive mx-auto mb-2" />
+          <p className="text-destructive">Erreur du jeton de sécurité</p>
+          <Button onClick={() => window.location.reload()} className="mt-2">
+            Actualiser la page
+          </Button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="border-0 shadow-sm bg-background/50 backdrop-blur-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
               {mode === 'create' ? (
-                <Plus className="w-4 h-4 text-white" />
+                <>
+                  <Plus className="h-5 w-5" />
+                  Créer un témoignage
+                </>
               ) : (
-                <Edit className="w-4 h-4 text-white" />
+                <>
+                  <Edit className="h-5 w-5" />
+                  Modifier le témoignage
+                </>
               )}
-            </div>
-            <span>{mode === 'create' ? 'Testimonial Information' : 'Edit Testimonial Information'}</span>
-          </CardTitle>
+            </CardTitle>
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-foreground">
-                        Customer Name *
-                      </FormLabel>
+                      <FormLabel>Nom du client *</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="Enter customer name"
-                          className={`transition-all duration-200 ${
-                            fieldErrors.name 
-                              ? 'border-destructive focus:border-destructive focus:ring-destructive' 
-                              : 'border-border focus:border-primary focus:ring-primary'
-                          }`}
-                          disabled={isPending}
-                        />
+                        <Input placeholder="Nom du client" {...field} />
                       </FormControl>
-                      <FormMessage>
-                        {fieldErrors.name && (
-                          <div className="flex items-center text-destructive">
-                            <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.name}
-                          </div>
-                        )}
-                      </FormMessage>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
                   control={form.control}
-                  name="title"
+                  name="rating"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-foreground">
-                        Title/Position
-                      </FormLabel>
+                      <FormLabel>Note *</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="e.g., CEO, Manager, Customer"
-                          className={`transition-all duration-200 ${
-                            fieldErrors.title 
-                              ? 'border-destructive focus:border-destructive focus:ring-destructive' 
-                              : 'border-border focus:border-primary focus:ring-primary'
-                          }`}
-                          disabled={isPending}
-                        />
+                        <div className="flex items-center gap-2">
+                          <Select value={field.value.toString()} onValueChange={(value) => field.onChange(parseInt(value))}>
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5].map((rating) => (
+                                <SelectItem key={rating} value={rating.toString()}>
+                                  <div className="flex items-center gap-2">
+                                    {rating} <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <span className="text-sm text-muted-foreground">sur 5</span>
+                        </div>
                       </FormControl>
-                      <FormMessage>
-                        {fieldErrors.title && (
-                          <div className="flex items-center text-destructive">
-                            <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.title}
-                          </div>
-                        )}
-                      </FormMessage>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -253,143 +287,167 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-foreground">
-                      Testimonial Message *
-                    </FormLabel>
+                    <FormLabel>Message *</FormLabel>
                     <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Enter the customer's testimonial message"
-                        rows={4}
-                        className={`transition-all duration-200 resize-none ${
-                          fieldErrors.message 
-                            ? 'border-destructive focus:border-destructive focus:ring-destructive' 
-                            : 'border-border focus:border-primary focus:ring-primary'
-                        }`}
-                        disabled={isPending}
+                      <Textarea 
+                        placeholder="Message du témoignage..." 
+                        className="min-h-[120px]"
+                        {...field} 
                       />
                     </FormControl>
-                    <FormMessage>
-                      {fieldErrors.message && (
-                        <div className="flex items-center text-destructive">
-                          <X className="w-4 h-4 mr-1" />
-                          {fieldErrors.message}
-                        </div>
-                      )}
-                    </FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="image"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">
-                      Image URL
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="https://example.com/image.jpg"
-                        className={`transition-all duration-200 ${
-                          fieldErrors.image 
-                            ? 'border-destructive focus:border-destructive focus:ring-destructive' 
-                            : 'border-border focus:border-primary focus:ring-primary'
-                        }`}
-                        disabled={isPending}
-                      />
-                    </FormControl>
-                    <FormMessage>
-                      {fieldErrors.image && (
-                        <div className="flex items-center text-destructive">
-                          <X className="w-4 h-4 mr-1" />
-                          {fieldErrors.image}
-                        </div>
-                      )}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
+              {/* Source Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Source</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="internal">Interne</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="google">Google</SelectItem>
+                          <SelectItem value="trustpilot">Trustpilot</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-muted/50">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-medium text-foreground">
-                        Published
-                      </FormLabel>
-                      <div className="text-xs text-muted-foreground">
-                        Show this testimonial on the public website
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Titre (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Titre du témoignage" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* External Source Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="externalId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ID externe (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ID de la plateforme externe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="externalUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL externe (optionnel)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Image */}
+              <FormField control={form.control} name="image" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Image (optionnel)</FormLabel>
+                  <FormControl>
+                    <TestimonialImageUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      onRemove={() => field.onChange('')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              {/* Status Switches */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Actif</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Le témoignage sera visible sur le site
+                        </div>
                       </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isPending}
-                        className="data-[state=checked]:bg-primary"
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
 
-              {generalError && (
-                <Card className="border-destructive/20 bg-destructive/5">
-                  <CardContent className="p-4">
-                    <div className="flex items-center text-destructive">
-                      <X className="w-4 h-4 mr-2" />
-                      <span className="text-sm font-medium">{generalError}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                <FormField
+                  control={form.control}
+                  name="isVerified"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">Vérifié</FormLabel>
+                        <div className="text-sm text-muted-foreground">
+                          Marquer comme vérifié
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              <div className="flex justify-end space-x-3 pt-6 border-t border-border">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+              {/* Submit Button */}
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => router.back()}
                   disabled={isPending}
-                  className="bg-background/50 backdrop-blur-sm border-border hover:bg-muted"
                 >
-                  Cancel
+                  Annuler
                 </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isPending}
-                  className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {mode === 'create' ? 'Creating...' : 'Updating...'}
-                    </>
-                  ) : (
-                    <>
-                      {mode === 'create' ? (
-                        <>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Testimonial
-                        </>
-                      ) : (
-                        <>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Update Testimonial
-                        </>
-                      )}
-                    </>
-                  )}
+                <Button type="submit" disabled={isPending}>
+                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {mode === 'create' ? 'Créer' : 'Mettre à jour'}
                 </Button>
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
-    </div>
   );
 } 

@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getProductById } from '@/features/products/queries/getProductById';
-import { getAllCategories } from '@/features/categories/services/getAllCategories';
 import ProductForm from '@/components/features/products/ProductForm';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
+import { requirePermission } from '@/lib/auth/authorization';
+import { getAllCategoriesAction } from '@/features/categories/actions/getAllCategoriesAction';
 
 interface EditProductPageProps {
   params: {
@@ -11,6 +12,9 @@ interface EditProductPageProps {
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
+  // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
+  await requirePermission('products', 'update');
+
   const { id } = params;
 
   // Fetch product data
@@ -22,7 +26,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   const product = productResult.data;
 
   // Fetch categories
-  const categoriesResult = await getAllCategories();
+  const categoriesResult = await getAllCategoriesAction();
   const categories = categoriesResult.success ? categoriesResult.data || [] : [];
 
   return (
@@ -37,8 +41,8 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         ]}
       />
 
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-muted/50">
+        <div className="">
           <ProductForm 
             mode="edit" 
             categories={categories} 

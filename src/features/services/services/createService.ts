@@ -21,7 +21,7 @@ export async function createService(serviceData: CreateServiceInput): Promise<Cr
     const service = await prisma.service.create({
       data: {
         ...serviceData,
-        order: serviceData.order ?? nextOrder,
+        order: nextOrder,
       },
     });
 

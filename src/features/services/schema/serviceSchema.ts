@@ -20,7 +20,6 @@ export const createServiceSchema = z.object({
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   icon: z.string().max(50, 'Le nom de l\'icône ne peut pas dépasser 50 caractères').optional(),
   isActive: z.boolean().default(true),
-  order: z.number().int().min(0).default(0),
 });
 
 // Update Service schema
@@ -29,7 +28,6 @@ export const updateServiceSchema = z.object({
   description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
   icon: z.string().max(50, 'Le nom de l\'icône ne peut pas dépasser 50 caractères').optional(),
   isActive: z.boolean().optional(),
-  order: z.number().int().min(0).optional(),
 });
 
 // Reorder Services schema

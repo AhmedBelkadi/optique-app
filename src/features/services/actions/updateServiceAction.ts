@@ -17,13 +17,11 @@ export interface UpdateServiceState {
     description: string;
     icon: string;
     isActive: boolean;
-    order: number;
   };
   data?: any;
 }
 
 export async function updateServiceAction(
-  id: string,
   prevState: UpdateServiceState,
   formData: FormData
 ): Promise<UpdateServiceState> {
@@ -40,13 +38,28 @@ export async function updateServiceAction(
     // Validate CSRF token
     await validateCSRFToken(formData);
 
+    // Get service ID from form data
+    const id = formData.get('serviceId') as string;
+    if (!id) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+        values: {
+          name: formData.get('name') as string || '',
+          description: formData.get('description') as string || '',
+          icon: formData.get('icon') as string || '',
+          isActive: formData.get('isActive') === 'true',
+        },
+      };
+    }
+
     // Extract and validate form data
     const rawData = {
       name: formData.get('name') as string,
       description: formData.get('description') as string || undefined,
       icon: formData.get('icon') as string || undefined,
       isActive: formData.get('isActive') === 'true',
-      order: formData.get('order') ? parseInt(formData.get('order') as string) : undefined,
+
     };
 
     // Validate data
@@ -60,7 +73,7 @@ export async function updateServiceAction(
           description: rawData.description || '',
           icon: rawData.icon || '',
           isActive: rawData.isActive,
-          order: rawData.order || 0,
+          
         },
       };
     }
@@ -79,7 +92,7 @@ export async function updateServiceAction(
           description: '',
           icon: '',
           isActive: true,
-          order: 0,
+
         },
         data: result.data,
       };
@@ -93,7 +106,7 @@ export async function updateServiceAction(
           description: rawData.description || '',
           icon: rawData.icon || '',
           isActive: rawData.isActive,
-          order: rawData.order || 0,
+          
         },
       };
     }
@@ -109,7 +122,7 @@ export async function updateServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          
         },
       };
     }
@@ -125,7 +138,7 @@ export async function updateServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          
         },
       };
     }
@@ -141,7 +154,7 @@ export async function updateServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          
         },
       };
     }
@@ -149,13 +162,13 @@ export async function updateServiceAction(
     // Log and handle other errors
     logError(error as Error, { 
       action: 'updateService',
-      serviceId: id,
+      serviceId: formData.get('serviceId'),
       formData: {
         name: formData.get('name'),
         description: formData.get('description'),
         icon: formData.get('icon'),
         isActive: formData.get('isActive'),
-        order: formData.get('order'),
+
       }
     });
 
@@ -168,7 +181,7 @@ export async function updateServiceAction(
         description: formData.get('description') as string || '',
         icon: formData.get('icon') as string || '',
         isActive: formData.get('isActive') === 'true',
-        order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+        
       },
     };
   }

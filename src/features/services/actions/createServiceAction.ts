@@ -17,7 +17,6 @@ export interface CreateServiceState {
     description: string;
     icon: string;
     isActive: boolean;
-    order: number;
   };
   data?: any;
 }

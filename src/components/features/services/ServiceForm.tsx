@@ -51,8 +51,8 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
   const { csrfToken } = useCSRF();
   const isEditing = !!service;
 
-  const [state, formAction, isPending] = useActionState(
-    isEditing ? updateServiceAction.bind(null, service!.id) : createServiceAction,
+  const [state, formAction, isPending] = useActionState<CreateServiceState | UpdateServiceState, FormData>(
+    isEditing ? updateServiceAction : createServiceAction,
     {
       success: false,
       error: '',
@@ -62,7 +62,6 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
         description: service?.description || '',
         icon: service?.icon || '',
         isActive: service?.isActive ?? true,
-        order: service?.order || 0,
       },
     }
   );
@@ -74,7 +73,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
       description: service?.description || '',
       icon: service?.icon || '',
       isActive: service?.isActive ?? true,
-      order: service?.order || 0,
+
     },
   });
 
@@ -142,7 +141,10 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
             <input type="hidden" name="description" value={form.watch('description') || ''} />
             <input type="hidden" name="icon" value={form.watch('icon') || ''} />
             <input type="hidden" name="isActive" value={form.watch('isActive')?.toString() || 'true'} />
-            <input type="hidden" name="order" value={form.watch('order')?.toString() || '0'} />
+            {isEditing && service && (
+              <input type="hidden" name="serviceId" value={service.id} />
+            )}
+
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -159,25 +161,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="order"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ordre d'Affichage</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        placeholder="0" 
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
             </div>
 
             <FormField

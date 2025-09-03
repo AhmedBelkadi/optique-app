@@ -13,7 +13,6 @@ export interface DeleteServiceState {
 }
 
 export async function deleteServiceAction(
-  id: string,
   prevState: DeleteServiceState,
   formData: FormData
 ): Promise<DeleteServiceState> {
@@ -29,6 +28,15 @@ export async function deleteServiceAction(
     
     // Validate CSRF token
     await validateCSRFToken(formData);
+
+    // Get service ID from form data
+    const id = formData.get('serviceId') as string;
+    if (!id) {
+      return {
+        success: false,
+        error: 'Service ID is required',
+      };
+    }
 
     // Delete service
     const result = await deleteService(id);
@@ -73,7 +81,7 @@ export async function deleteServiceAction(
     // Log and handle other errors
     logError(error as Error, { 
       action: 'deleteService',
-      serviceId: id,
+      serviceId: formData.get('serviceId'),
     });
 
     return {

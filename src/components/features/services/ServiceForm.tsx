@@ -101,20 +101,13 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
     previousIsPending.current = isPending;
   }, [isPending, state.success, state.error, onSuccess, onServiceCreated, onServiceUpdated, isEditing, service, state.data, form]);
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (formData: FormData) => {
     if (!csrfToken) {
       toast.error('Jeton de sécurité non disponible. Veuillez actualiser la page.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('description', data.description || '');
-    formData.append('icon', data.icon || '');
-    formData.append('isActive', data.isActive.toString());
-    formData.append('order', data.order.toString());
     formData.append('csrf_token', csrfToken);
-
     formAction(formData);
   };
 
@@ -143,7 +136,14 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form action={handleSubmit} className="space-y-6">
+            {/* Hidden inputs for form data */}
+            <input type="hidden" name="name" value={form.watch('name')} />
+            <input type="hidden" name="description" value={form.watch('description') || ''} />
+            <input type="hidden" name="icon" value={form.watch('icon') || ''} />
+            <input type="hidden" name="isActive" value={form.watch('isActive')?.toString() || 'true'} />
+            <input type="hidden" name="order" value={form.watch('order')?.toString() || '0'} />
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}

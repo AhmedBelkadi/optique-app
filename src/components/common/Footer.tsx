@@ -22,9 +22,16 @@ interface FooterProps {
 export default function Footer({ siteSettings, contactSettings }: FooterProps) {
   return (  
     <footer className="relative">
+      {/* Decorative gradient line at top */}
+      <div className="h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
+      
       {/* Main Footer */}
-      <div className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
+      <div className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 text-primary-foreground relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full -translate-y-48 translate-x-48"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full translate-y-40 -translate-x-40"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
             {/* Company Info */}
             <div className="lg:col-span-2 space-y-4">
@@ -48,9 +55,9 @@ export default function Footer({ siteSettings, contactSettings }: FooterProps) {
                     href={contactSettings.instagramLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-secondary/20 hover:border-secondary/30 border border-transparent rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm group"
                   >
-                    <Instagram className="w-5 h-5 text-white" />
+                    <Instagram className="w-5 h-5 text-white group-hover:text-secondary transition-colors duration-300" />
                   </Link>
                 )}
                 {contactSettings?.facebookLink && (
@@ -58,9 +65,9 @@ export default function Footer({ siteSettings, contactSettings }: FooterProps) {
                     href={contactSettings.facebookLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                    className="w-12 h-12 md:w-10 md:h-10 bg-white/20 hover:bg-secondary/20 hover:border-secondary/30 border border-transparent rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 backdrop-blur-sm group"
                   >
-                    <Facebook className="w-5 h-5 text-white" />
+                    <Facebook className="w-5 h-5 text-white group-hover:text-secondary transition-colors duration-300" />
                   </Link>
                 )}
                 {(!contactSettings?.instagramLink && !contactSettings?.facebookLink) && (

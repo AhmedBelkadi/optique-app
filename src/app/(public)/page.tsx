@@ -9,6 +9,7 @@ import FeaturedProducts from '@/components/features/home/FeaturedProducts';
 import Testimonials from '@/components/features/home/Testimonials';
 import DynamicContactSection from '@/components/features/home/DynamicContactSection';
 import { Button } from '@/components/ui/button';
+import { SectionDivider } from '@/components/ui/section-divider';
 import { Eye, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
@@ -87,6 +88,8 @@ async function HomeContent() {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <SectionDivider variant="gradient" color="both" />
 
       {/* Values Section - Dynamic (Admin Editable) */}
       <DynamicValues 
@@ -94,10 +97,16 @@ async function HomeContent() {
         siteSettings={siteSettings?.siteName || null} 
       />
 
+      {/* Section Divider */}
+      {products.length > 0 && <SectionDivider variant="dots" color="both" />}
+
       {/* Featured Products */}
       {products.length > 0 && (
         <FeaturedProducts products={products} />
       )}
+
+      {/* Section Divider */}
+      {testimonials.length > 0 && <SectionDivider variant="wave" color="both" />}
 
       {/* Testimonials Section */}
       {testimonials.length > 0 && (
@@ -106,6 +115,8 @@ async function HomeContent() {
         />
       )}
 
+      {/* Section Divider */}
+      <SectionDivider variant="gradient" color="both" />
 
       {/* Contact Section */}
       <DynamicContactSection 

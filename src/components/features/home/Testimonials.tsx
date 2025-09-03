@@ -27,11 +27,11 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
   // Take only the first 6 testimonials for home page display
   const featuredTestimonials = testimonials.slice(0, 6)
 
-  // Use standard colors
-  const badgeBackground = '#FF6B6B' // Coral
-  const badgeText = '#FFFFFF' // White
-  const starColor = '#F59E0B' // Warm amber
-  const verifiedBadgeColor = '#10B981' // Green
+  // Use CSS variables for consistent theming
+  const badgeBackground = 'hsl(var(--primary))' // Primary color
+  const badgeText = 'hsl(var(--primary-foreground))' // Primary foreground
+  const starColor = 'hsl(var(--secondary))' // Secondary color for stars
+  const verifiedBadgeColor = 'hsl(var(--primary))' // Primary for verified badge
 
   // Mobile swipe handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -110,20 +110,19 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
   }, [currentIndex, isDragging])
 
   return (
-    <section className="py-12 md:py-20 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="py-12 md:py-20 bg-gradient-to-br from-secondary/3 via-background to-primary/3 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-primary/5 rounded-full -translate-y-36 translate-x-36"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full translate-y-32 -translate-x-32"></div>
+      
+      <div className="container mx-auto px-4 relative">
         <div className="text-center mb-12 md:mb-16">
-          <div 
-            className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-4"
-            style={{
-              backgroundColor: badgeBackground,
-              color: badgeText
-            }}
-          >
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-4 bg-secondary/10 text-secondary border border-secondary/20">
             <Quote className="w-4 h-4 mr-2" />
             Ce que disent nos clients
           </div>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-4">Ce que disent nos clients</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-secondary to-primary rounded-full mx-auto mb-6"></div>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             Découvrez les témoignages de nos clients satisfaits qui nous font confiance pour leur vision
           </p>

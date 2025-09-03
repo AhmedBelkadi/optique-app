@@ -102,11 +102,20 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
   }, [currentIndex, isDragging])
 
   return (
-    <section className="py-12 md:py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="py-12 md:py-20 bg-gradient-to-br from-background via-secondary/2 to-background relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 left-0 w-64 h-64 bg-primary/5 rounded-full -translate-x-32 -translate-y-32"></div>
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary/5 rounded-full translate-x-40 translate-y-40"></div>
+      
+      <div className="container mx-auto px-4 relative">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-2xl md:text-4xl font-bold text-navy-900 mb-4">Nos Produits Vedettes</h2>
-          <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-4 bg-secondary/10 text-secondary border border-secondary/20">
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            Collection Premium
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-4">Nos Produits Vedettes</h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-6"></div>
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             Découvrez notre sélection de montures et verres de qualité pour tous les styles
           </p>
         </div>

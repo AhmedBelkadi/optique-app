@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  * - Staff role with "Activité Principale" access only (create/read/update)
  * - Admin user account
  * 
- * Activité Principale includes: Products, Categories, Appointments, Customers, Testimonials
+ * Activité Principale includes: Products, Categories, Appointments, Customers, Testimonials, Services
  * Staff CANNOT: delete, manage permissions, manage users, access system settings
  */
 
@@ -138,6 +138,13 @@ async function main() {
       { name: 'Delete Banners', description: 'Allow users to delete banners', resource: 'banners', action: 'delete' },
       { name: 'Manage Banners', description: 'Full banner management capabilities', resource: 'banners', action: 'manage' },
       
+      // Services
+      { name: 'Create Services', description: 'Allow users to create new services', resource: 'services', action: 'create' },
+      { name: 'Read Services', description: 'Allow users to view services', resource: 'services', action: 'read' },
+      { name: 'Update Services', description: 'Allow users to modify existing services', resource: 'services', action: 'update' },
+      { name: 'Delete Services', description: 'Allow users to delete services', resource: 'services', action: 'delete' },
+      { name: 'Manage Services', description: 'Full service management capabilities', resource: 'services', action: 'manage' },
+      
       // Dashboard
       { name: 'Read Dashboard', description: 'Allow users to access the admin dashboard', resource: 'dashboard', action: 'read' },
       { name: 'Manage Dashboard', description: 'Full dashboard management capabilities', resource: 'dashboard', action: 'manage' },
@@ -218,7 +225,7 @@ async function main() {
     console.log(`✅ Assigned ${adminPermissions.length} permissions to admin role`);
 
     // Staff gets only "Activité Principale" permissions (main activity)
-    // This includes: Products, Categories, Appointments, Customers, Testimonials, Dashboard
+    // This includes: Products, Categories, Appointments, Customers, Testimonials, Services, Dashboard
     // Staff can create, read, and update but NOT delete or manage these resources
     const staffPermissions = await prisma.permission.findMany({
       where: {
@@ -231,6 +238,7 @@ async function main() {
               { resource: 'appointments' },
               { resource: 'customers' },
               { resource: 'testimonials' },
+              { resource: 'services' },
               { resource: 'dashboard' },
             ],
           },

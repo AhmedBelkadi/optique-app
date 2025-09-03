@@ -47,9 +47,12 @@ import { reorderServicesAction } from '@/features/services/actions/reorderServic
 interface ServicesListProps {
   services: Service[];
   onRefresh: () => void;
+  onServiceCreated?: (service: Service) => void;
+  onServiceUpdated?: (service: Service) => void;
+  onServiceDeleted?: (serviceId: string) => void;
 }
 
-export function ServicesList({ services, onRefresh }: ServicesListProps) {
+export function ServicesList({ services, onRefresh, onServiceCreated, onServiceUpdated, onServiceDeleted }: ServicesListProps) {
   const [isPending, startTransition] = useTransition();
   const [reorderMode, setReorderMode] = useState(false);
   const [reorderedServices, setReorderedServices] = useState<Service[]>(services);
@@ -58,6 +61,7 @@ export function ServicesList({ services, onRefresh }: ServicesListProps) {
     startTransition(async () => {
       const result = await deleteServiceAction(id, {});
       if (result.success) {
+        onServiceDeleted?.(id);
         onRefresh();
       }
     });
@@ -178,7 +182,7 @@ export function ServicesList({ services, onRefresh }: ServicesListProps) {
             >
               Réorganiser
             </Button>
-            <ServiceForm onSuccess={onRefresh} />
+                         <ServiceForm onSuccess={onRefresh} onServiceCreated={onServiceCreated} />
           </div>
         </CardTitle>
       </CardHeader>
@@ -244,9 +248,9 @@ export function ServicesList({ services, onRefresh }: ServicesListProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <ServiceForm service={service} onSuccess={onRefresh} />
-                        </DropdownMenuItem>
+                                                 <DropdownMenuItem asChild>
+                           <ServiceForm service={service} onSuccess={onRefresh} onServiceUpdated={onServiceUpdated} />
+                         </DropdownMenuItem>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem

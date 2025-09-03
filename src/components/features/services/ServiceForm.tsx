@@ -32,6 +32,8 @@ import { updateServiceAction } from '@/features/services/actions/updateServiceAc
 interface ServiceFormProps {
   service?: Service;
   onSuccess?: () => void;
+  onServiceCreated?: (service: Service) => void;
+  onServiceUpdated?: (service: Service) => void;
 }
 
 const commonIcons = [
@@ -40,7 +42,7 @@ const commonIcons = [
   'Users', 'Clock', 'Phone', 'Mail', 'MessageSquare'
 ];
 
-export function ServiceForm({ service, onSuccess }: ServiceFormProps) {
+export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpdated }: ServiceFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const isEditing = !!service;
@@ -76,6 +78,13 @@ export function ServiceForm({ service, onSuccess }: ServiceFormProps) {
         form.reset();
         setIsOpen(false);
         onSuccess?.();
+        
+        // Call the appropriate callback
+        if (isEditing && service && result.data) {
+          onServiceUpdated?.(result.data);
+        } else if (!isEditing && result.data) {
+          onServiceCreated?.(result.data);
+        }
       }
     });
   };

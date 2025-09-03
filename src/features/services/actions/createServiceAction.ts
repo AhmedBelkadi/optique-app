@@ -9,6 +9,7 @@ export interface CreateServiceState {
   success?: boolean;
   error?: string;
   fieldErrors?: Record<string, string[]>;
+  data?: any;
 }
 
 export async function createServiceAction(
@@ -50,6 +51,7 @@ export async function createServiceAction(
       revalidatePath('/admin/services');
       return {
         success: true,
+        data: result.data,
       };
     } else {
       return {

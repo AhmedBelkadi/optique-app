@@ -195,6 +195,13 @@ async function seedPermissionsAndRoles() {
     { name: 'Delete Banners', description: 'Allow users to delete banners', resource: 'banners', action: 'delete' },
     { name: 'Manage Banners', description: 'Full banner management capabilities', resource: 'banners', action: 'manage' },
     
+    // Services
+    { name: 'Create Services', description: 'Allow users to create new services', resource: 'services', action: 'create' },
+    { name: 'Read Services', description: 'Allow users to view services', resource: 'services', action: 'read' },
+    { name: 'Update Services', description: 'Allow users to modify existing services', resource: 'services', action: 'update' },
+    { name: 'Delete Services', description: 'Allow users to delete services', resource: 'services', action: 'delete' },
+    { name: 'Manage Services', description: 'Full service management capabilities', resource: 'services', action: 'manage' },
+    
     // Dashboard
     { name: 'Read Dashboard', description: 'Allow users to access the admin dashboard', resource: 'dashboard', action: 'read' },
     { name: 'Manage Dashboard', description: 'Full dashboard management capabilities', resource: 'dashboard', action: 'manage' },
@@ -257,7 +264,7 @@ async function seedPermissionsAndRoles() {
   }
 
   // Assign "Activité Principale" permissions to staff role
-  // Staff gets create, read, update permissions for: Products, Categories, Appointments, Customers, Testimonials, Dashboard
+  // Staff gets create, read, update permissions for: Products, Categories, Appointments, Customers, Testimonials, Services, Dashboard
   // Staff CANNOT: delete, manage permissions, manage users, access system settings
   const staffPermissions = await prisma.permission.findMany({
     where: {
@@ -270,6 +277,7 @@ async function seedPermissionsAndRoles() {
             { resource: 'appointments' },
             { resource: 'customers' },
             { resource: 'testimonials' },
+            { resource: 'services' },
             { resource: 'dashboard' },
           ],
         },

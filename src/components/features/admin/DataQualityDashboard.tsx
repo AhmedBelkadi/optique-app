@@ -38,11 +38,13 @@ export default async function DataQualityDashboard() {
     withGoodDescription: products.filter(p => p.description && p.description.trim().length >= 20).length,
   };
 
-  const productCompleteness = Math.round(
-    ((productQualityMetrics.withImages + productQualityMetrics.withCategories + 
-      productQualityMetrics.withBrand + productQualityMetrics.withGoodDescription) / 
-      (productQualityMetrics.total * 4)) * 100
-  );
+  const productCompleteness = productQualityMetrics.total > 0 
+    ? Math.round(
+        ((productQualityMetrics.withImages + productQualityMetrics.withCategories + 
+          productQualityMetrics.withBrand + productQualityMetrics.withGoodDescription) / 
+          (productQualityMetrics.total * 4)) * 100
+      )
+    : 0;
 
   // Customer Quality Analysis
   const customerQualityMetrics = {
@@ -52,10 +54,12 @@ export default async function DataQualityDashboard() {
     withNotes: customers.filter(c => c.notes && c.notes.trim().length > 0).length,
   };
 
-  const customerCompleteness = Math.round(
-    ((customerQualityMetrics.withPhone + customerQualityMetrics.withAddress + 
-      customerQualityMetrics.withNotes) / (customerQualityMetrics.total * 3)) * 100
-  );
+  const customerCompleteness = customerQualityMetrics.total > 0 
+    ? Math.round(
+        ((customerQualityMetrics.withPhone + customerQualityMetrics.withAddress + 
+          customerQualityMetrics.withNotes) / (customerQualityMetrics.total * 3)) * 100
+      )
+    : 0;
 
   // Content Management Status
   const contentStatus = {
@@ -115,24 +119,36 @@ export default async function DataQualityDashboard() {
                 ></div>
               </div>
               
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Images: {productQualityMetrics.withImages}/{productQualityMetrics.total}</span>
-                  <span>{Math.round((productQualityMetrics.withImages / productQualityMetrics.total) * 100)}%</span>
+              {productQualityMetrics.total > 0 ? (
+                <div className="space-y-2 text-xs text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Images: {productQualityMetrics.withImages}/{productQualityMetrics.total}</span>
+                    <span>{Math.round((productQualityMetrics.withImages / productQualityMetrics.total) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Catégories: {productQualityMetrics.withCategories}/{productQualityMetrics.total}</span>
+                    <span>{Math.round((productQualityMetrics.withCategories / productQualityMetrics.total) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Marques: {productQualityMetrics.withBrand}/{productQualityMetrics.total}</span>
+                    <span>{Math.round((productQualityMetrics.withBrand / productQualityMetrics.total) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Descriptions: {productQualityMetrics.withGoodDescription}/{productQualityMetrics.total}</span>
+                    <span>{Math.round((productQualityMetrics.withGoodDescription / productQualityMetrics.total) * 100)}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Catégories: {productQualityMetrics.withCategories}/{productQualityMetrics.total}</span>
-                  <span>{Math.round((productQualityMetrics.withCategories / productQualityMetrics.total) * 100)}%</span>
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-sm">Aucun produit enregistré</p>
+                  <Link 
+                    href="/admin/products/new"
+                    className="text-xs text-primary hover:underline mt-1 inline-block"
+                  >
+                    Ajouter votre premier produit
+                  </Link>
                 </div>
-                <div className="flex justify-between">
-                  <span>Marques: {productQualityMetrics.withBrand}/{productQualityMetrics.total}</span>
-                  <span>{Math.round((productQualityMetrics.withBrand / productQualityMetrics.total) * 100)}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Descriptions: {productQualityMetrics.withGoodDescription}/{productQualityMetrics.total}</span>
-                  <span>{Math.round((productQualityMetrics.withGoodDescription / productQualityMetrics.total) * 100)}%</span>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -164,20 +180,32 @@ export default async function DataQualityDashboard() {
                 ></div>
               </div>
               
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex justify-between">
-                  <span>Téléphone: {customerQualityMetrics.withPhone}/{customerQualityMetrics.total}</span>
-                  <span>{Math.round((customerQualityMetrics.withPhone / customerQualityMetrics.total) * 100)}%</span>
+              {customerQualityMetrics.total > 0 ? (
+                <div className="space-y-2 text-xs text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Téléphone: {customerQualityMetrics.withPhone}/{customerQualityMetrics.total}</span>
+                    <span>{Math.round((customerQualityMetrics.withPhone / customerQualityMetrics.total) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Adresse: {customerQualityMetrics.withAddress}/{customerQualityMetrics.total}</span>
+                    <span>{Math.round((customerQualityMetrics.withAddress / customerQualityMetrics.total) * 100)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Notes: {customerQualityMetrics.withNotes}/{customerQualityMetrics.total}</span>
+                    <span>{Math.round((customerQualityMetrics.withNotes / customerQualityMetrics.total) * 100)}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Adresse: {customerQualityMetrics.withAddress}/{customerQualityMetrics.total}</span>
-                  <span>{Math.round((customerQualityMetrics.withAddress / customerQualityMetrics.total) * 100)}%</span>
+              ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-sm">Aucun client enregistré</p>
+                  <Link 
+                    href="/admin/customers/new"
+                    className="text-xs text-primary hover:underline mt-1 inline-block"
+                  >
+                    Ajouter votre premier client
+                  </Link>
                 </div>
-                <div className="flex justify-between">
-                  <span>Notes: {customerQualityMetrics.withNotes}/{customerQualityMetrics.total}</span>
-                  <span>{Math.round((customerQualityMetrics.withNotes / customerQualityMetrics.total) * 100)}%</span>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>

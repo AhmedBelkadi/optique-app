@@ -64,9 +64,9 @@ export default async function DashboardMetrics() {
       title: 'Clients',
       value: totalCustomers,
       icon: Users,
-      description: `Taux d'engagement: ${customerEngagementRate}%`,
-      status: customerEngagementRate < 50 ? 'warning' as const : 'normal' as const,
-      alert: customerEngagementRate < 50 ? 'Faible engagement' : undefined,
+      description: totalCustomers > 0 ? `Taux d'engagement: ${customerEngagementRate}%` : 'Aucun client enregistré',
+      status: totalCustomers === 0 ? 'info' as const : (customerEngagementRate < 50 ? 'warning' as const : 'normal' as const),
+      alert: totalCustomers === 0 ? 'Commencez par ajouter des clients' : (customerEngagementRate < 50 ? 'Faible engagement' : undefined),
     },
     {
       title: 'Rendez-vous Aujourd\'hui',

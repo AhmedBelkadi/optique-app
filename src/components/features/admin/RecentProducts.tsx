@@ -79,8 +79,15 @@ export default async function RecentProducts() {
         {products.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-            <p>Aucun produit trouvé</p>
-            <p className="text-sm">Ajoutez votre premier produit pour commencer</p>
+            <p className="text-lg font-medium mb-2">Aucun produit trouvé</p>
+            <p className="text-sm mb-4">Ajoutez votre premier produit pour commencer</p>
+            <Link 
+              href="/admin/products/new"
+              className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+            >
+              <Package className="h-4 w-4 mr-2" />
+              Ajouter un produit
+            </Link>
           </div>
         ) : (
           <div className="space-y-4">

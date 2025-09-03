@@ -24,7 +24,7 @@ export default async function UpcomingAppointments() {
     return appointmentDate > now;
   }).slice(0, 5); // Take only first 5 upcoming appointments
 
-  const getStatusColor = (status: AppointmentStatus) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONFIRMED':
         return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -43,7 +43,7 @@ export default async function UpcomingAppointments() {
     }
   };
 
-  const getStatusIcon = (status: AppointmentStatus) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case 'CONFIRMED':
         return <CheckCircle className="h-4 w-4" />;
@@ -62,7 +62,7 @@ export default async function UpcomingAppointments() {
     }
   };
 
-  const getStatusPriority = (status: AppointmentStatus) => {
+  const getStatusPriority = (status: string) => {
     switch (status) {
       case 'IN_PROGRESS':
         return 1;
@@ -132,8 +132,15 @@ export default async function UpcomingAppointments() {
         {sortedAppointments.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-            <p>Aucun rendez-vous à venir</p>
-            <p className="text-sm">Programmez des rendez-vous pour les voir ici</p>
+            <p className="text-lg font-medium mb-2">Aucun rendez-vous à venir</p>
+            <p className="text-sm mb-4">Programmez des rendez-vous pour les voir ici</p>
+            <Link 
+              href="/admin/appointments/new"
+              className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Programmer un rendez-vous
+            </Link>
           </div>
         ) : (
           <div className="space-y-4">

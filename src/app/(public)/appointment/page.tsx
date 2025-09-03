@@ -6,10 +6,15 @@ import { AppointmentFormSkeleton, InformationCardsSkeleton, PageHeaderSkeleton }
 import { ResponsiveAppointmentForm } from '@/components/features/appointments/ResponsiveAppointmentForm';
 import { AppointmentInfoCards } from '@/components/features/appointments/AppointmentInfoCards';
 import { getContactSettings } from '@/features/settings/services/contactSettings';
+import { getPublicServices } from '@/features/services/services/getPublicServices';
 
 async function AppointmentContent() {
-  const contactSettings = await getContactSettings();
+  const [contactSettings, servicesResult] = await Promise.all([
+    getContactSettings(),
+    getPublicServices()
+  ]);
   const contactSettingsData = contactSettings.data;
+  const services = servicesResult.success ? servicesResult.data || [] : [];
 
   if (!contactSettings) {
     return (
@@ -92,7 +97,7 @@ async function AppointmentContent() {
 
           {/* Information Section - Takes 1 column on large screens */}
           <div className="lg:col-span-1">
-            <AppointmentInfoCards contactSettings={contactSettingsData ?? null} />
+            <AppointmentInfoCards contactSettings={contactSettingsData ?? null} services={services} />
           </div>
         </div>
       </div>

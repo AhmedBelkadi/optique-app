@@ -2,6 +2,13 @@ import { Clock, CheckCircle, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+interface Service {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+}
+
 interface AppointmentInfoCardsProps {
   contactSettings?: {
     phone?: string | null;
@@ -9,9 +16,10 @@ interface AppointmentInfoCardsProps {
     openingHours?: string | null;
     address?: string | null;
   } | null;
+  services?: Service[];
 }
 
-export function AppointmentInfoCards({ contactSettings }: AppointmentInfoCardsProps) {
+export function AppointmentInfoCards({ contactSettings, services = [] }: AppointmentInfoCardsProps) {
   return (
     <div className="space-y-6">
       {/* Business Hours Card */}
@@ -53,26 +61,38 @@ export function AppointmentInfoCards({ contactSettings }: AppointmentInfoCardsPr
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
-              <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
-              <span className="text-sm font-medium">Examens Complets de la Vue</span>
-            </div>
-            <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
-              <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
-              <span className="text-sm font-medium">Adaptation de Lentilles de Contact</span>
-            </div>
-            <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
-              <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
-              <span className="text-sm font-medium">Sélection de Montures</span>
-            </div>
-            <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
-              <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
-              <span className="text-sm font-medium">Soins d'Urgence</span>
-            </div>
-            <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
-              <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
-              <span className="text-sm font-medium">Soins de Suivi</span>
-            </div>
+            {services.length > 0 ? (
+              services.slice(0, 5).map((service) => (
+                <div key={service.id} className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">{service.name}</span>
+                </div>
+              ))
+            ) : (
+              // Fallback services if none are configured
+              <>
+                <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">Examens Complets de la Vue</span>
+                </div>
+                <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">Adaptation de Lentilles de Contact</span>
+                </div>
+                <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">Sélection de Montures</span>
+                </div>
+                <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">Réparation et Ajustement</span>
+                </div>
+                <div className="flex items-center p-2 hover:bg-muted/30 rounded-lg transition-colors">
+                  <CheckCircle className="w-5 h-5 text-success mr-3 flex-shrink-0" />
+                  <span className="text-sm font-medium">Conseils Personnalisés</span>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -4,6 +4,13 @@ import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Globe, Shield, Award, Instagram, Facebook, Twitter, Linkedin, Youtube, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+interface Service {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+}
+
 interface FooterProps {
   siteSettings?: {
     siteName?: string;
@@ -17,9 +24,10 @@ interface FooterProps {
     instagramLink?: string;
     facebookLink?: string;
   } | null;
+  services?: Service[];
 }
 
-export default function Footer({ siteSettings, contactSettings }: FooterProps) {
+export default function Footer({ siteSettings, contactSettings, services = [] }: FooterProps) {
   return (  
     <footer className="relative">
       {/* Decorative gradient line at top */}
@@ -87,51 +95,59 @@ export default function Footer({ siteSettings, contactSettings }: FooterProps) {
             <div className="space-y-4">
               <h4 className="text-lg font-semibold text-white border-b-2 border-white/30 pb-3">Nos Services</h4>
               <ul className="space-y-3">
-                <li>
-                  <Link 
-                    href="/appointment" 
-                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
-                  >
-                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Prendre Rendez-vous
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/eye-exam" 
-                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
-                  >
-                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Examen de la Vue
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/contact-lenses" 
-                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
-                  >
-                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Lentilles de Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/glasses" 
-                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
-                  >
-                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Lunettes de Designer
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/testimonials" 
-                    className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
-                  >
-                    <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Témoignages
-                  </Link>
-                </li>
+                {services.length > 0 ? (
+                  services.map((service) => (
+                    <li key={service.id}>
+                      <Link 
+                        href="/appointment" 
+                        className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                      >
+                        <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                        {service.name}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  // Fallback services if none are configured
+                  <>
+                    <li>
+                      <Link 
+                        href="/appointment" 
+                        className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                      >
+                        <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                        Prendre Rendez-vous
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        href="/appointment" 
+                        className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                      >
+                        <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                        Examens de la Vue
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        href="/products" 
+                        className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                      >
+                        <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                        Lunettes et Verres
+                      </Link>
+                    </li>
+                    <li>
+                      <Link 
+                        href="/contact" 
+                        className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
+                      >
+                        <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
+                        Contact et Conseils
+                      </Link>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
             

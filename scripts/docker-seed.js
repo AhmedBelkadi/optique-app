@@ -58,6 +58,10 @@ async function main() {
     console.log('🎨 Creating theme settings...');
     await seedThemeSettings();
 
+    // 10. Create Services
+    console.log('🔧 Creating services...');
+    await seedServices();
+
     console.log('🎉 Arinass Optique Docker seeding completed successfully!');
     console.log('');
     console.log('📊 Summary:');
@@ -611,6 +615,58 @@ async function seedThemeSettings() {
       secondaryColor: '#4A4A4A', // Your specified secondary color
     },
   });
+}
+
+async function seedServices() {
+  const services = [
+    {
+      name: 'Examens Complets de la Vue',
+      description: 'Consultations optométriques complètes avec tests de vision et prescription de verres correcteurs.',
+      icon: 'Eye',
+      order: 1,
+    },
+    {
+      name: 'Adaptation de Lentilles de Contact',
+      description: 'Fitting et adaptation personnalisée de lentilles de contact pour un confort optimal.',
+      icon: 'Circle',
+      order: 2,
+    },
+    {
+      name: 'Sélection de Montures',
+      description: 'Conseil personnalisé pour choisir la monture qui correspond à votre style et vos besoins.',
+      icon: 'Glasses',
+      order: 3,
+    },
+    {
+      name: 'Réparation et Ajustement',
+      description: 'Service de réparation et ajustement de vos lunettes pour un confort parfait.',
+      icon: 'Wrench',
+      order: 4,
+    },
+    {
+      name: 'Lunettes de Soleil',
+      description: 'Large gamme de lunettes de soleil avec protection UV et style tendance.',
+      icon: 'Sun',
+      order: 5,
+    },
+    {
+      name: 'Suivi et Contrôles',
+      description: 'Suivi régulier de votre vision et contrôles périodiques pour maintenir une vision optimale.',
+      icon: 'Calendar',
+      order: 6,
+    },
+  ];
+
+  for (const service of services) {
+    // Check if a record with this name already exists
+    const existing = await prisma.service.findFirst({
+      where: { name: service.name }
+    });
+
+    if (!existing) {
+      await prisma.service.create({ data: service });
+    }
+  }
 }
 
 main()

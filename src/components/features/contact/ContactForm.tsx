@@ -125,10 +125,19 @@ export default function ContactForm() {
   }
 
   return (
-    <Card className="p-8 md:p-12">
-      <CardContent className="p-0">
+    <Card className="p-8 md:p-12 relative overflow-hidden border-border hover:border-primary/30 transition-all duration-300">
+      {/* Decorative gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/2 via-transparent to-secondary/2 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+      
+      <CardContent className="p-0 relative">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Envoyez-nous un message</h2>
+          <div className="flex items-center mb-4">
+            <div className="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center mr-3">
+              <MessageSquare className="w-4 h-4 text-secondary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Envoyez-nous un message</h2>
+          </div>
+          <div className="w-16 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mb-4"></div>
           <p className="text-muted-foreground">
             Remplissez le formulaire ci-dessous et nous vous répondrons dans les plus brefs délais.
           </p>
@@ -254,9 +263,11 @@ export default function ContactForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg"
+            className="w-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
             disabled={isPending}
           >
+            {/* Decorative gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary/20 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             {isPending ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />

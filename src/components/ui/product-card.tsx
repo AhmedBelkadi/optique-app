@@ -13,8 +13,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, className = "" }: ProductCardProps) {
   return (
-    <Card className={`group hover:shadow-lg transition-all duration-300 border-border hover:border-primary/30 h-full flex flex-col ${className}`}>
-      <CardHeader className="p-0 flex-shrink-0">
+    <Card className={`group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/30 h-full flex flex-col relative overflow-hidden ${className}`}>
+      {/* Decorative gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+      
+      <CardHeader className="p-0 flex-shrink-0 relative">
         <div className="aspect-square bg-muted rounded-t-lg overflow-hidden relative">
           {product.images && product.images.length > 0 && product.images[0].path ? (
             <Image
@@ -30,14 +33,17 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
             </div>
           )}
           
-          {/* Category Badge */}
+          {/* Category Badge with secondary color accent */}
           {product.categories && product.categories.length > 0 && (
             <div className="absolute top-3 left-3">
-              <Badge variant="secondary" className="bg-background/90 text-foreground border-border text-xs">
+              <Badge variant="secondary" className="bg-secondary/10 text-secondary border border-secondary/20 text-xs backdrop-blur-sm">
                 {product.categories[0].name}
               </Badge>
             </div>
           )}
+          
+          {/* Hover overlay with secondary color accent */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
       </CardHeader>
       
@@ -61,7 +67,7 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
               </span>
             </div>
             
-            <Button asChild size="sm" variant="outline" className="h-10 px-4">
+            <Button asChild size="sm" variant="secondary" className="h-10 px-4 bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/20 hover:border-secondary/30 transition-all duration-300">
               <Link href={`/products/${product.id}`}>
                 <Eye className="w-4 h-4 mr-2" />
                 Voir

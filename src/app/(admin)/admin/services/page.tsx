@@ -10,6 +10,7 @@ export default async function ServicesPage() {
   // Fetch services
   const servicesResult = await getAllServicesAction();
   const services = servicesResult.success && servicesResult.data ? servicesResult.data : [];
+  
 
   return (
     <div className="">

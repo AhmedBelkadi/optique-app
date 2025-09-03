@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createServiceSchema, updateServiceSchema, Service } from '@/features/services/schema/serviceSchema';
+import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,8 +26,11 @@ import {
   FormMessage 
 } from '@/components/ui/form';
 import { Plus, Edit, Eye, EyeOff } from 'lucide-react';
-import { createServiceAction } from '@/features/services/actions/createServiceAction';
-import { updateServiceAction } from '@/features/services/actions/updateServiceAction';
+import { createServiceAction, CreateServiceState } from '@/features/services/actions/createServiceAction';
+import { updateServiceAction, UpdateServiceState } from '@/features/services/actions/updateServiceAction';
+import { createServiceSchema, updateServiceSchema, Service } from '@/features/services/schema/serviceSchema';
+import { useCSRF } from '@/components/common/CSRFProvider';
+import { toast } from 'react-hot-toast';
 
 interface ServiceFormProps {
   service?: Service;
@@ -44,8 +47,25 @@ const commonIcons = [
 
 export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpdated }: ServiceFormProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const previousIsPending = useRef(false);
+  const { csrfToken } = useCSRF();
   const isEditing = !!service;
+
+  const [state, formAction, isPending] = useActionState(
+    isEditing ? updateServiceAction.bind(null, service!.id) : createServiceAction,
+    {
+      success: false,
+      error: '',
+      fieldErrors: {},
+      values: {
+        name: service?.name || '',
+        description: service?.description || '',
+        icon: service?.icon || '',
+        isActive: service?.isActive ?? true,
+        order: service?.order || 0,
+      },
+    }
+  );
 
   const form = useForm({
     resolver: zodResolver(isEditing ? updateServiceSchema : createServiceSchema),
@@ -58,35 +78,44 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
     },
   });
 
-  const onSubmit = (data: any) => {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('description', data.description || '');
-      formData.append('icon', data.icon || '');
-      formData.append('isActive', data.isActive.toString());
-      formData.append('order', data.order.toString());
-
-      let result;
-      if (isEditing && service) {
-        result = await updateServiceAction(service.id, {}, formData);
-      } else {
-        result = await createServiceAction({}, formData);
-      }
-
-      if (result.success) {
+  // Handle action completion
+  useEffect(() => {
+    if (previousIsPending.current && !isPending) {
+      if (state.success) {
+        toast.success(isEditing ? 'Service mis à jour avec succès !' : 'Service créé avec succès !');
+        
         form.reset();
         setIsOpen(false);
         onSuccess?.();
         
         // Call the appropriate callback
-        if (isEditing && service && result.data) {
-          onServiceUpdated?.(result.data);
-        } else if (!isEditing && result.data) {
-          onServiceCreated?.(result.data);
+        if (isEditing && service && state.data) {
+          onServiceUpdated?.(state.data);
+        } else if (!isEditing && state.data) {
+          onServiceCreated?.(state.data);
         }
+      } else if (state.error) {
+        toast.error(state.error || (isEditing ? 'Échec de la mise à jour du service' : 'Échec de la création du service'));
       }
-    });
+    }
+    previousIsPending.current = isPending;
+  }, [isPending, state.success, state.error, onSuccess, onServiceCreated, onServiceUpdated, isEditing, service, state.data, form]);
+
+  const handleSubmit = (data: any) => {
+    if (!csrfToken) {
+      toast.error('Jeton de sécurité non disponible. Veuillez actualiser la page.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('description', data.description || '');
+    formData.append('icon', data.icon || '');
+    formData.append('isActive', data.isActive.toString());
+    formData.append('order', data.order.toString());
+    formData.append('csrf_token', csrfToken);
+
+    formAction(formData);
   };
 
   return (
@@ -114,7 +143,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}

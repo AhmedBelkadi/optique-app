@@ -1,13 +1,10 @@
 import { Clock, Calendar, Users, Shield, Star } from 'lucide-react';
-import { PageHeader } from '@/components/ui/page-header';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { AppointmentFormSkeleton, InformationCardsSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { ResponsiveAppointmentForm } from '@/components/features/appointments/ResponsiveAppointmentForm';
 import { AppointmentInfoCards } from '@/components/features/appointments/AppointmentInfoCards';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { getContactSettings } from '@/features/settings/services/contactSettings';
 
 async function AppointmentContent() {
@@ -32,7 +29,6 @@ async function AppointmentContent() {
         {/* <div className="container mx-auto px-4 py-4"> */}
           <Breadcrumb 
             items={[
-              { label: 'Accueil', href: '/' },
               { label: 'Rendez-vous', href: '/appointment' }
             ]} 
           />
@@ -69,7 +65,7 @@ async function AppointmentContent() {
             <div className="flex flex-wrap justify-center gap-6 mb-12">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Users className="h-4 w-4 text-primary" />
-                <span>+20 clients satisfaits</span>
+                <span>Clients satisfaits</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Shield className="h-4 w-4 text-primary" />

@@ -134,12 +134,12 @@ async function AboutContent() {
                   ) : (
                     <>
                       <p>
-                        Fondée en 2008 par la famille Arinass, notre boutique d'optique est née d'une passion commune : offrir à
+                        Fondée avec passion, notre boutique d'optique est née d'une vision commune : offrir à
                         chaque client une vision parfaite et un style unique. Ce qui a commencé comme un petit magasin familial
                         dans le centre de ${contactSettings?.city || 'notre ville'} s'est transformé en une référence incontournable de l'optique dans la région.
                       </p>
                       <p>
-                        Aujourd'hui, nous sommes fiers de servir des milliers de clients satisfaits, des familles locales aux
+                        Aujourd'hui, nous sommes fiers de servir de nombreux clients satisfaits, des familles locales aux
                         visiteurs internationaux. Notre secret ? Un service personnalisé, des produits de qualité et une équipe
                         passionnée qui considère chaque client comme un membre de la famille.
                       </p>

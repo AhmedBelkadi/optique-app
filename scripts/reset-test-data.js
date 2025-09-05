@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -50,7 +52,6 @@ async function main() {
     
     // Clear other models
     await prisma.banner.deleteMany({});
-    await prisma.homeSection.deleteMany({});
     
     console.log('✅ All test data cleared successfully!');
     console.log('💡 Run "npm run setup-test-env" to recreate test data');

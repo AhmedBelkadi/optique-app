@@ -24,7 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { deleteProductAction } from '@/features/products/actions/deleteProduct';
 import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 
 interface ProductGridProps {

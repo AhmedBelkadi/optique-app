@@ -213,7 +213,7 @@ export default function AboutSectionDialog({
             <div className="flex justify-end space-x-4">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={() => onOpenChange(false)}
               >
                 <X className="mr-2 h-4 w-4" />

@@ -75,10 +75,7 @@ export default function ThemeProvider({
   secondaryColor = null,
 }: ThemeProviderProps) {
   useEffect(() => {
-    console.log('ThemeProvider: useEffect triggered with props:', {
-      primaryColor,
-      secondaryColor,
-    });
+
     
     const root = document.documentElement;
     
@@ -104,16 +101,9 @@ export default function ThemeProvider({
     
     // Debug: Log the actual values being set in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('ThemeProvider: Setting CSS variables:', {
-        '--primary': primaryColor,
-        '--secondary': secondaryColor,
-      });
+
       
-      // Also log the converted HSL values
-      console.log('ThemeProvider: Converted HSL values:', {
-        '--primary': isHexColor(primaryColor || '') ? hexToHsl(primaryColor!) : primaryColor,
-        '--secondary': isHexColor(secondaryColor || '') ? hexToHsl(secondaryColor!) : secondaryColor,
-      });
+
     }
   }, [primaryColor, secondaryColor]);
 

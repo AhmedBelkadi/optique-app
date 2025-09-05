@@ -381,7 +381,7 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
                 <h4 className="text-lg font-medium">Nouveau client</h4>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={handleBackToSelect}
                 >

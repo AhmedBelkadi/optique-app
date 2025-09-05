@@ -135,7 +135,7 @@ export default function DeleteAboutSectionModal({
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={() => onOpenChange(false)}
                 disabled={isPending}
                 className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

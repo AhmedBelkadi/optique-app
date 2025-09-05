@@ -78,7 +78,7 @@ export default function DeleteAboutBenefitModal({ benefit, isOpen, onClose, onSu
         <DialogFooter>
           <Button
             type="button"
-            variant="outline"
+            variant="default"
             onClick={handleClose}
             disabled={isDeleting}
           >

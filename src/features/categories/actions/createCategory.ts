@@ -51,24 +51,30 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
     const result = await createCategory(validation.data);
     
     if (result.success && result.data) {
-      // Handle image upload if provided
+      let finalCategoryData = result.data;
+
+      // Handle image upload if provided BEFORE returning response
       const imageFile = formData.get('image') as File;
       if (imageFile && imageFile.size > 0) {
         try {
           const imageResult = await saveCategoryImage(imageFile, result.data.id);
           
           // Update category with image path
-          await prisma.category.update({
+          const updatedCategory = await prisma.category.update({
             where: { id: result.data.id },
             data: { image: imageResult.path },
           });
+
+          // Use the updated category data with image path
+          finalCategoryData = updatedCategory;
+          
         } catch (error) {
           logError(error as Error, { 
             action: 'createCategory', 
             categoryId: result.data.id,
             step: 'imageUpload' 
           });
-          // Continue even if image upload fails
+          // Continue even if image upload fails - keep original data
         }
       }
 
@@ -83,7 +89,7 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
           name: '',
           description: '',
         },
-        data: result.data,
+        data: finalCategoryData, // ← Now includes image path if upload succeeded
       };
     } else {
       return {
@@ -122,7 +128,6 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
 
     // Handle permission/authorization errors
     if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-      // This is a redirect error, likely due to permission issues
       return {
         success: false,
         error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
@@ -153,4 +158,4 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
       },
     };
   }
-} 
+}

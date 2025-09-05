@@ -43,10 +43,10 @@ export default function ColorPreview({ title, description, colors, onColorChange
       case 'secondary':
         return (
           <div className="space-y-2">
-            <Button variant="outline" style={{ borderColor: colorValue, color: colorValue }}>
+            <Button variant="default" style={{ borderColor: colorValue, color: colorValue }}>
               Secondary Button
             </Button>
-            <Badge variant="outline" style={{ borderColor: colorValue, color: colorValue }}>
+            <Badge variant="default" style={{ borderColor: colorValue, color: colorValue }}>
               Secondary Badge
             </Badge>
           </div>

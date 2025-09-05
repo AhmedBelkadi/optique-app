@@ -62,14 +62,7 @@ export async function sendUserCredentialsEmail(credentials: EmailCredentials): P
 
     const info = await transporter.sendMail(mailOptions);
 
-    // Log success
-    console.log('📧 Email envoyé avec succès :', {
-      messageId: info.messageId,
-      to: credentials.to,
-      name: credentials.name,
-      role: credentials.role,
-      // Don't log the password
-    });
+
 
     return {
       success: true,
@@ -320,15 +313,6 @@ export async function sendContactMessageEmail(contactData: ContactMessageData): 
     };
 
     const info = await transporter.sendMail(mailOptions);
-
-    // Log success
-    console.log('📧 Message de contact envoyé avec succès :', {
-      messageId: info.messageId,
-      to: adminEmail,
-      from: contactData.name,
-      phone: contactData.phone,
-      email: contactData.email || 'Aucun email fourni',
-    });
 
     return {
       success: true,

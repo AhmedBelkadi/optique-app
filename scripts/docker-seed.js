@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
 
 const prisma = new PrismaClient();
 
@@ -589,7 +591,7 @@ async function seedContactSettings() {
       googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY', // You'll need to add your actual API key
       googleMapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.123456789!2d-9.598107!3d30.427755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDI1JzM5LjkiTiA5wrAzNSc1My4yIlc!5e0!3m2!1sen!2sma!4v1234567890123!5m2!1sen!2sma',
       googleMapLink: 'https://maps.google.com/?q=n62,imm,22+résidence+difaf+dcheira+el+jihadia+inzegane,86360,Morocco',
-      instagramLink: 'https://instagram.com/arinass_optique',
+      instagramLink: 'https://www.instagram.com/arinassoptique',
       facebookLink: 'https://facebook.com/arinass.optique',
     },
     create: {
@@ -604,7 +606,7 @@ async function seedContactSettings() {
       googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY', // You'll need to add your actual API key
       googleMapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3444.123456789!2d-9.598107!3d30.427755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDI1JzM5LjkiTiA5wrAzNSc1My4yIlc!5e0!3m2!1sen!2sma!4v1234567890123!5m2!1sen!2sma',
       googleMapLink: 'https://maps.google.com/?q=n62,imm,22+résidence+difaf+dcheira+el+jihadia+inzegane,86360,Morocco',
-      instagramLink: 'https://instagram.com/arinass_optique',
+      instagramLink: 'https://www.instagram.com/arinassoptique',
       facebookLink: 'https://facebook.com/arinass.optique',
     },
   });

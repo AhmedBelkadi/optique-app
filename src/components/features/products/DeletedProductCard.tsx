@@ -7,6 +7,8 @@ import { restoreProductAction } from '@/features/products/actions/restoreProduct
 import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 import { Product } from '@/features/products/schema/productSchema';
 import { useCSRF } from '@/components/common/CSRFProvider';
+import { Badge } from '@/components/ui/badge';
+
 
 interface DeletedProductCardProps {
   product: Product;
@@ -67,12 +69,12 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
           {product.categories && product.categories.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-4">
               {product.categories.map((category) => (
-                <span
+                <Badge
                   key={category.id}
                   className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-foreground"
                 >
                   {category.name}
-                </span>
+                </Badge>
               ))}
             </div>
           )}
@@ -89,26 +91,7 @@ export default function DeletedProductCard({ product, onSuccess }: DeletedProduc
         </div>
       </div>
 
-      {product.images && product.images.length > 0 && (
-        <div className="mt-4">
-          <div className="flex space-x-2 overflow-x-auto">
-            {product.images.slice(0, 3).map((image) => (
-              <div key={image.id} className="flex-shrink-0 w-16 h-16 bg-muted rounded-md overflow-hidden">
-                <img
-                  src={image.path}
-                  alt={image.alt || product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-            {product.images.length > 3 && (
-              <div className="flex-shrink-0 w-16 h-16 bg-muted rounded-md flex items-center justify-center text-xs text-muted-foreground">
-                +{product.images.length - 3}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 } 

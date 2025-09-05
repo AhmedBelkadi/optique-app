@@ -54,7 +54,7 @@ export default function ProductsPage() {
     ],
     actions: (
       <>
-        <Button variant="outline" size="sm">
+        <Button variant="default" size="sm">
           <Eye className="w-4 h-4 mr-2" />
           View Trash
         </Button>
@@ -97,7 +97,7 @@ useAdminPageConfig({
   breadcrumbs: [{ label: 'Products', href: '/admin/products' }],
   actions: (
     <>
-      <Button variant="outline">View Trash</Button>
+      <Button variant="default">View Trash</Button>
       <Button>Add Product</Button>
     </>
   ),
@@ -116,8 +116,8 @@ useAdminPageConfig({
   ],
   actions: (
     <>
-      <Button variant="outline">Back</Button>
-      <Button variant="outline">Edit</Button>
+      <Button variant="default">Back</Button>
+      <Button variant="default">Edit</Button>
       <Button variant="destructive">Delete</Button>
     </>
   ),
@@ -178,7 +178,7 @@ Actions are rendered in the header's right section and can include any React com
 ```tsx
 actions: (
   <>
-    <Button variant="outline" size="sm">
+    <Button variant="default" size="sm">
       <Eye className="w-4 h-4 mr-2" />
       View
     </Button>

@@ -187,7 +187,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/admin/appointments">
-            <Button variant="outline" size="sm">
+            <Button variant="default" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour aux rendez-vous
             </Button>
@@ -390,13 +390,13 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
             </CardHeader>
             <CardContent className="space-y-3">
               <Link href={`/admin/customers/${appointment.customer.id}`}>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="default" className="w-full justify-start">
                   <User className="w-4 h-4 mr-2" />
                   Voir le client
                 </Button>
               </Link>
               <Link href={`/admin/appointments/${appointment.id}/edit`}>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="default" className="w-full justify-start">
                   <Edit className="w-4 h-4 mr-2" />
                   Modifier le rendez-vous
                 </Button>
@@ -415,7 +415,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
             <CardContent className="space-y-3">
               <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10">
+                  <Button variant="default" className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10">
                     <Trash2 className="w-4 h-4 mr-2" />
                     Supprimer
                   </Button>
@@ -428,7 +428,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end gap-3">
-                    <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button variant="default" onClick={() => setIsDeleteDialogOpen(false)}>
                       Annuler
                     </Button>
                     <Button 

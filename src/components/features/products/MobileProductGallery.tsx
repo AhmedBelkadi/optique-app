@@ -194,7 +194,6 @@ export function MobileProductGallery({ images, productName }: MobileProductGalle
           url: window.location.href
         });
       } catch (error) {
-        console.log('Error sharing:', error);
       }
     } else {
       // Fallback: copy URL to clipboard

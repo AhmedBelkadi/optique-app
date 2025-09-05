@@ -99,7 +99,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               </Button>
             </Link>
             <Link href="/admin/products/trash">
-              <Button variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/10">
+              <Button variant="destructive">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Trash
               </Button>

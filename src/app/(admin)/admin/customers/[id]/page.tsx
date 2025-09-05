@@ -119,7 +119,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
                             {formatTime(appointment.startTime)}
                           </p>
                         </div>
-                        <Badge variant="outline">{appointment.status.displayName}</Badge>
+                        <Badge variant="default">{appointment.status.displayName}</Badge>
                       </div>
                     </div>
                   ))}

@@ -38,7 +38,7 @@ export default async function NavBar() {
                             <div className="flex items-center space-x-2">
                                 <UserNavWrapper user={user} />
                                 <Link href="/admin">
-                                    <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                                    <Button variant="default" size="sm" className="hidden sm:inline-flex">
                                         Admin
                                     </Button>
                                 </Link>

@@ -65,7 +65,6 @@ export async function getAllAppointments(options: GetAllAppointmentsOptions = {}
 
     // Get total count
     const total = await prisma.appointment.count({ where });
-    console.log('Total appointments found:', total);
 
     // Get appointments
     const appointments = await prisma.appointment.findMany({
@@ -95,7 +94,6 @@ export async function getAllAppointments(options: GetAllAppointmentsOptions = {}
       take: limit
     });
     
-    console.log('Appointments fetched:', appointments.length);
 
     // Calculate pagination info
     const totalPages = Math.ceil(total / limit);

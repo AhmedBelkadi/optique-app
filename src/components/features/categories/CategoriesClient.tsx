@@ -37,12 +37,9 @@ export default function CategoriesClient({ categories: initialCategories }: Cate
 
   // Handle category update success
   const handleCategoryUpdated = useCallback((updatedCategory: Category) => {
-    console.log('CategoriesClient: handleCategoryUpdated called with:', updatedCategory);
     
     setCategories(prev => {
-      console.log('CategoriesClient: Previous categories:', prev);
       const newCategories = prev.map(cat => cat.id === updatedCategory.id ? updatedCategory : cat);
-      console.log('CategoriesClient: Updated categories:', newCategories);
       return newCategories;
     });
   }, []);
@@ -60,7 +57,7 @@ export default function CategoriesClient({ categories: initialCategories }: Cate
           {/* View Mode Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="default" size="sm">
                 {viewMode === 'grid' ? <Grid3X3 className="w-4 h-4" /> : <List className="w-4 h-4" />}
               </Button>
             </DropdownMenuTrigger>

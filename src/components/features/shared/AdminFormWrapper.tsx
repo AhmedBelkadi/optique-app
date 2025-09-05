@@ -85,7 +85,7 @@ export default function AdminFormWrapper({
                          <div className="flex justify-end space-x-3 pt-6 border-t border-border">
                <Button 
                  type="button" 
-                 variant="outline" 
+                 variant="default" 
                  onClick={handleCancel}
                  disabled={isPending}
                  className="bg-background/50 backdrop-blur-sm border-border hover:bg-muted"

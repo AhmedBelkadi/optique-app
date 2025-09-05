@@ -45,13 +45,7 @@ function useCurrentThemeSettings() {
       const primary = getCSSVariable('--primary');
       const secondary = getCSSVariable('--secondary');
       
-      // Debug logging
-      console.log('SettingsForm: CSS variables detected:', {
-        primary,
-        secondary,
-        primaryExists: !!primary,
-        secondaryExists: !!secondary
-      });
+
       
       // Check if we have valid CSS variable values
       if (primary && secondary) {
@@ -60,7 +54,6 @@ function useCurrentThemeSettings() {
           secondaryColor: secondary,
         };
 
-        console.log('SettingsForm: Setting theme from CSS variables:', currentTheme);
         setThemeSettings(currentTheme);
         return true; // CSS variables are ready
       }
@@ -94,7 +87,6 @@ interface SettingsFormProps {
 export default function SettingsForm({
   siteSettings,
   contactSettings,
-  operationalSettings,
   themeSettings
 }: SettingsFormProps) {
   const { csrfToken, isLoading: csrfLoading, error: csrfError, retry } = useCSRF();
@@ -649,7 +641,7 @@ export default function SettingsForm({
             <p className="text-lg font-semibold">Failed to load security token</p>
             <p className="text-sm text-muted-foreground mt-2">{csrfError}</p>
         </div>
-          <Button onClick={retry} variant="outline">
+          <Button onClick={retry} variant="default">
             Retry
           </Button>
         </div>

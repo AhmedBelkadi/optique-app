@@ -39,7 +39,7 @@ export default function UnauthorizedPage() {
           </div>
 
           <div className="flex flex-col space-y-3">
-            <Button asChild variant="outline" className="w-full">
+            <Button asChild variant="default" className="w-full">
               <Link href="/admin">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Dashboard

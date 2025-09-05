@@ -19,6 +19,7 @@ import {
   Eye,
   Info
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -71,7 +72,6 @@ export function MobileProductInfo({ product }: MobileProductInfoProps) {
           url: window.location.href
         });
       } catch (error) {
-        console.log('Error sharing:', error);
       }
     } else {
       // Fallback: copy URL to clipboard
@@ -144,49 +144,41 @@ export function MobileProductInfo({ product }: MobileProductInfoProps) {
           className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 h-12"
           asChild
         >
-          <a 
+          <Link
             href={`https://wa.me/212606970209?text=Bonjour! Je suis intéressé par le produit: ${product.name} (${product.reference || 'N/A'}). Pouvez-vous me donner plus d'informations?`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <MessageCircle className="w-5 h-5 mr-2" />
             Demander sur WhatsApp
-          </a>
+          </Link>
         </Button>
         
         {/* Secondary Actions */}
         <div className="grid grid-cols-2 gap-3">
           <Button 
-            variant="outline" 
+            variant="default" 
             size="lg"
             className="h-12"
             asChild
           >
-            <a href="/appointment">
+            <Link href="/appointment">
               <Calendar className="w-4 h-4 mr-2" />
               Prendre RDV
-            </a>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="h-12"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Voir en magasin
+            </Link>
           </Button>
         </div>
       </div>
 
       {/* Product Rating */}
-      <div className="flex items-center justify-center gap-2 py-3 bg-muted/30 rounded-lg">
+      {/* <div className="flex items-center justify-center gap-2 py-3 bg-muted/30 rounded-lg">
         <div className="flex items-center gap-1">
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="w-4 h-4 text-warning fill-current" />
           ))}
         </div>
         <span className="text-sm text-muted-foreground">5.0 (Excellent)</span>
-      </div>
+      </div> */}
 
       {/* Collapsible Sections */}
       <div className="space-y-4">
@@ -349,23 +341,23 @@ export function MobileProductInfo({ product }: MobileProductInfoProps) {
         </p>
         <div className="flex gap-3">
           <Button 
-            variant="outline" 
+            variant="success" 
             size="sm"
             className="flex-1 h-10"
             asChild
           >
-            <a href="/contact">
+            <Link href="/contact">
               Nous contacter
-            </a>
+            </Link>
           </Button>
           <Button 
             size="sm"
             className="flex-1 h-10"
             asChild
           >
-            <a href="/appointment">
+            <Link href="/appointment">
               Prendre RDV
-            </a>
+            </Link>
           </Button>
         </div>
       </div>

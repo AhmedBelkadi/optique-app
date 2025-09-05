@@ -40,13 +40,13 @@ export default function FAQError({ error, reset }: ErrorProps) {
               <RefreshCw className="w-4 h-4 mr-2" />
               Réessayer
             </Button>
-            <Button variant="outline" asChild className="w-full">
+            <Button variant="default" asChild className="w-full">
               <Link href="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Retour à l'accueil
               </Link>
             </Button>
-            <Button variant="outline" asChild className="w-full">
+            <Button variant="default" asChild className="w-full">
               <Link href="/contact">
                 <Home className="w-4 h-4 mr-2" />
                 Nous contacter

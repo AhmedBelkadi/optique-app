@@ -158,7 +158,7 @@ async function TestimonialsContent({ searchParams }: TestimonialsPageProps) {
           {(pagination?.totalPages || 1) > 1 && (
             <div className="flex justify-center items-center gap-2">
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
                 disabled={page === 1}
                 asChild
@@ -194,7 +194,7 @@ async function TestimonialsContent({ searchParams }: TestimonialsPageProps) {
               </div>
 
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
                 disabled={page === (pagination?.totalPages || 1)}
                 asChild

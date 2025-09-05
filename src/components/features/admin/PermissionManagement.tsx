@@ -353,7 +353,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
             {/* Clear Filters */}
             {(searchTerm || resourceFilter !== 'all' || actionFilter !== 'all') && (
               <Button
-                variant="outline"
+                variant="default"
                 onClick={clearFilters}
                 className="border-border/50 hover:bg-muted/50"
               >
@@ -403,13 +403,13 @@ export default function PermissionManagement({ permissions: initialPermissions }
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Label className="text-sm font-medium">Resource:</Label>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="default" className="text-xs">
                       {getResourceLabel(permission.resource)}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Label className="text-sm font-medium">Action:</Label>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="default" className="text-xs">
                       {getActionLabel(permission.action)}
                     </Badge>
                   </div>
@@ -424,7 +424,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                 {/* Actions */}
                 <div className="flex justify-end space-x-2 pt-2">
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => handleEditPermission(permission)}
                   >
@@ -462,7 +462,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                 : 'Get started by creating your first permission'}
             </p>
             {(searchTerm || resourceFilter !== 'all' || actionFilter !== 'all') && (
-              <Button variant="outline" onClick={clearFilters}>
+              <Button variant="default" onClick={clearFilters}>
                 Clear Filters
               </Button>
             )}
@@ -621,7 +621,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseCreate}
                   disabled={createIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
@@ -802,7 +802,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseEdit}
                   disabled={updateIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
@@ -886,7 +886,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseDelete}
                   disabled={deleteIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

@@ -179,7 +179,7 @@ export function ProfilePreview({ user, showDetails = false }: ProfilePreviewProp
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-lg border border-slate-200/50">
                 <span className="text-sm font-medium text-slate-700">Niveau d'accès</span>
                 <Badge 
-                  variant="outline" 
+                  variant="default" 
                   className="text-xs px-3 py-1 border-primary/30 text-primary bg-primary/5"
                 >
                   {user.isAdmin ? 'Administrateur' : user.isStaff ? 'Staff' : 'Utilisateur'}

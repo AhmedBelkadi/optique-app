@@ -161,13 +161,13 @@ export default function AdminNavigation() {
         </h3>
         <div className="space-y-1">
           <Link href="/admin/content/faq-page">
-            <Button variant="outline" size="sm" className="w-full justify-start text-sm">
+            <Button variant="default" size="sm" className="w-full justify-start text-sm">
               <HelpCircle className="mr-2 h-4 w-4 text-purple-600" />
               Manage FAQs & Page Settings
             </Button>
           </Link>
           <Link href="/admin/content/home">
-            <Button variant="outline" size="sm" className="w-full justify-start text-sm">
+            <Button variant="default" size="sm" className="w-full justify-start text-sm">
               <Eye className="mr-2 h-4 w-4 text-blue-600" />
               Update Hero Section
             </Button>

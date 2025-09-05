@@ -57,7 +57,6 @@ export default function EditCategoryModal({
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        console.log('EditCategoryModal: Success, state:', state);
         
         toast.success('Catégorie mise à jour avec succès !', {
           icon: '✅',
@@ -69,7 +68,6 @@ export default function EditCategoryModal({
         
         // Pass the updated category data to the success callback
         if (state.data) {
-          console.log('EditCategoryModal: Calling onSuccess with data:', state.data);
           onSuccess?.(state.data);
         } else {
           // If no data returned, create a temporary updated object
@@ -83,7 +81,6 @@ export default function EditCategoryModal({
             deletedAt: null,
             isDeleted: false,
           };
-          console.log('EditCategoryModal: Calling onSuccess with temp data:', updatedCategory);
           onSuccess?.(updatedCategory);
         }
         
@@ -91,7 +88,6 @@ export default function EditCategoryModal({
         // Reset form
         setSelectedImage(null);
       } else if (state.error) {
-        console.log('EditCategoryModal: Error:', state.error);
         toast.error(state.error || 'Échec de la mise à jour de la catégorie', {
           icon: '❌',
           style: {
@@ -215,7 +211,7 @@ export default function EditCategoryModal({
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={onClose}
                 disabled={isPending}
                 className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

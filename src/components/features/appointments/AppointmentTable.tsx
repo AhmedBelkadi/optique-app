@@ -192,7 +192,7 @@ export default function AppointmentTable({ appointments, onDelete, onUpdate }: A
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{durationText}</Badge>
+                  <Badge variant="default">{durationText}</Badge>
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(appointment.status)}

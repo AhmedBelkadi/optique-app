@@ -227,7 +227,7 @@ export default function CustomerSelector({
                      </p>
                      <Button
                        type="button"
-                       variant="outline"
+                       variant="default"
                        size="sm"
                        onClick={handleCreateNew}
                        className="w-full"
@@ -280,7 +280,7 @@ export default function CustomerSelector({
                     <div className="border-t border-border/50 mt-2 pt-2">
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={handleCreateNew}
                         className="w-full"

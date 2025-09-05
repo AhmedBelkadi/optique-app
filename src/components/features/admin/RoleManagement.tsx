@@ -426,12 +426,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 <Label className="text-sm font-medium">Permissions</Label>
                 <div className="flex flex-wrap gap-1">
                   {role.permissions.slice(0, 3).map((permission) => (
-                    <Badge key={permission.id} variant="outline" className="text-xs">
+                    <Badge key={permission.id} variant="default" className="text-xs">
                       {resourceLabels[permission.resource]}:{actionLabels[permission.action]}
                     </Badge>
                   ))}
                   {role.permissions.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="default" className="text-xs">
                       +{role.permissions.length - 3} more
                     </Badge>
                   )}
@@ -444,7 +444,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               {/* Actions */}
               <div className="flex justify-end space-x-2 pt-2">
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={() => handleEditRole(role)}
                   disabled={role.name === 'admin'}
@@ -546,7 +546,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 <div className="flex items-center justify-between">
                   <Label className="text-sm font-medium text-foreground">Permissions</Label>
                   <div className="flex items-center space-x-2">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="default" className="text-xs">
                       {getSelectedPermissionsCount()}/{getTotalPermissionsCount()} selected
                     </Badge>
                   </div>
@@ -578,12 +578,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                 <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
                                 <div className="flex flex-wrap gap-1 mt-2">
                                   {template.permissions.slice(0, 3).map((perm, idx) => (
-                                    <Badge key={idx} variant="outline" className="text-xs">
+                                    <Badge key={idx} variant="default" className="text-xs">
                                       {perm}
                                     </Badge>
                                   ))}
                                   {template.permissions.length > 3 && (
-                                    <Badge variant="outline" className="text-xs">
+                                    <Badge variant="default" className="text-xs">
                                       +{template.permissions.length - 3} more
                                     </Badge>
                                   )}
@@ -592,7 +592,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                             </div>
                             <Button
                               type="button"
-                              variant="outline"
+                              variant="default"
                               size="sm"
                               className="w-full mt-3"
                               onClick={() => handleTemplateSelect(key)}
@@ -610,7 +610,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                     <div className="flex flex-wrap gap-2">
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions(permissions.map(p => p.id))}
                       >
@@ -618,7 +618,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions([])}
                       >
@@ -626,7 +626,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions(permissions.filter(p => p.action === 'read').map(p => p.id))}
                       >
@@ -643,7 +643,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                               <div className="flex items-center space-x-3">
                                 {resourceIcons[resource] || <Settings className="h-4 w-4" />}
                                 <h4 className="font-medium text-sm capitalize">{resourceLabels[resource]}</h4>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="default" className="text-xs">
                                   {perms.length} permission{perms.length !== 1 ? 's' : ''}
                                 </Badge>
                               </div>
@@ -675,7 +675,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                     <Label htmlFor={`create-${permission.id}`} className="flex-1 cursor-pointer">
                                       <div className="flex items-center justify-between">
                                         <span className="text-sm">{permission.name}</span>
-                                        <Badge variant="outline" className="text-xs ml-2">
+                                        <Badge variant="default" className="text-xs ml-2">
                                           {actionLabels[permission.action]}
                                         </Badge>
                                       </div>
@@ -711,7 +711,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseCreate}
                   disabled={createIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
@@ -820,7 +820,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 <div className="flex items-center justify-between">
                   <Label className="text-sm font-medium text-foreground">Permissions</Label>
                   <div className="flex items-center space-x-2">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="default" className="text-xs">
                       {getSelectedPermissionsCount()}/{getTotalPermissionsCount()} selected
                     </Badge>
                   </div>
@@ -830,7 +830,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => setSelectedPermissions(permissions.map(p => p.id))}
                   >
@@ -838,7 +838,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => setSelectedPermissions([])}
                   >
@@ -846,7 +846,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => setSelectedPermissions(permissions.filter(p => p.action === 'read').map(p => p.id))}
                   >
@@ -863,7 +863,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                           <div className="flex items-center space-x-3">
                             {resourceIcons[resource] || <Settings className="h-4 w-4" />}
                             <h4 className="font-medium text-sm capitalize">{resourceLabels[resource]}</h4>
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="default" className="text-xs">
                               {perms.length} permission{perms.length !== 1 ? 's' : ''}
                             </Badge>
                           </div>
@@ -895,7 +895,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                 <Label htmlFor={`edit-${permission.id}`} className="flex-1 cursor-pointer">
                                   <div className="flex items-center justify-between">
                                     <span className="text-sm">{permission.name}</span>
-                                    <Badge variant="outline" className="text-xs ml-2">
+                                    <Badge variant="default" className="text-xs ml-2">
                                       {actionLabels[permission.action]}
                                     </Badge>
                                   </div>
@@ -929,7 +929,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseEdit}
                   disabled={updateIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
@@ -1013,7 +1013,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={handleCloseDelete}
                   disabled={deleteIsPending}
                   className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

@@ -111,7 +111,7 @@ export default function DeletedAppointmentsContainer({
                   </div>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={() => handleRestore(appointment.id)}
                   disabled={restoring === appointment.id}

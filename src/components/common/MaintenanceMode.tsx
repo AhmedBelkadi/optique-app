@@ -37,7 +37,7 @@ export default function MaintenanceMode({ siteName = 'Optique' }: MaintenanceMod
 
           <div className="pt-4">
             <Button 
-              variant="outline" 
+              variant="default" 
               className="w-full"
               onClick={() => window.location.reload()}
             >

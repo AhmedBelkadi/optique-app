@@ -169,7 +169,7 @@ export default function ExternalAPIKeysForm({ initialSettings }: ExternalAPIKeys
       case 'disabled':
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Désactivé</Badge>;
       case 'not-configured':
-        return <Badge variant="outline" className="text-muted-foreground"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
+        return <Badge variant="default" className="text-muted-foreground"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
       default:
         return null;
     }
@@ -268,7 +268,7 @@ export default function ExternalAPIKeysForm({ initialSettings }: ExternalAPIKeys
             
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={handleTestGoogle}
               disabled={isTestingGoogle || !settings.googlePlacesApiKey || !settings.googlePlaceId}
@@ -353,7 +353,7 @@ export default function ExternalAPIKeysForm({ initialSettings }: ExternalAPIKeys
             
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={handleTestFacebook}
               disabled={isTestingFacebook || !settings.facebookAccessToken || !settings.facebookPageId}

@@ -181,7 +181,7 @@ export default function MobileContactForm() {
             </p>
             <Button 
               onClick={() => window.location.reload()} 
-              variant="outline"
+              variant="default"
               className="mt-4 h-12"
             >
               Envoyer un autre message

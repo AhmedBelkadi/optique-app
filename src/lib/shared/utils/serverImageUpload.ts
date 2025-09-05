@@ -22,7 +22,7 @@ export async function saveImage(
   const filename = `${productId}-${order}-${timestamp}.${extension}`;
 
   // Ensure uploads directory exists
-  const uploadsDir = join(process.cwd(), 'public', 'uploads', 'products');
+  const uploadsDir = join(process.cwd(),'uploads', 'products');
   if (!existsSync(uploadsDir)) {
     await mkdir(uploadsDir, { recursive: true });
   }

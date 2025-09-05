@@ -290,7 +290,7 @@ export function MobileFilterSheet({
         <div className="border-t border-border p-6 space-y-3">
           {hasActiveFilters && (
             <Button
-              variant="outline"
+              variant="default"
               onClick={handleClearFilters}
               className="w-full h-11"
             >

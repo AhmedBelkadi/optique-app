@@ -49,7 +49,7 @@ export default function CategoryMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            variant="default"
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between h-10 px-3 py-2 text-sm border-border hover:border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"

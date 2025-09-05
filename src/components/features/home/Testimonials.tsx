@@ -29,7 +29,6 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
 
   // Use CSS variables for consistent theming
   const badgeBackground = 'hsl(var(--primary))' // Primary color
-  const badgeText = 'hsl(var(--primary-foreground))' // Primary foreground
   const starColor = 'hsl(var(--secondary))' // Secondary color for stars
   const verifiedBadgeColor = 'hsl(var(--primary))' // Primary for verified badge
 
@@ -155,10 +154,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-4 w-4 ${i < (testimonial.rating || 5) ? "fill-current" : ""}`}
-                          style={{ 
-                            color: i < (testimonial.rating || 5) ? starColor : '#D1D5DB'
-                          }}
+                          className={`h-4 w-4 text-yellow-500 ${i < (testimonial.rating || 5) ? "fill-current" : ""}`}
                         />
                       ))}
                     </div>
@@ -215,7 +211,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                         </Badge>
                       )}
                       <Badge 
-                        variant="outline" 
+                        variant="default" 
                         className="text-xs capitalize"
                       >
                         {testimonial.source === 'internal' ? 'Interne' : 
@@ -236,7 +232,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
           {/* Navigation Arrows */}
           <div className="flex justify-between items-center mb-6">
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={prevSlide}
               className="h-10 w-10 rounded-full p-0 bg-white/90 backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200 shadow-lg"
@@ -259,7 +255,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
             </div>
 
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={nextSlide}
               className="h-10 w-10 rounded-full p-0 bg-white/90 backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200 shadow-lg"
@@ -311,15 +307,12 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                     {/* Rating */}
                     <div className="flex justify-center mb-4">
                       <div className="flex space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${i < (testimonial.rating || 5) ? "fill-current" : ""}`}
-                            style={{ 
-                              color: i < (testimonial.rating || 5) ? starColor : '#D1D5DB'
-                            }}
-                          />
-                        ))}
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 text-yellow-500 ${i < (testimonial.rating || 5) ? "fill-current" : ""}`}
+                        />
+                      ))}
                       </div>
                     </div>
 
@@ -374,7 +367,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                           </Badge>
                         )}
                         <Badge 
-                          variant="outline" 
+                          variant="default" 
                           className="text-xs capitalize"
                         >
                           {testimonial.source === 'internal' ? 'Interne' : 

@@ -145,7 +145,7 @@ export default function FAQForm({ faq, onSuccess, onCancel }: FAQFormProps) {
             
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={handleCancel}
               disabled={isLoading}
             >

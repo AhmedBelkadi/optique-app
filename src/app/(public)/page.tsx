@@ -66,7 +66,8 @@ async function HomeContent() {
                   </Button>
                 </Link>
                 <Link href={contactSettings?.googleMapLink || '#'} target="_blank" rel="noopener noreferrer">
-                  <Button variant="secondary" className="bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground border border-secondary/20 hover:border-secondary/30 font-semibold px-6 py-3 h-12 flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md hover:shadow-lg transition-all duration-300">
+                  <Button variant="secondary" 
+                  className="bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-secondary/20 hover:border-secondary/30 font-semibold px-6 py-3 h-12 flex items-center justify-center space-x-2 w-full sm:w-auto shadow-md hover:shadow-lg transition-all duration-300">
                     <span>Visiter la Boutique</span>
                     <ArrowRight className="w-5 h-5" />
                   </Button>

@@ -109,7 +109,7 @@ export default function AdminHeader({
           ) : (
             <div className="flex items-center space-x-2">
               <Link href="/auth/login">
-                <Button variant="outline" size="sm" className="hidden sm:inline-flex">
+                <Button variant="default" size="sm" className="hidden sm:inline-flex">
                   Login
                 </Button>
               </Link>

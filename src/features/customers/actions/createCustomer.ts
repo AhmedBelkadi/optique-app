@@ -19,15 +19,7 @@ export async function createCustomerAction(prevState: any, formData: FormData) {
     // Apply rate limiting
     await apiRateLimit(identifier);
     
-    // Validate CSRF token
-    console.log('FormData contents:', {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      address: formData.get('address'),
-      notes: formData.get('notes'),
-      csrf_token: formData.get('csrf_token'),
-    });
+
     
     await validateCSRFToken(formData);
 

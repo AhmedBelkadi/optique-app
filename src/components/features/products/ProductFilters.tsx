@@ -182,7 +182,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
             )}
             
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
               className="h-10 px-3"

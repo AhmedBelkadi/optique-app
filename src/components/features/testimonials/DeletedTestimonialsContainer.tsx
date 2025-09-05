@@ -104,7 +104,7 @@ export default function DeletedTestimonialsContainer({
                   </div>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={() => handleRestore(testimonial.id)}
                   disabled={restoring === testimonial.id || csrfLoading}

@@ -133,7 +133,7 @@ export default function ImageUploadField({
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={handleUploadClick}
               disabled={isUploading}

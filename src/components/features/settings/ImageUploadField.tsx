@@ -89,7 +89,7 @@ export default function ImageUploadField({
         
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
@@ -106,7 +106,7 @@ export default function ImageUploadField({
         {value && (
           <Button
             type="button"
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={clearImage}
             className="text-destructive hover:text-destructive"

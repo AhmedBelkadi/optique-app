@@ -437,7 +437,7 @@ export function MobileAboutContent({
                 )}
                 <div className="grid grid-cols-2 gap-3">
                   <Button 
-                    variant="outline"
+                    variant="default"
                     className="h-10 text-xs md:text-sm"
                     asChild
                   >
@@ -447,7 +447,7 @@ export function MobileAboutContent({
                     </a>
                   </Button>
                   <Button 
-                    variant="outline"
+                    variant="default"
                     className="h-10 text-xs md:text-sm"
                     asChild
                   >

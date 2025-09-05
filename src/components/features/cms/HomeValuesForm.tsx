@@ -135,7 +135,7 @@ export default function HomeValuesForm({
           <p className="text-muted-foreground mb-4">
             {csrfError ? 'Erreur lors du chargement du jeton de sécurité.' : 'Jeton de sécurité non disponible.'}
           </p>
-          <Button onClick={() => window.location.reload()} variant="outline">
+          <Button onClick={() => window.location.reload()} variant="default">
             Actualiser la page
           </Button>
         </CardContent>
@@ -178,7 +178,7 @@ export default function HomeValuesForm({
           </p>
         </div>
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={onCancel}
           className="flex items-center space-x-2"
@@ -347,7 +347,7 @@ export default function HomeValuesForm({
                 {initialData && (
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="default"
                     onClick={resetToInitial}
                   >
                     Restaurer
@@ -355,7 +355,7 @@ export default function HomeValuesForm({
                 )}
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                                      onClick={resetToDefaults}
                 >
                   Réinitialiser
@@ -365,7 +365,7 @@ export default function HomeValuesForm({
               <div className="flex space-x-2">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={onCancel}
                 >
                   Annuler

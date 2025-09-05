@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "cross-env NODE_ENV=production node server.js",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
@@ -16,8 +16,6 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "node scripts/docker-seed.js",
-    "db:seed:permissions": "node scripts/seed-permissions.js",
-    "setup-test-env": "node scripts/setup-test-environment.js",
     "reset-test-data": "node scripts/reset-test-data.js",
     "analyze": "ANALYZE=true npm run build",
     "prepare": "husky install"
@@ -50,6 +48,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "express": "^5.1.0",
     "framer-motion": "^12.23.12",
     "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.526.0",
@@ -75,6 +74,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
     "eslint-config-prettier": "^9.1.0",

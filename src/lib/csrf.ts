@@ -9,7 +9,6 @@ export class CSRFError extends Error {
 
 export async function verifyCSRFToken(token: string | null): Promise<boolean> {
   if (!token) {
-    console.log('CSRF Verify: No token provided');
     return false;
   }
   
@@ -17,25 +16,16 @@ export async function verifyCSRFToken(token: string | null): Promise<boolean> {
     const cookieStore = await cookies();
     const storedToken = cookieStore.get('csrf_token');
     
-    console.log('CSRF Verify Debug:', {
-      providedToken: token,
-      storedToken: storedToken?.value,
-      hasStoredToken: !!storedToken,
-      tokenLength: token?.length,
-      storedTokenLength: storedToken?.value?.length,
-    });
+
     
     if (!storedToken) {
-      console.log('CSRF Verify: No stored token found');
       return false;
     }
     
     // Use timing-safe comparison to prevent timing attacks
     const isValid = timingSafeEqual(token, storedToken.value);
-    console.log('CSRF Verify: Token comparison result:', isValid);
     return isValid;
   } catch (error) {
-    console.log('CSRF Verify: Error occurred:', error);
     return false;
   }
 }
@@ -58,18 +48,12 @@ export async function validateCSRFToken(formData: FormData): Promise<void> {
   // Get the CSRF token from the FormData
   const token = formData.get('csrf_token') as string;
   
-  console.log('CSRF Validation Debug:', {
-    tokenFromFormData: token,
-    tokenLength: token?.length,
-    hasToken: !!token,
-  });
+
   
   if (!await verifyCSRFToken(token)) {
-    console.log('CSRF validation failed');
     throw new CSRFError('Invalid CSRF token');
   }
   
-  console.log('CSRF validation successful');
 }
 
 // Alternative validation that reads from cookies directly (for cases where token is not in FormData)

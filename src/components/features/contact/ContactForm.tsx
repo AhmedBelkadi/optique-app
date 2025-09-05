@@ -113,7 +113,7 @@ export default function ContactForm() {
             </p>
             <Button 
               onClick={() => window.location.reload()} 
-              variant="outline"
+              variant="default"
               className="mt-4"
             >
               Envoyer un autre message

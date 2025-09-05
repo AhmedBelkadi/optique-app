@@ -15,6 +15,7 @@ import { Suspense } from 'react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { AboutSectionSkeleton, BenefitsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { MobileAboutContent } from '@/components/features/about/MobileAboutContent';
+import Link from 'next/link';
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -340,32 +341,32 @@ async function AboutContent() {
                         className="w-full bg-green-500 hover:bg-green-600 font-semibold py-4 h-14 text-lg"
                         asChild
                       >
-                        <a href={`tel:${contactSettings.phone}`}>
+                        <Link href={`tel:${contactSettings.phone}`}>
                           <Phone className="mr-3 h-5 w-5" />
                           Nous Appeler
-                        </a>
+                        </Link>
                       </Button>
                     )}
                     <div className="grid grid-cols-2 gap-4">
                       <Button 
-                        variant="outline"
+                        variant="default"
                         className="h-12"
                         asChild
                       >
-                        <a href="/appointment">
+                        <Link href="/appointment">
                           <Calendar className="mr-2 h-4 w-4" />
                           Prendre RDV
-                        </a>
+                        </Link>
                       </Button>
                       <Button 
-                        variant="outline"
+                        variant="secondary"
                         className="h-12"
                         asChild
                       >
-                        <a href="/contact">
+                        <Link href="/contact">
                           <MessageCircle className="mr-2 h-4 w-4" />
                           Nous Contacter
-                        </a>
+                        </Link>
                       </Button>
                     </div>
                   </div>

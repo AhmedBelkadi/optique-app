@@ -131,7 +131,7 @@ export default function FAQDialog({ open, onOpenChange, faq, onSuccess }: FAQDia
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >

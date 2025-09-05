@@ -260,7 +260,7 @@ export default function ThemePresets({ onApplyPreset, currentTheme }: ThemePrese
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1">
                     {preset.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs px-2 py-0">
+                      <Badge key={tag} variant="default" className="text-xs px-2 py-0">
                         {tag}
                       </Badge>
                     ))}

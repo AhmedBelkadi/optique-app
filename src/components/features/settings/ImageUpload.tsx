@@ -293,7 +293,7 @@ export default function ImageUpload({
       {!previewUrl && (
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           onClick={openFileDialog}
           disabled={isUploading}
           className="w-full h-12 text-base font-medium transition-all duration-200 hover:scale-[1.02] hover:shadow-md"

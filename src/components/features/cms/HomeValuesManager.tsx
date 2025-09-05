@@ -133,7 +133,7 @@ export function HomeValuesManager({ values }: HomeValuesManagerProps) {
           {value.description}
         </p>
         {value.highlight && (
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="default" className="text-xs">
             {value.highlight}
           </Badge>
         )}

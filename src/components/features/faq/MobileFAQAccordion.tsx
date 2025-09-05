@@ -91,7 +91,7 @@ export function MobileFAQAccordion({ faqs, categories = [] }: MobileFAQAccordion
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Questions Fréquentes</h2>
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={() => setShowSearch(!showSearch)}
             className="h-10 w-10 p-0"
@@ -256,7 +256,7 @@ export function MobileFAQAccordion({ faqs, categories = [] }: MobileFAQAccordion
             </p>
             {hasActiveFilters && (
               <Button
-                variant="outline"
+                variant="default"
                 onClick={() => {
                   setSearchQuery('');
                   setSelectedCategory('Tous');

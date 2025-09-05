@@ -144,7 +144,7 @@ export default function DeleteHomeValueModal({
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={() => onOpenChange(false)}
                 disabled={isPending}
                 className="flex-1"

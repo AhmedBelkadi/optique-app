@@ -82,7 +82,7 @@ export function CTASection({
                 className={`font-semibold px-8 py-3 ${currentVariant.primaryButton}`}
                 style={{
                   backgroundColor: variant === 'secondary' ? 'hsl(var(--primary))' : 'hsl(var(--secondary))',
-                  color: variant === 'secondary' ? '#FFFFFF' : '#000000'
+                  color: variant === 'secondary' ? '#FFFFFF' : '#FFFFFF'
                 }}
               >
                 <Link href={primaryAction.href}>

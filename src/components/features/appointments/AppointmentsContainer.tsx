@@ -281,7 +281,7 @@ export default function AppointmentsContainer({
                   Rechercher
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant="default" 
                   onClick={handleClearFilters}
                   className="h-10 px-3"
                   title="Effacer tous les filtres"
@@ -487,7 +487,7 @@ export default function AppointmentsContainer({
         <div className="flex items-center justify-center space-x-2">
           {pagination.hasPrev && (
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => updateFilters({ page: (currentPage - 1).toString() })}
             >
               Précédent
@@ -511,7 +511,7 @@ export default function AppointmentsContainer({
           
           {pagination.hasNext && (
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => updateFilters({ page: (currentPage + 1).toString() })}
             >
               Suivant

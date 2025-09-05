@@ -123,7 +123,7 @@ export default function ColorPicker({
         
         <Button
           type="button"
-          variant="outline"
+          variant="default"
           size="sm"
           onClick={() => setShowPicker(!showPicker)}
         >

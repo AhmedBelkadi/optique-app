@@ -348,7 +348,7 @@ export function ProductsPageClient({
               <div className="flex items-center space-x-2">
                 {/* Previous Button */}
                 {pagination.page > 1 && (
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="default" size="sm" asChild>
                     <a href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),
@@ -407,7 +407,7 @@ export function ProductsPageClient({
                 
                 {/* Next Button */}
                 {pagination.page < pagination.totalPages && (
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="default" size="sm" asChild>
                     <a href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),

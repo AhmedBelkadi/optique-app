@@ -260,7 +260,7 @@ export default function FAQPageManager({
               Ajouter une nouvelle FAQ
             </Button>
             <Button 
-              variant="outline"
+              variant="default"
               onClick={() => setActiveTab('faqs')}
               className="flex items-center gap-2"
             >

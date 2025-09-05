@@ -42,11 +42,9 @@ export default function DeleteCategoryModal({
   });
 
   useEffect(() => {
-    console.log('DeleteCategoryModal useEffect:', { isPending, state, previousIsPending: previousIsPending.current });
     
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        console.log('Showing success toast');
         toast.success('Category deleted successfully!', {
           icon: '✅',
           style: {
@@ -57,7 +55,6 @@ export default function DeleteCategoryModal({
         onSuccess?.();
         onClose();
       } else if (state.error) {
-        console.log('Showing error toast:', state.error);
         toast.error(state.error || 'Failed to delete category', {
           icon: '❌',
           style: {
@@ -72,7 +69,6 @@ export default function DeleteCategoryModal({
 
   // Debug: Log when action state changes
   useEffect(() => {
-    console.log('Action state changed:', state);
   }, [state]);
 
   const handleDelete = () => {
@@ -144,7 +140,7 @@ export default function DeleteCategoryModal({
           <div className="flex space-x-3 w-full">
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={onClose}
               disabled={isPending}
               className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

@@ -163,7 +163,7 @@ export function MobileAppointmentForm({ contactSettings }: { contactSettings: Co
   const maxDateStr = maxDate.toISOString().split('T')[0];
 
   // Show CSRF loading state
-  if (csrfLoading) {
+  if (csrfError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
@@ -484,7 +484,7 @@ export function MobileAppointmentForm({ contactSettings }: { contactSettings: Co
             {currentStep > 1 && (
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={prevStep}
                 className="flex-1 h-12"
               >

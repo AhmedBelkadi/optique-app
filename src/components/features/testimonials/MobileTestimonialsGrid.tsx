@@ -98,7 +98,6 @@ export function MobileTestimonialsGrid({
           url: window.location.href
         });
       } catch (error) {
-        console.log('Error sharing:', error);
       }
     } else {
       // Fallback: copy to clipboard
@@ -148,7 +147,7 @@ export function MobileTestimonialsGrid({
         {/* Filter Toggle */}
         <div className="flex items-center justify-between">
           <Button
-            variant="outline"
+            variant="default"
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 h-10"
           >
@@ -194,7 +193,7 @@ export function MobileTestimonialsGrid({
 
             {hasActiveFilters && (
               <Button
-                variant="outline"
+                variant="default"
                 onClick={clearFilters}
                 className="w-full h-10"
               >
@@ -247,7 +246,7 @@ export function MobileTestimonialsGrid({
             </Select>
           </div>
           {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters}>
+            <Button variant="default" onClick={clearFilters}>
               Effacer les filtres
             </Button>
           )}
@@ -367,7 +366,7 @@ export function MobileTestimonialsGrid({
                             </Badge>
                           )}
                           <Badge 
-                            variant="outline" 
+                            variant="default" 
                             className="text-xs capitalize"
                           >
                             {testimonial.source === 'internal' ? 'Interne' : 
@@ -406,7 +405,7 @@ export function MobileTestimonialsGrid({
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-center space-x-2 pt-8">
           {pagination.page > 1 && (
-            <Button variant="outline" asChild>
+            <Button variant="default" asChild>
               <a href={`/testimonials?${new URLSearchParams({
                 ...(searchQuery && { search: searchQuery }),
                 ...(ratingFilter !== 'all' && { rating: ratingFilter }),
@@ -439,7 +438,7 @@ export function MobileTestimonialsGrid({
           })}
           
           {pagination.page < pagination.totalPages && (
-            <Button variant="outline" asChild>
+            <Button variant="default" asChild>
               <a href={`/testimonials?${new URLSearchParams({
                 ...(searchQuery && { search: searchQuery }),
                 ...(ratingFilter !== 'all' && { rating: ratingFilter }),

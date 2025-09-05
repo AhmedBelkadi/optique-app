@@ -39,18 +39,10 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
   });
 
   useEffect(() => {
-    console.log('CreateUserModal: useEffect triggered', {
-      isPending,
-      previousIsPending: previousIsPending.current,
-      stateSuccess: state.success,
-      stateError: state.error,
-      stateUserId: state.userId
-    });
+
     
     if (previousIsPending.current && !isPending) {
-      console.log('CreateUserModal: Action completed, checking result...');
       if (state.success) {
-        console.log('CreateUserModal: Success! Creating temporary user...');
         toast.success('User created successfully!', {
           icon: '✅',
           style: {
@@ -77,7 +69,6 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
               }
             }]
           };
-          console.log('CreateUserModal: Calling onSuccess with new user:', newUser);
           onSuccess(newUser);
         }
         
@@ -85,7 +76,6 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
         // Reset form
         setSelectedRole('staff');
       } else if (state.error) {
-        console.log('CreateUserModal: Error occurred:', state.error);
         toast.error(state.error || 'Failed to create user', {
           icon: '❌',
           style: {
@@ -96,7 +86,6 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
       }
       
       if (state.warning) {
-        console.log('CreateUserModal: Warning:', state.warning);
         toast(state.warning, { 
           icon: '⚠️',
           style: {
@@ -264,7 +253,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={onClose}
                 disabled={isPending}
                 className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

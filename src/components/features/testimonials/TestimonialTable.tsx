@@ -231,7 +231,7 @@ export default function TestimonialTable({ testimonials, onDelete, onUpdate }: T
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="default" className="text-xs">
                     {getSourceDisplay(testimonial.source)}
                   </Badge>
                 </TableCell>
@@ -247,7 +247,7 @@ export default function TestimonialTable({ testimonials, onDelete, onUpdate }: T
                       {testimonial.isActive ? 'Publié' : 'Masqué'}
                     </Badge>
                     {testimonial.isVerified && (
-                      <Badge variant="outline" className="bg-blue-100 text-blue-800 text-xs">
+                      <Badge variant="default" className="bg-blue-100 text-blue-800 text-xs">
                         Vérifié
                       </Badge>
                     )}

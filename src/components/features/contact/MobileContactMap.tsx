@@ -175,7 +175,7 @@ export function MobileContactMap({
             <div className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={getDirections}
                   className="h-10 text-sm"
@@ -184,7 +184,7 @@ export function MobileContactMap({
                   Itinéraire
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={openInMaps}
                   className="h-10 text-sm"

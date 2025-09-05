@@ -223,7 +223,7 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
               )}
             </CardTitle>
             <Button
-              variant="outline"
+              variant="default"
               onClick={() => router.back()}
               className="flex items-center gap-2"
             >
@@ -434,7 +434,7 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
               <div className="flex justify-end gap-4">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="default"
                   onClick={() => router.back()}
                   disabled={isPending}
                 >

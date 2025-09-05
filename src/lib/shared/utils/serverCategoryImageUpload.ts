@@ -21,7 +21,7 @@ export async function saveCategoryImage(
   const filename = `${categoryId}-${timestamp}.${extension}`;
 
   // Ensure uploads directory exists
-  const uploadsDir = join(process.cwd(), 'public', 'uploads', 'categories');
+  const uploadsDir = join(process.cwd(),'uploads', 'categories');
   if (!existsSync(uploadsDir)) {
     await mkdir(uploadsDir, { recursive: true });
   }

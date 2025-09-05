@@ -352,10 +352,10 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="default" className="text-xs">
                 {activeBanners.length} Active
               </Badge>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="default" className="text-xs">
                 {banners.length} Total
               </Badge>
             </div>
@@ -523,7 +523,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     </Button>
                     <Button 
                       type="button" 
-                      variant="outline"
+                      variant="default"
                       onClick={() => {
                         setShowForm(false);
                         setEditingBanner(null);

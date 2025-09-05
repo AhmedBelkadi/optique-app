@@ -69,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <Button 
                   onClick={this.handleRetry}
                   className="flex-1"
-                  variant="outline"
+                  variant="default"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Réessayer
@@ -124,7 +124,7 @@ export function ErrorDisplay({
       <p className="text-muted-foreground mb-6">{message}</p>
       
       {onRetry && (
-        <Button onClick={onRetry} variant="outline">
+        <Button onClick={onRetry} variant="default">
           <RefreshCw className="w-4 h-4 mr-2" />
           Réessayer
         </Button>

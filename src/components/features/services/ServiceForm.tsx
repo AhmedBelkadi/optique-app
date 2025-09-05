@@ -240,7 +240,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={() => setIsOpen(false)}
                 disabled={isPending}
               >

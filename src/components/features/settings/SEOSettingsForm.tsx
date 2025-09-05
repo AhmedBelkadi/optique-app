@@ -144,7 +144,7 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
         
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant="default"
             onClick={() => setShowPreview(!showPreview)}
             className="flex items-center gap-2"
           >
@@ -562,7 +562,7 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="sm" 
                 className="w-full justify-start"
                 onClick={() => setActiveTab('homepage')}
@@ -572,7 +572,7 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
               </Button>
               
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="sm" 
                 className="w-full justify-start"
                 onClick={() => setActiveTab('products')}
@@ -582,7 +582,7 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
               </Button>
               
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="sm" 
                 className="w-full justify-start"
                 onClick={() => setActiveTab('categories')}
@@ -592,7 +592,7 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
               </Button>
 
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="sm" 
                 className="w-full justify-start"
                 onClick={() => setActiveTab('analytics')}

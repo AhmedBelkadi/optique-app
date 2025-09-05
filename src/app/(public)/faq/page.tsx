@@ -113,13 +113,13 @@ async function FAQContent() {
         title="Vous ne trouvez pas votre réponse ?"
         description="Notre équipe d'experts est là pour vous aider. Contactez-nous directement pour des conseils personnalisés."
         primaryAction={{
+          label: "Prendre Rendez-vous",
+          href: "/appointment"
+        }}
+        secondaryAction={{
           label: "Nous Appeler",
           href: "/contact",
           icon: <Phone className="h-5 w-5" />
-        }}
-        secondaryAction={{
-          label: "Prendre Rendez-vous",
-          href: "/appointment"
         }}
       />
       

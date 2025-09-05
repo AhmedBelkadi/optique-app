@@ -31,7 +31,7 @@ export default function AppointmentCreateContainer() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/admin/appointments">
-            <Button variant="outline" size="sm">
+            <Button variant="default" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour aux rendez-vous
             </Button>
@@ -45,7 +45,7 @@ export default function AppointmentCreateContainer() {
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/appointments">
-            <Button variant="outline">
+            <Button variant="default">
               Annuler
             </Button>
           </Link>

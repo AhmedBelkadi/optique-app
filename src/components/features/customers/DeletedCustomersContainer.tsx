@@ -91,7 +91,7 @@ export default function DeletedCustomersContainer({ initialDeletedCustomers }: D
                   </div>
                 </div>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={() => handleRestore(customer.id)}
                   disabled={restoring === customer.id}

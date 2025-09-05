@@ -181,7 +181,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={handleClose}
                 disabled={isPending}
                 className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"

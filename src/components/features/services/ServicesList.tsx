@@ -215,7 +215,7 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
                       )}
                       {service.icon && (
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="default" className="text-xs">
                             {service.icon}
                           </Badge>
                         </div>

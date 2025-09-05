@@ -362,7 +362,7 @@ export function AppointmentForm({ contactSettings }: { contactSettings: ContactS
             {/* WhatsApp Contact Button */}
             <Button 
               type="button"
-              variant="outline"
+              variant="default"
               className="w-full bg-green-600 hover:bg-green-700 text-white border-green-600 hover:border-green-700 shadow-lg hover:shadow-xl transition-all duration-300 "
               asChild
             >

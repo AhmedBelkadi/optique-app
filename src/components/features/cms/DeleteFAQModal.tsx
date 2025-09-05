@@ -131,7 +131,7 @@ export default function DeleteFAQModal({ faq, isOpen, onClose, onSuccess }: Dele
             <div className="flex space-x-3 w-full">
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 onClick={onClose}
                 disabled={isPending}
                 className="flex-1"

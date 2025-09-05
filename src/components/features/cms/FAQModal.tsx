@@ -188,7 +188,7 @@ export default function FAQModal({ faq, isOpen, onClose, onSuccess }: FAQModalPr
             <p className="text-muted-foreground mb-4">
               {csrfError ? 'Erreur lors du chargement du jeton de sécurité.' : 'Jeton de sécurité non disponible.'}
             </p>
-            <Button onClick={() => window.location.reload()} variant="outline">
+            <Button onClick={() => window.location.reload()} variant="default">
               Actualiser la page
             </Button>
           </div>
@@ -259,7 +259,7 @@ export default function FAQModal({ faq, isOpen, onClose, onSuccess }: FAQModalPr
           <DialogFooter>
             <Button
               type="button"
-              variant="outline"
+              variant="default"
               onClick={handleClose}
               disabled={isCreatePending || isUpdatePending}
             >

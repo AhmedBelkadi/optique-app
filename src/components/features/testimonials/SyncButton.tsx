@@ -99,7 +99,7 @@ export default function SyncButton() {
 
   if (csrfLoading) {
     return (
-      <Button variant="outline" disabled className="flex items-center gap-2">
+      <Button variant="default" disabled className="flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin" />
         Chargement...
       </Button>
@@ -108,7 +108,7 @@ export default function SyncButton() {
 
   if (csrfError) {
     return (
-      <Button variant="outline" disabled className="flex items-center gap-2 text-destructive">
+      <Button variant="default" disabled className="flex items-center gap-2 text-destructive">
         Erreur CSRF
       </Button>
     );
@@ -159,7 +159,7 @@ export default function SyncButton() {
       <Button
         onClick={handleSync}
         disabled={isLoading || (!syncStatus?.hasGoogleConfig && !syncStatus?.hasFacebookConfig)}
-        variant="outline"
+        variant="default"
         className="flex items-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
         title={
           !syncStatus?.hasGoogleConfig && !syncStatus?.hasFacebookConfig

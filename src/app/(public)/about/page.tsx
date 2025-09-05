@@ -16,6 +16,10 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { AboutSectionSkeleton, BenefitsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { MobileAboutContent } from '@/components/features/about/MobileAboutContent';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 async function AboutContent() {
   // Fetch about page data
   const [sectionsResult, benefitsResult, contactResult, themeSettingsResult, siteSettingsResult] = await Promise.all([
@@ -26,8 +30,8 @@ async function AboutContent() {
     getSiteSettings()
   ]);
 
-  const aboutSections = sectionsResult.success ? sectionsResult.data || [] : [];
-  const benefits = benefitsResult.success ? benefitsResult.data || [] : [];
+  const aboutSections = sectionsResult.success && sectionsResult.data ? sectionsResult.data : [];
+  const benefits = benefitsResult.success && benefitsResult.data ? benefitsResult.data : [];
   const contactSettings = contactResult.data;
   const themeSettings = themeSettingsResult.success ? themeSettingsResult.data : null;
   const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null;

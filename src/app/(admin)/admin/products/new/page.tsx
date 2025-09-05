@@ -4,12 +4,16 @@ import ProductForm from '@/components/features/products/ProductForm';
 import { requirePermission } from '@/lib/auth/authorization';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function NewProductPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('products', 'create');
 
   const result = await getAllCategoriesAction();
-  const categories = result.success ? result.data || [] : [];
+  const categories = result.success && result.data ? result.data : [];
 
   return (
     <>

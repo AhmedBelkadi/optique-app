@@ -209,7 +209,7 @@ export async function updatePermissionAction(prevState: UpdatePermissionState, f
       action: 'updatePermission',
       userId: (await getCurrentUser())?.id,
       permissionId: formData.get('permissionId'),
-      formData: rawData,
+      formData: formData,
     });
 
     return {

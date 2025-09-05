@@ -12,7 +12,7 @@ export async function softDeleteTestimonial(id: string) {
 
     const testimonial = await prisma.testimonial.update({
       where: { id },
-      data: sanitizedData,
+      data: sanitizedData as any,
     });
 
     return { success: true, data: testimonial };

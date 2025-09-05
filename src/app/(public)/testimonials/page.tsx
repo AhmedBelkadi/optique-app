@@ -14,6 +14,10 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { TestimonialsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { MobileTestimonialsGrid } from '@/components/features/testimonials/MobileTestimonialsGrid';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 interface TestimonialsPageProps {
   searchParams: Promise<{
     search?: string;

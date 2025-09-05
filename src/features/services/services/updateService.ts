@@ -31,8 +31,8 @@ export async function updateService(id: string, serviceData: UpdateServiceInput)
     const transformedService: Service = {
       id: service.id,
       name: service.name,
-      description: service.description,
-      icon: service.icon,
+      description: service.description || undefined,
+      icon: service.icon || undefined,
       isActive: service.isActive,
       order: service.order,
       createdAt: service.createdAt,

@@ -5,6 +5,9 @@ import FAQPageSkeleton from '@/components/features/cms/FAQPageSkeleton';
 import { getAllFAQsAction } from '@/features/faqs/actions/getAllFAQsAction';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
 
 export default async function ContentFAQPage() {
 
@@ -13,7 +16,7 @@ export default async function ContentFAQPage() {
 
   // Fetch all FAQs
   const faqsResult = await getAllFAQsAction();
-  const faqs = faqsResult.success ? faqsResult.data || [] : [];
+  const faqs = faqsResult.success ? (faqsResult as any).data || [] : [];
 
   return (
     <>

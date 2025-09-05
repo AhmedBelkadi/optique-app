@@ -3,13 +3,17 @@ import { requirePermission } from '@/lib/auth/authorization';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import CategoriesClient from '@/components/features/categories/CategoriesClient';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function CategoriesPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('categories', 'read');
 
   // Fetch categories
   const categoriesResult = await getAllCategoriesAction();
-  const categories = categoriesResult.success ? categoriesResult.data || [] : [];
+  const categories = categoriesResult.success ? (categoriesResult as any).data || [] : [];
 
   return (
     <div className="">

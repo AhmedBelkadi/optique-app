@@ -3,9 +3,7 @@
 import { useState, useCallback } from 'react';
 import { Service } from '@/features/services/schema/serviceSchema';
 import { ServicesList } from './ServicesList';
-import { ServiceForm } from './ServiceForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Eye, EyeOff, Settings, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

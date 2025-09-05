@@ -4,6 +4,10 @@ import { HomeValuesManager } from '@/components/features/cms/HomeValuesManager';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function HomePage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('home', 'read');
@@ -26,7 +30,7 @@ export default async function HomePage() {
         <HomeValuesContainer />
       </Suspense>
     </>
-  );
+  );  
 }
 
 async function HomeValuesContainer() {

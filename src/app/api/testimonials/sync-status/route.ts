@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSyncStatus } from '@/features/testimonials/services/autoSyncReviews';
 
 export async function GET(request: NextRequest) {
   try {
+    // Lazy import Prisma / services
+    const { getSyncStatus } = await import('@/features/testimonials/services/autoSyncReviews');
+
     const status = await getSyncStatus();
     
     return NextResponse.json(status);

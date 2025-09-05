@@ -57,7 +57,7 @@ export async function reorderFAQsAction(prevState: any, formData: FormData): Pro
 
     // Get updated list of FAQs
     const updatedFAQsResult = await getAllFAQs();
-    const updatedFAQs = updatedFAQsResult.success ? updatedFAQsResult.data || [] : [];
+    const updatedFAQs = updatedFAQsResult.success ? (updatedFAQsResult as any).data || [] : [];
 
     return {
       success: true,

@@ -79,7 +79,7 @@ export async function updateHomeValueAction(prevState: UpdateHomeValueState,
       
       // Get updated list of home values
       const updatedValuesResult = await getAllHomeValues();
-      const updatedValues = updatedValuesResult.success ? updatedValuesResult.data || [] : [];
+      const updatedValues = updatedValuesResult.success ? (updatedValuesResult as any).data || [] : [];
       
       return {
         success: true,

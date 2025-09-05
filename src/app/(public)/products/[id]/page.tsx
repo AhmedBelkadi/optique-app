@@ -1,23 +1,6 @@
 import { getProductById } from '@/features/products/queries/getProductById';
 import { getPublicProducts } from '@/features/products/services/getPublicProducts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Package, 
-  Eye,
-  ArrowLeft,
-  Calendar,
-  Tag,
-  Hash,
-  Building,
-  MessageCircle,
-  Share2,
-  Star
-} from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/ui/page-header';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -29,14 +12,18 @@ import { ProductDetailsSkeleton, ProductsGridSkeleton, PageHeaderSkeleton } from
 import { MobileProductGallery } from '@/components/features/products/MobileProductGallery';
 import { MobileProductInfo } from '@/components/features/products/MobileProductInfo';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface ProductDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function ProductDetailsContent({ params }: ProductDetailsPageProps) {
-  const productResult = await getProductById(params.id);
+  const { id } = await params;
+  const productResult = await getProductById(id);
   
   if (!productResult.success || !productResult.data) {
     notFound();

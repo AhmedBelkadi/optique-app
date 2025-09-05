@@ -11,6 +11,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 interface ProductsPageProps {
   searchParams: Promise<{
     search?: string;
@@ -45,7 +49,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   
   // Fetch categories for the filter dropdown   
   const categoriesResult = await getAllCategoriesAction();
-  const categories = categoriesResult.success ? categoriesResult.data || [] : [];
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
   
   // Parse price filters
   const minPriceNum = minPrice ? parseFloat(minPrice) : undefined;
@@ -71,7 +75,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     limit: limitNum,
   });
   
-  const products = result.success ? result.data || [] : [];
+  const products = result.success && result.data ? result.data : [];
   const pagination = result.success ? result.pagination : undefined;
 
   return (

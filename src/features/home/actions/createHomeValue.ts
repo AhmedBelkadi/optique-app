@@ -69,7 +69,7 @@ export async function createHomeValueAction(
       
       // Get updated list of home values
       const updatedValuesResult = await getAllHomeValues();
-      const updatedValues = updatedValuesResult.success ? updatedValuesResult.data || [] : [];
+      const updatedValues = updatedValuesResult.success ? (updatedValuesResult as any).data || [] : [];
       
       return {
         success: true,
@@ -105,7 +105,15 @@ export async function createHomeValueAction(
       return {
         success: false,
         error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-        fieldErrors: {}
+        fieldErrors: {},
+        values: {
+          title: '',
+          description: '',
+          highlight: '',
+          icon: '',
+          order: 0,
+        },
+        valueId: ''
       };
     }
 
@@ -115,7 +123,15 @@ export async function createHomeValueAction(
       return {
         success: false,
         error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-        fieldErrors: {}
+        fieldErrors: {},
+        values: {
+          title: '',
+          description: '',
+          highlight: '',
+          icon: '',
+          order: 0,
+        },
+        valueId: ''
       };
     }
 

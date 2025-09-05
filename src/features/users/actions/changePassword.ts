@@ -35,7 +35,7 @@ export async function changePasswordAction(
     const identifier = await getClientIdentifier();
     
     // Apply rate limiting (stricter for password changes)
-    await apiRateLimit(identifier, { maxRequests: 3, windowMs: 15 * 60 * 1000 }); // 3 attempts per 15 minutes
+    await apiRateLimit(identifier); // 3 attempts per 15 minutes
     
     // Validate CSRF token
     await validateCSRFToken(formData);

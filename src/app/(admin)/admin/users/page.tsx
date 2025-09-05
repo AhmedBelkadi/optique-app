@@ -6,6 +6,10 @@ import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import UsersSkeleton from '@/components/features/users/UsersSkeleton';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function UsersPage() {
   // Check if user has permission to read users
   await requirePermission('users', 'read');

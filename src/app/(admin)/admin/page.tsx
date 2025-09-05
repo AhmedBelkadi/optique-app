@@ -10,6 +10,10 @@ import DataQualityDashboard from '@/components/features/admin/DataQualityDashboa
 import { requirePermission } from '@/lib/auth/authorization';
 import { getCurrentUser } from '@/features/auth/services/session';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function AdminDashboard() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   // Dashboard is accessible to both admin and staff, but we need basic access

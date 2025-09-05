@@ -8,6 +8,10 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { ProductsPageClient } from '@/components/features/products/ProductsPageClient';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 interface ProductsPageProps {
   searchParams: Promise<{
     search?: string;

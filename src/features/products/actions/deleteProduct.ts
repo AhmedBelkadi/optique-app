@@ -3,7 +3,6 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { deleteProduct } from '@/features/products/services/deleteProduct';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { DeleteProductState } from '@/types/api';
 
@@ -50,7 +49,6 @@ export async function deleteProductAction(prevState: DeleteProductState, formDat
       return {
         success: false,
         error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-        fieldErrors: {}
       };
     }
 
@@ -60,7 +58,6 @@ export async function deleteProductAction(prevState: DeleteProductState, formDat
       return {
         success: false,
         error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-        fieldErrors: {}
       };
     }
     return {

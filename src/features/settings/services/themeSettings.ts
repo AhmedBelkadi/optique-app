@@ -24,13 +24,19 @@ export async function getThemeSettings(): Promise<{
 
       return {
         success: true,
-        data: defaultSettings,
+        data: {
+          primaryColor: defaultSettings.primaryColor || undefined,
+          secondaryColor: defaultSettings.secondaryColor || undefined
+        },
       };
     }
 
     return {
       success: true,
-      data: settings,
+      data: {
+        primaryColor: settings.primaryColor || undefined,
+        secondaryColor: settings.secondaryColor || undefined
+      },
     };
   } catch (error) {
     console.error('Error fetching theme settings:', error);

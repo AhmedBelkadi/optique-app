@@ -97,7 +97,7 @@ export async function upsertSettingsAction(prevState: UpsertSettingsState, formD
       return {
         success: false,
         error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-        fieldErrors: {}
+        message: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.'
       };
     }
 
@@ -107,7 +107,7 @@ export async function upsertSettingsAction(prevState: UpsertSettingsState, formD
       return {
         success: false,
         error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-        fieldErrors: {}
+        message: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.'
       };
     }
     

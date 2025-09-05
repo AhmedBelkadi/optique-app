@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 // Site Settings Schema
 export const siteSettingsSchema = z.object({
-  siteName: z.string().optional(),
-  slogan: z.string().optional(),
-  logoUrl: z.string().optional(),
-  heroBackgroundImg: z.string().optional(),
+  siteName: z.string().nullable(),
+  slogan: z.string().nullable(),
+  logoUrl: z.string().nullable(),
+  heroBackgroundImg: z.string().nullable(),
 });
 
 export type SiteSettings = z.infer<typeof siteSettingsSchema>;
@@ -30,15 +30,15 @@ export type ContactSettings = z.infer<typeof contactSettingsSchema>;
 
 // SEO Settings Schema
 export const seoSettingsSchema = z.object({
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-  productMetaTitle: z.string().optional(),
-  productMetaDescription: z.string().optional(),
-  categoryMetaTitle: z.string().optional(),
-  categoryMetaDescription: z.string().optional(),
-  ogImage: z.string().optional(),
-  googleAnalyticsId: z.string().optional(),
-  facebookPixelId: z.string().optional(),
+  metaTitle: z.string().nullable(),
+  metaDescription: z.string().nullable(),
+  productMetaTitle: z.string().nullable(),
+  productMetaDescription: z.string().nullable(),
+  categoryMetaTitle: z.string().nullable(),
+  categoryMetaDescription: z.string().nullable(),
+  ogImage: z.string().nullable(),
+  googleAnalyticsId: z.string().nullable(),
+  facebookPixelId: z.string().nullable(),
 });
 
 export type SEOSettings = z.infer<typeof seoSettingsSchema>;

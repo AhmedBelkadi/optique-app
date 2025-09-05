@@ -31,7 +31,10 @@ export async function upsertThemeSettingsAction(prevState: any, formData: FormDa
     };
     
     // Save theme settings
-    const result = await upsertThemeSettings(themeData);
+    const result = await upsertThemeSettings({
+      primaryColor: themeData.primaryColor || undefined,
+      secondaryColor: themeData.secondaryColor || undefined
+    });
     
     if (result.success) {
       return {

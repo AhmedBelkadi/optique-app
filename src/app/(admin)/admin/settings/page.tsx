@@ -8,6 +8,10 @@ import { getOperationalSettings } from '@/features/settings/services/operational
 import { getThemeSettings } from '@/features/settings/services/themeSettings';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function ContentSettingsPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('settings', 'read');

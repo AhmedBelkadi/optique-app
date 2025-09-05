@@ -2,6 +2,10 @@ import TestimonialForm from '@/components/features/testimonials/TestimonialForm'
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function NewTestimonialPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('testimonials', 'create');

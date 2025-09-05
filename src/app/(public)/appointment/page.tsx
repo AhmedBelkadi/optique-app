@@ -8,13 +8,17 @@ import { AppointmentInfoCards } from '@/components/features/appointments/Appoint
 import { getContactSettings } from '@/features/settings/services/contactSettings';
 import { getPublicServices } from '@/features/services/services/getPublicServices';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 async function AppointmentContent() {
   const [contactSettings, servicesResult] = await Promise.all([
     getContactSettings(),
     getPublicServices()
   ]);
   const contactSettingsData = contactSettings.data;
-  const services = servicesResult.success ? servicesResult.data || [] : [];
+  const services = servicesResult.success && servicesResult.data ? servicesResult.data : [];
 
   if (!contactSettings) {
     return (

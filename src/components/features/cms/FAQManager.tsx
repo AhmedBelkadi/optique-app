@@ -221,12 +221,14 @@ export default function FAQManager({ faqs }: FAQManagerProps) {
       />
 
       {/* Delete Confirmation Modal */}
-      <DeleteFAQModal
-        open={deleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
-        faq={faqToDelete}
-        onSuccess={handleDeleteSuccess}
-      />
+      {faqToDelete && (
+        <DeleteFAQModal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          faq={faqToDelete}
+          onSuccess={handleDeleteSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -3,7 +3,6 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { restoreAppointment } from '@/features/appointments/services/restoreAppointment';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
 

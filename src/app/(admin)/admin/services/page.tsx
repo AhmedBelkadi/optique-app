@@ -3,6 +3,10 @@ import { requirePermission } from '@/lib/auth/authorization';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import ServicesClient from '@/components/features/services/ServicesClient';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function ServicesPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('services', 'read');

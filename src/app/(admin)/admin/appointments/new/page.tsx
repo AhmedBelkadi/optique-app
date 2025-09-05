@@ -4,6 +4,10 @@ import AppointmentCreateContainer from '@/components/features/appointments/Appoi
 import AppointmentCreateSkeleton from '@/components/features/appointments/AppointmentCreateSkeleton';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function NewAppointmentPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('appointments', 'create');

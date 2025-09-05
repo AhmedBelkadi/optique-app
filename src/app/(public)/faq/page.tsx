@@ -17,10 +17,14 @@ import { FAQListSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { EmptyState } from '@/components/ui/error-boundary';
 import { MobileFAQAccordion } from '@/components/features/faq/MobileFAQAccordion';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 async function FAQContent() {
   // Fetch all FAQs
   const faqsResult = await getAllFAQs();
-  const faqs = faqsResult.success ? faqsResult.data || [] : [];
+  const faqs = faqsResult.success && faqsResult.data ? faqsResult.data : [];
 
   // Create a simple category for all FAQs
   const categories = [

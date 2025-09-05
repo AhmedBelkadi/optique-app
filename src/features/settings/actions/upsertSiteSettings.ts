@@ -44,10 +44,10 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
 
     // Extract and validate sanitized form data
     const siteData = {
-      siteName: validation.sanitizedData.siteName || undefined,
-      slogan: validation.sanitizedData.slogan || undefined,
-      logoUrl: validation.sanitizedData.logoUrl || undefined,
-      heroBackgroundImg: validation.sanitizedData.heroBackgroundImg || undefined,
+      siteName: validation.sanitizedData.siteName || null,
+      slogan: validation.sanitizedData.slogan || null,
+      logoUrl: validation.sanitizedData.logoUrl || null,
+      heroBackgroundImg: validation.sanitizedData.heroBackgroundImg || null,
     };
 
     const result = await upsertSiteSettings(siteData);

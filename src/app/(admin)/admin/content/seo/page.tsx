@@ -5,6 +5,10 @@ import SEOSettingsForm from '@/components/features/settings/SEOSettingsForm';
 import { getSEOSettingsAction } from '@/features/seo/actions/getSEOSettingsAction';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function ContentSEOPage() {
 
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK

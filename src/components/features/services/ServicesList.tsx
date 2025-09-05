@@ -17,14 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { 
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -32,15 +25,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { 
-  Edit, 
+ 
   Trash2, 
   MoreHorizontal, 
   Eye, 
   EyeOff, 
-  GripVertical
+  
 } from 'lucide-react';
 import { ServiceForm } from './ServiceForm';
-import { deleteServiceAction, DeleteServiceState } from '@/features/services/actions/deleteServiceAction';
+import { deleteServiceAction } from '@/features/services/actions/deleteServiceAction';
 import { reorderServicesAction, ReorderServicesState } from '@/features/services/actions/reorderServicesAction';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import { toast } from 'react-hot-toast';

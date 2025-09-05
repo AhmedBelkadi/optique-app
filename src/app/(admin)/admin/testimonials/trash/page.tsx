@@ -3,19 +3,21 @@ import DeletedTestimonialsContainer from '@/components/features/testimonials/Del
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function TrashPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('testimonials', 'read');
 
   const result = await getAllTestimonialsAction({
     isDeleted: true,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
     page: 1,
     limit: 50,
   });
   
-  const deletedTestimonials = result.success ? result.data || [] : [];
+  const deletedTestimonials = result.success ? (result as any).data || [] : [];
 
   return (
     <>

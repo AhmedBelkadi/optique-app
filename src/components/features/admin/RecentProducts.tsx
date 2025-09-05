@@ -14,7 +14,7 @@ export default async function RecentProducts() {
     sortOrder: 'desc',
   });
 
-  const products = result.success ? result.data || [] : [];
+  const products = result.success ? (result as any).data || [] : [];
 
   const getProductHealthScore = (product: any) => {
     let score = 100;
@@ -91,7 +91,7 @@ export default async function RecentProducts() {
           </div>
         ) : (
           <div className="space-y-4">
-            {products.map((product) => {
+            {products.map((product: any) => {
               const health = getProductHealthScore(product);
               return (
                 <div key={product.id} className="flex items-center space-x-4 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">

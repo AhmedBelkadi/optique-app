@@ -11,6 +11,10 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+
 export async function generateMetadata(): Promise<Metadata> {
   const seoSettingsResult = await getSEOSettings();
   const seoSettings = seoSettingsResult.data;

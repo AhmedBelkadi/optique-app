@@ -6,6 +6,9 @@ import { getAllAboutSectionsAction } from '@/features/about/actions/getAllAboutS
 import { getAboutBenefitsAction } from '@/features/about/actions/getAboutBenefitsAction';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
 
 export default async function ContentAboutPage() {
 
@@ -17,8 +20,8 @@ export default async function ContentAboutPage() {
     getAboutBenefitsAction()
   ]);
 
-  const aboutSections = aboutSectionsResult.success ? aboutSectionsResult.data || [] : [];
-  const benefits = aboutBenefitsResult.success ? aboutBenefitsResult.data || [] : [];
+  const aboutSections = aboutSectionsResult.success ? (aboutSectionsResult as any).data || [] : [];
+  const benefits = aboutBenefitsResult.success ? (aboutBenefitsResult as any).data || [] : [];
 
   return (
     <>
@@ -29,8 +32,7 @@ export default async function ContentAboutPage() {
           { label: 'Contenu CMS', href: '/admin/content' },
           { label: 'Page À Propos' }
         ]}
-        showSearch={false}
-        showNotifications={true}
+
       />
 
       <div className="space-y-6">

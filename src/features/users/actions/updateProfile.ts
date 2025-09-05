@@ -69,7 +69,10 @@ export async function updateProfileAction(
       return {
         error: '',
         fieldErrors: {},
-        values: validatedData,
+        values: {
+          ...validatedData,
+          phone: validatedData.phone || ''
+        },
         success: true,
       };
     } else {

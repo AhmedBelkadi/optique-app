@@ -44,7 +44,7 @@ export async function createServiceAction(
       description: formData.get('description') as string || undefined,
       icon: formData.get('icon') as string || undefined,
       isActive: formData.get('isActive') === 'true',
-      order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+      // order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
     };
 
     // Validate data
@@ -58,7 +58,7 @@ export async function createServiceAction(
           description: rawData.description || '',
           icon: rawData.icon || '',
           isActive: rawData.isActive,
-          order: rawData.order,
+          // order: rawData.order,
         },
       };
     }
@@ -77,7 +77,7 @@ export async function createServiceAction(
           description: '',
           icon: '',
           isActive: true,
-          order: 0,
+          // order: 0,
         },
         data: result.data,
       };
@@ -91,7 +91,7 @@ export async function createServiceAction(
           description: rawData.description || '',
           icon: rawData.icon || '',
           isActive: rawData.isActive,
-          order: rawData.order,
+          // order: rawData.order,
         },
       };
     }
@@ -107,7 +107,7 @@ export async function createServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          // order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
         },
       };
     }
@@ -123,7 +123,7 @@ export async function createServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          // order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
         },
       };
     }
@@ -139,7 +139,7 @@ export async function createServiceAction(
           description: formData.get('description') as string || '',
           icon: formData.get('icon') as string || '',
           isActive: formData.get('isActive') === 'true',
-          order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+          // order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
         },
       };
     }
@@ -152,7 +152,7 @@ export async function createServiceAction(
         description: formData.get('description'),
         icon: formData.get('icon'),
         isActive: formData.get('isActive'),
-        order: formData.get('order'),
+        // order: formData.get('order'),
       }
     });
 
@@ -165,7 +165,7 @@ export async function createServiceAction(
         description: formData.get('description') as string || '',
         icon: formData.get('icon') as string || '',
         isActive: formData.get('isActive') === 'true',
-        order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
+        // order: formData.get('order') ? parseInt(formData.get('order') as string) : 0,
       },
     };
   }

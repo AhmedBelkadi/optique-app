@@ -3,10 +3,9 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { updateAppointment } from '@/features/appointments/services/updateAppointment';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
-import { UpdateAppointmentInput } from '../schema/appointmentSchema';
+import { UpdateAppointmentData } from '../services/updateAppointment';
 
 export async function updateAppointmentAction(prevState: any, formData: FormData): Promise<any> {
   try {
@@ -23,14 +22,18 @@ export async function updateAppointmentAction(prevState: any, formData: FormData
     await validateCSRFToken(formData);
 
     const id = formData.get('id') as string;
-    const data: UpdateAppointmentInput = {
-      patientId: formData.get('patientId') as string,
-      appointmentDate: formData.get('appointmentDate') as string,
-      appointmentTime: formData.get('appointmentTime') as string,
-      reason: formData.get('reason') as string,
-      status: formData.get('status') as string,
-      notes: formData.get('notes') as string,
-      doctorId: formData.get('doctorId') as string,
+    const data: UpdateAppointmentData = {
+      title: formData.get('title') as string || undefined,
+      description: formData.get('description') as string || undefined,
+      startTime: formData.get('startTime') as string || undefined,
+      endTime: formData.get('endTime') as string || undefined,
+      duration: formData.get('duration') ? parseInt(formData.get('duration') as string) : undefined,
+      statusId: formData.get('statusId') as string || undefined,
+      notes: formData.get('notes') as string || undefined,
+      customerName: formData.get('customerName') as string || undefined,
+      customerPhone: formData.get('customerPhone') as string || undefined,
+      customerEmail: formData.get('customerEmail') as string || undefined,
+      customerNotes: formData.get('customerNotes') as string || undefined,
     };
 
     const result = await updateAppointment(id, data);

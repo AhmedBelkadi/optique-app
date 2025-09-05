@@ -18,7 +18,7 @@ export const homeValuesFormSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   highlight: z.string().min(1, 'Highlight is required'),
   icon: z.string().min(1, 'Icon name is required'),
-  order: z.number().default(0),
+  order: z.number().min(0),
 });
 
 export type HomeValuesFormData = z.infer<typeof homeValuesFormSchema>;

@@ -7,6 +7,9 @@ import AppointmentDetailSkeleton from '@/components/features/appointments/Appoin
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface AppointmentDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -19,7 +22,7 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
   
   const result = await getAppointmentAction(id);
   const statusesResult = await getAppointmentStatusesAction();
-  const appointmentStatuses = statusesResult.success ? statusesResult.data || [] : [];
+  const appointmentStatuses = statusesResult.success ? (statusesResult as any).data || [] : [];
   
   if (!result.success) {
     notFound();

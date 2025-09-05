@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { RotateCcw, Trash2, Eye, EyeOff } from 'lucide-react';
+import { RotateCcw, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { useCSRF } from '@/components/common/CSRFProvider';
 

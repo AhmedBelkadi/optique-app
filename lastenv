@@ -1,6 +1,0 @@
-DATABASE_URL="postgresql://postgres:ahmed2003@localhost:5432/optique_db"
-ENCRYPTION_KEY="abcdef123456789012345678901234567890"
-GMAIL_USER=ahmad.belkadi12@gmail.com
-GMAIL_APP_PASSWORD=zlmn vyai apeg ijfj
-APP_NAME=Optique App
-NEXT_PUBLIC_APP_URL=http://localhost:3000

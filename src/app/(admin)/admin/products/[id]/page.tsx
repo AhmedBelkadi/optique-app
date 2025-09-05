@@ -4,6 +4,9 @@ import ProductDetails from '@/components/features/products/ProductDetails';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface ProductPageProps {
   params: Promise<{
     id: string;

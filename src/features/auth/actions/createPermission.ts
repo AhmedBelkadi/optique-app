@@ -183,7 +183,7 @@ export async function createPermissionAction(prevState: CreatePermissionState, f
     logError(error as Error, { 
       action: 'createPermission',
       userId: (await getCurrentUser())?.id,
-      formData: rawData,
+      formData: formData,
     });
 
     return {

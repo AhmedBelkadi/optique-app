@@ -6,7 +6,7 @@ import { createAppointment } from '@/features/appointments/services/createAppoin
 import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
-import { CreateAppointmentInput } from '../schema/appointmentSchema';
+import { AppointmentFormData } from '../schema/appointmentFormSchema';
 
 export async function createAppointmentAction(prevState: any, formData: FormData): Promise<any> {
   try {
@@ -22,14 +22,17 @@ export async function createAppointmentAction(prevState: any, formData: FormData
     // Validate CSRF token
     await validateCSRFToken(formData);
 
-    const data: CreateAppointmentInput = {
-      patientId: formData.get('patientId') as string,
+    const data: AppointmentFormData = {
+      customerId: formData.get('customerId') as string || undefined,
+      customerName: formData.get('customerName') as string,
+      customerPhone: formData.get('customerPhone') as string,
+      customerEmail: formData.get('customerEmail') as string,
+      customerNotes: formData.get('customerNotes') as string || undefined,
       appointmentDate: formData.get('appointmentDate') as string,
       appointmentTime: formData.get('appointmentTime') as string,
+      duration: parseInt(formData.get('duration') as string) || 60,
       reason: formData.get('reason') as string,
-      status: 'pending', // Default status
-      notes: formData.get('notes') as string,
-      doctorId: formData.get('doctorId') as string,
+      notes: formData.get('notes') as string || undefined,
     };
 
     const result = await createAppointment(data);

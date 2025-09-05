@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { createPublicAppointmentAction } from '@/features/appointments/actions/createPublicAppointment';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import { ContactSettings } from '@/features/settings/schema/settingsSchema';
+import { toast } from 'react-hot-toast';
 
 const appointmentReasons = [
   { value: "eye-test", label: "Examen de la vue" },
@@ -47,6 +48,7 @@ export function AppointmentForm({ contactSettings }: { contactSettings: ContactS
       
       if (result.success) {
         setState({ success: true, message: result.message || 'Rendez-vous créé avec succès!', error: '' });
+        toast.success(result.message || 'Rendez-vous créé avec succès!');
         // Reset form
         const form = document.querySelector('form');
         if (form) {
@@ -54,10 +56,12 @@ export function AppointmentForm({ contactSettings }: { contactSettings: ContactS
         }
       } else {
         setState({ success: false, message: '', error: result.error || 'Une erreur est survenue' });
+        toast.error(result.error || 'Une erreur est survenue');
       }
     } catch (error) {
       console.error('Form submission error:', error);
       setState({ success: false, message: '', error: 'Une erreur est survenue lors de la soumission' });
+      toast.error('Une erreur est survenue lors de la soumission');
     } finally {
       setIsSubmitting(false);
     }
@@ -363,7 +367,7 @@ export function AppointmentForm({ contactSettings }: { contactSettings: ContactS
               asChild
             >
               <a 
-                href={`${contactSettings.whatsappChatLink}?text=Bonjour! J'ai une question concernant les rendez-vous. Pouvez-vous m'aider?`}
+                href={`${contactSettings?.whatsappChatLink || ''}?text=Bonjour! J'ai une question concernant les rendez-vous. Pouvez-vous m'aider?`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

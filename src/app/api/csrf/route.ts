@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
-import { env } from '@/lib/env';
+
 
 export async function GET(request: NextRequest) {
   try {
+    // Lazy import Prisma / services
+    const { env } = await import('@/lib/env');
     const token = randomBytes(32).toString('hex');
     
     const response = NextResponse.json({ token });

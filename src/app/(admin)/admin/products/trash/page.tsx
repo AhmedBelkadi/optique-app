@@ -4,12 +4,16 @@ import DeletedProductsContainer from '@/components/features/products/DeletedProd
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function TrashPage() {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('products', 'read');
 
   const result = await getDeletedProducts();
-  const deletedProducts = result.success ? result.data || [] : [];
+  const deletedProducts = result.success ? (result as any).data || [] : [];
 
   return (
     <>

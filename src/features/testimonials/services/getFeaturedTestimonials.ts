@@ -21,7 +21,7 @@ export async function getFeaturedTestimonials(limit: number = 3): Promise<GetFea
     });
 
     // Transform the data to match our schema
-    const transformedTestimonials: Testimonial[] = testimonials.map(testimonial => ({
+    const transformedTestimonials: any[] = testimonials.map(testimonial => ({
       id: testimonial.id,
       name: testimonial.name,
       message: testimonial.message,

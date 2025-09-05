@@ -104,7 +104,7 @@ export default function AdminHeader({
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
-              <UserNav onLogout={() => logoutAction()} />
+              <UserNav onLogout={() => logoutAction({}, new FormData())} />
             </div>
           ) : (
             <div className="flex items-center space-x-2">

@@ -4,12 +4,16 @@ import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import BannerScheduler from '@/components/features/banners/BannerScheduler';
 import { getAllBannersAction } from '@/features/banners/actions/getAllBannersAction';
 import { requirePermission } from '@/lib/auth/authorization';
+  
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
 
 export default async function ContentBannersPage() {
 
   await requirePermission('banners', 'read');
   const bannersResult = await getAllBannersAction();
-  const banners = bannersResult.success ? bannersResult.data || [] : [];
+  const banners = bannersResult.success ? (bannersResult as any).data || [] : [];
 
   return (
     <>

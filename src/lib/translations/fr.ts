@@ -42,9 +42,6 @@ export const fr = {
     count: "Nombre",
     empty: "Vide",
     noData: "Aucune donnée",
-    loading: "Chargement...",
-    error: "Erreur",
-    success: "Succès",
     warning: "Avertissement",
     info: "Information"
   },

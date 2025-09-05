@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { createPublicAppointmentAction } from '@/features/appointments/actions/createPublicAppointment';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import { ContactSettings } from '@/features/settings/schema/settingsSchema';
+import { toast } from 'react-hot-toast';
 
 const appointmentReasons = [
   { value: "eye-test", label: "Examen de la vue" },
@@ -85,6 +86,7 @@ export function MobileAppointmentForm({ contactSettings }: { contactSettings: Co
         message: '', 
         error: 'Veuillez remplir tous les champs obligatoires avant de soumettre.' 
       });
+      toast.error('Veuillez remplir tous les champs obligatoires avant de soumettre.');
       return;
     }
 
@@ -110,13 +112,16 @@ export function MobileAppointmentForm({ contactSettings }: { contactSettings: Co
       
       if (result.success) {
         setState({ success: true, message: result.message || 'Rendez-vous créé avec succès!', error: '' });
+        toast.success(result.message || 'Rendez-vous créé avec succès!');
         setCurrentStep(5); // Success step
       } else {
         setState({ success: false, message: '', error: result.error || 'Une erreur est survenue' });
+        toast.error(result.error || 'Une erreur est survenue');
       }
     } catch (error) {
       console.error('Form submission error:', error);
       setState({ success: false, message: '', error: 'Une erreur est survenue lors de la soumission' });
+      toast.error('Une erreur est survenue lors de la soumission');
     } finally {
       setIsSubmitting(false);
     }

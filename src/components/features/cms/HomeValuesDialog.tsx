@@ -81,7 +81,7 @@ export default function HomeValuesDialog({
       highlight: '',
       icon: '',
       order: 0,
-    },
+    } as HomeValuesFormData,
   });
 
   // Reset form when dialog opens/closes or value changes

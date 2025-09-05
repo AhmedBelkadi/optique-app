@@ -8,17 +8,21 @@ import { notFound } from 'next/navigation';
 import { requirePermission } from '@/lib/auth/authorization';
 import { formatDateShort, formatDateLong, formatTime } from '@/lib/shared/utils/dateUtils';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface CustomerDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>; 
 }
 
 export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('customers', 'read');
 
-  const result = await getCustomerById(params.id);
+  const { id } = await params;
+  const result = await getCustomerById(id);
 
   if (!result.success || !result.data) {
     notFound();

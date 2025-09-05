@@ -2,10 +2,10 @@ import { prisma } from '@/lib/prisma';
 
 export interface ExternalAPISettings {
   id: string;
-  googlePlacesApiKey?: string;
-  googlePlaceId?: string;
-  facebookAccessToken?: string;
-  facebookPageId?: string;
+  googlePlacesApiKey: string | null;
+  googlePlaceId: string | null;
+  facebookAccessToken: string | null;
+  facebookPageId: string | null;
   enableGoogleSync: boolean;
   enableFacebookSync: boolean;
   createdAt: Date;

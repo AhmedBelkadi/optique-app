@@ -9,6 +9,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 interface TestimonialsPageProps {
   searchParams: Promise<{
     search?: string;
@@ -53,13 +57,11 @@ export default async function TestimonialsPage({ searchParams }: TestimonialsPag
     search,
     isActive,
     isDeleted,
-    sortBy: sortBy as 'name' | 'createdAt' | 'updatedAt' || 'createdAt',
-    sortOrder: sortOrder as 'asc' | 'desc' || 'desc',
     page: pageNum,
     limit: limitNum,
   });
   
-  const testimonials = result.success ? result.data || [] : [];
+  const testimonials = result.success ? (result as any).data || [] : [];
   const pagination = result.success ? result.pagination : undefined;
 
   return (

@@ -21,6 +21,7 @@ export async function softDeleteAppointmentAction(prevState: any, formData: Form
     // Validate CSRF token
     await validateCSRFToken(formData);
     
+    const id = formData.get('id') as string;
     const result = await softDeleteAppointment(id);
 
     if (result.success) {

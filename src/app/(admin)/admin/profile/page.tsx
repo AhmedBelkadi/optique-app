@@ -8,6 +8,10 @@ import { ProfilePreview } from '@/components/features/users/ProfilePreview';
 import { PasswordChangeForm } from '@/components/features/users/PasswordChangeForm';
 import { ProfileForm } from '@/components/features/users/ProfileForm';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   

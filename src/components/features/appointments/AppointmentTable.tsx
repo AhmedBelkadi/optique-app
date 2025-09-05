@@ -45,7 +45,7 @@ export default function AppointmentTable({ appointments, onDelete, onUpdate }: A
   const handleDelete = async (id: string) => {
     setIsLoading(id);
     try {
-      const result = await softDeleteAppointmentAction(id);
+      const result = await softDeleteAppointmentAction({}, new FormData());
       if (result.success) {
         toast.success('Appointment deleted successfully!', {
           icon: '✅',
@@ -80,7 +80,7 @@ export default function AppointmentTable({ appointments, onDelete, onUpdate }: A
   const handleRestore = async (id: string) => {
     setIsLoading(id);
     try {
-      const result = await restoreAppointmentAction(id);
+      const result = await restoreAppointmentAction({}, new FormData());
       if (result.success) {
         toast.success('Appointment restored successfully!', {
           icon: '✅',

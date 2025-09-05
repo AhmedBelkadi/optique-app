@@ -11,7 +11,6 @@ import {
   Loader2, 
   Search,
   BarChart3,
-  Share2,
   Eye,
   EyeOff,
   CheckCircle,
@@ -77,9 +76,13 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
 
   const [state, formAction] = useActionState(upsertSettingsAction, {
     success: false,
+    message: '',
     error: '',
-    fieldErrors: {},
-    values: {
+  });
+
+  const form = useForm<SEOFormData>({
+    resolver: zodResolver(seoFormSchema),
+    defaultValues: {
       metaTitle: settings.metaTitle || '',
       metaDescription: settings.metaDescription || '',
       productMetaTitle: settings.productMetaTitle || '',
@@ -89,21 +92,6 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
       ogImage: settings.ogImage || '',
       googleAnalyticsId: settings.googleAnalyticsId || '',
       facebookPixelId: settings.facebookPixelId || '',
-    },
-  });
-
-  const form = useForm<SEOFormData>({
-    resolver: zodResolver(seoFormSchema),
-    defaultValues: {
-      metaTitle: (state.values?.metaTitle as string) || settings.metaTitle || '',
-      metaDescription: (state.values?.metaDescription as string) || settings.metaDescription || '',
-      productMetaTitle: (state.values?.productMetaTitle as string) || settings.productMetaTitle || '',
-      productMetaDescription: (state.values?.productMetaDescription as string) || settings.productMetaDescription || '',
-      categoryMetaTitle: (state.values?.categoryMetaTitle as string) || settings.categoryMetaTitle || '',
-      categoryMetaDescription: (state.values?.categoryMetaDescription as string) || settings.categoryMetaDescription || '',
-      ogImage: (state.values?.ogImage as string) || settings.ogImage || '',
-      googleAnalyticsId: (state.values?.googleAnalyticsId as string) || settings.googleAnalyticsId || '',
-      facebookPixelId: (state.values?.facebookPixelId as string) || settings.facebookPixelId || '',
     },
   });
 

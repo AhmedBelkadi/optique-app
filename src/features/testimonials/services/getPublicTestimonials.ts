@@ -78,7 +78,12 @@ export async function getPublicTestimonials(options: GetPublicTestimonialsOption
 
     return {
       success: true,
-      data: testimonials,
+      data: testimonials.map(t => ({
+        ...t,
+        source: t.source as "internal" | "facebook" | "google" | "trustpilot",
+        syncStatus: t.syncStatus as "pending" | "success" | "failed",
+        externalData: t.externalData as { platform: string; reviewId: string; timestamp: Date; authorId?: string; helpful?: number } | null
+      })),
       pagination: {
         page,
         limit,

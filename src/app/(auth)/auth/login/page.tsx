@@ -1,4 +1,7 @@
 import LoginForm from '@/components/features/auth/LoginForm';
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
 
 export default function LoginPage() {
   return (

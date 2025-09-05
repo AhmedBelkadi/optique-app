@@ -16,6 +16,10 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 import Image from 'next/image';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 async function HomeContent() {
   // Fetch all data in parallel
   const [homeValuesResult, contactSettingsResult, siteSettingsResult, productsResult, testimonialsResult] = await Promise.all([
@@ -26,7 +30,7 @@ async function HomeContent() {
     getPublicTestimonials()
   ]);
 
-  const homeValues = homeValuesResult.success ? homeValuesResult.data || [] : [];
+  const homeValues = homeValuesResult.success && homeValuesResult.data ? homeValuesResult.data : [];
   const contactSettings = contactSettingsResult.success ? contactSettingsResult.data : null;
   const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null;
   const products = productsResult.success && productsResult.data ? productsResult.data : [];

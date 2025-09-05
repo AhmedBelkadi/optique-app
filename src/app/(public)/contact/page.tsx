@@ -18,6 +18,10 @@ import ContactForm from '@/components/features/contact/ContactForm';
 import MobileContactForm from '@/components/features/contact/MobileContactForm';
 import { MobileContactMap } from '@/components/features/contact/MobileContactMap';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 async function ContactContent() {
   const [contactResult, siteSettingsResult] = await Promise.all([
     getContactSettings(),
@@ -196,7 +200,7 @@ async function ContactContent() {
                 googleMapEmbed={contactSettings.googleMapEmbed}
                 address={contactSettings.address}
                 googleMapLink={contactSettings.googleMapLink}
-                siteName={siteSettings?.siteName}
+                siteName={siteSettings?.siteName || undefined}
               />
             </div>
             
@@ -221,7 +225,7 @@ async function ContactContent() {
       </div>
       </div>
     </div>
-  );
+  );  
 }
 
 export default function ContactPage() {

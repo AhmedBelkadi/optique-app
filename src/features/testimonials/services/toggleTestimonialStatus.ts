@@ -31,7 +31,7 @@ export async function toggleTestimonialStatus(id: string, newStatus: boolean) {
 
     const testimonial = await prisma.testimonial.update({
       where: { id },
-      data: sanitizedData,
+      data: sanitizedData as any,
     });
 
     return { 

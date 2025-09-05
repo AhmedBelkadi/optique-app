@@ -8,6 +8,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 interface CustomersPageProps {
   searchParams: Promise<{
     search?: string;
@@ -45,7 +49,7 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
     limit: limitNum,
   });
 
-  const customers = result.success ? result.data || [] : [];
+  const customers = result.success && result.data ? result.data : [];
   const pagination = result.success ? result.pagination : undefined;
 
   return (

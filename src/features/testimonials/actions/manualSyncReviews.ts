@@ -35,7 +35,7 @@ export async function manualSyncReviewsAction(prevState: any, formData: FormData
           totalSynced: result.totalSynced,
           google: result.google,
           facebook: result.facebook,
-          timestamp: result.timestamp
+          timestamp: new Date()
         }
       };
     } else {

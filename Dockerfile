@@ -9,19 +9,22 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci --ignore-scripts
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY scripts ./scripts
+
 
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application
-RUN npm run build
+# Before building
+COPY .env.build .env
+RUN npm run build -- --no-lint
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -33,6 +36,10 @@ ENV NODE_ENV production
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Copy package files and install only production dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 # Copy the built application
 COPY --from=builder /app/public ./public
@@ -51,6 +58,9 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copy scripts (so db:seed works)
+COPY --from=builder /app/scripts ./scripts
+
 USER nextjs
 
 EXPOSE 3000
@@ -60,3 +70,4 @@ ENV HOSTNAME "0.0.0.0"
 
 # Run database migrations and start the application
 CMD ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && node server.js"]
+

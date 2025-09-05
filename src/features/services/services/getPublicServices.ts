@@ -18,8 +18,8 @@ export const getPublicServices = async () => {
     const transformedServices: Service[] = services.map(service => ({
       id: service.id,
       name: service.name,
-      description: service.description,
-      icon: service.icon,
+      description: service.description || undefined,
+      icon: service.icon || undefined,
       isActive: service.isActive,
       order: service.order,
       createdAt: service.createdAt,

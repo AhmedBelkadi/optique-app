@@ -14,10 +14,10 @@ import {
   FilterX,
   SlidersHorizontal
 } from 'lucide-react';
-import Link from 'next/link';
 import { ProductCard } from '@/components/ui/product-card';
 import { MobileFilterSheet } from './MobileFilterSheet';
 import { QuickFilterChips } from './QuickFilterChips';
+import { Category } from '@/features/categories/schema/categorySchema';
 
 interface Product {
   id: string;
@@ -29,11 +29,6 @@ interface Product {
     id: string;
     name: string;
   };
-}
-
-interface Category {
-  id: string;
-  name: string;
 }
 
 interface ProductsPageClientProps {
@@ -70,9 +65,9 @@ export function ProductsPageClient({
   });
 
   // Check if any filters are active
-  const hasActiveFilters = currentFilters.search || 
+  const hasActiveFilters = Boolean(currentFilters.search || 
     (currentFilters.category && currentFilters.category !== 'all') || 
-    currentFilters.priceRange !== 'all';
+    currentFilters.priceRange !== 'all');
 
   const handleApplyFilters = (filters: any) => {
     const params = new URLSearchParams();

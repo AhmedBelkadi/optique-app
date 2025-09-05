@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Filter, Calendar, Clock, User, Phone, Mail, Eye, Edit, Trash2, CheckCircle, X, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { deleteAppointmentAction } from '@/features/appointments/actions/deleteAppointmentAction';
 import { getAllAppointmentsAction } from '@/features/appointments/actions/getAllAppointmentsAction';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import Link from 'next/link';
+import { FormattedDate, FormattedTime } from '@/components/common/FormattedDate';
 
 interface Appointment {
   id: string;
@@ -203,29 +202,6 @@ export default function AppointmentsContainer({
     }
   };
 
-  const formatDateTime = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd MMM yyyy à HH:mm', { locale: fr });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd MMM yyyy', { locale: fr });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const formatTime = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'HH:mm', { locale: fr });
-    } catch {
-      return dateString;
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -407,12 +383,15 @@ export default function AppointmentsContainer({
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span>{formatDate(appointment.startTime)}</span>
+                        <span><FormattedDate date={appointment.startTime} /></span>
+
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                         <span>
-                          {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+                        <span>
+                           <FormattedTime date={appointment.startTime} /> - <FormattedTime date={appointment.endTime} />
+                        </span>
                         </span>
                       </div>
                     </div>
@@ -444,32 +423,35 @@ export default function AppointmentsContainer({
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-2 border-t border-border/50">
                       <Link href={`/admin/appointments/${appointment.id}`} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full">
+                        <Button size="sm" className="w-full">
                           <Eye className="h-4 w-4 mr-2" />
                           Voir
                         </Button>
                       </Link>
                       <Link href={`/admin/appointments/${appointment.id}/edit`} className="flex-1">
-                        <Button variant="outline" size="sm" className="w-full">
+                        <Button variant="success" size="sm" className="w-full">
                           <Edit className="h-4 w-4 mr-2" />
                           Modifier
                         </Button>
                       </Link>
                       <Dialog>
-                        <DialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/10"
-                            disabled={deleting === appointment.id}
-                          >
-                            {deleting === appointment.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </DialogTrigger>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          disabled={deleting === appointment.id}
+                        >
+                          {deleting === appointment.id ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                          ) : (
+                            <>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Supprimer
+                            </>
+                          )}
+                        </Button>
+                      </DialogTrigger>
+
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>Confirmer la suppression</DialogTitle>
@@ -478,7 +460,7 @@ export default function AppointmentsContainer({
                             </DialogDescription>
                           </DialogHeader>
                           <div className="flex justify-end gap-3">
-                            <Button variant="outline" onClick={() => document.querySelector('[role="dialog"]')?.remove()}>
+                            <Button variant="secondary" onClick={() => document.querySelector('[role="dialog"]')?.remove()}>
                               Annuler
                             </Button>
                             <Button 

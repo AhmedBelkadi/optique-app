@@ -8,6 +8,10 @@ import { getExternalAPISettingsAction } from '@/features/settings/actions/getExt
 import { requirePermission } from '@/lib/auth/authorization';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default async function ContentOperationsPage() {
 
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK

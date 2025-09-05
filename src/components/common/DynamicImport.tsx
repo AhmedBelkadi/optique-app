@@ -74,12 +74,12 @@ export function createDynamicImport<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
   options: {
     ssr?: boolean;
-    loading?: ComponentType<any>;
+    loading?: () => React.ReactNode; // ⬅️ fix here
   } = {}
 ) {
   return dynamic(importFn, {
     ssr: false,
-    loading: options.loading || DefaultLoading,
-    ...options,   
+    loading: options.loading ?? (() => <DefaultLoading />), // ⬅️ fix here
+    ...options,
   });
-} 
+}

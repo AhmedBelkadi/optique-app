@@ -9,6 +9,9 @@ import NavBar from '@/components/common/NavBar';
 import Footer from '@/components/common/Footer';
 import FloatingCTA from '@/components/features/home/FloatingCTA';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   // Fetch settings from separate services
   const [siteResult, operationalResult, contactResult, servicesResult] = await Promise.all([
@@ -21,20 +24,23 @@ export default async function PublicLayout({ children }: { children: React.React
   const siteSettings = siteResult.data;
   const contactSettings = contactResult.data;
   const maintenanceMode = operationalResult.data?.maintenanceMode || false;
-  const services = servicesResult.success ? servicesResult.data || [] : [];
+  const services = servicesResult.success && servicesResult.data ? servicesResult.data : [];
 
   const bannerResult = await getActiveBanner();
   const activeBanner = bannerResult.success ? bannerResult.data : null;
 
   return (
     <MaintenanceModeWrapper
-      siteName={siteSettings?.siteName}
+      siteName={siteSettings?.siteName || undefined}
       maintenanceMode={maintenanceMode} // pass the value here
     >
       {activeBanner && <PromotionalBanner message={activeBanner.text} />}
       <NavBar />
       <main className="flex-1">{children}</main>
-      <Footer siteSettings={siteSettings} contactSettings={contactSettings} services={services} />
+      <Footer siteSettings={siteSettings ? {
+        siteName: siteSettings.siteName || undefined,
+        slogan: siteSettings.slogan || undefined
+      } : undefined} contactSettings={contactSettings} services={services} />
       <FloatingCTA />
     </MaintenanceModeWrapper>
   );

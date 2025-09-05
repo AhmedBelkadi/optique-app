@@ -17,6 +17,7 @@ export const faqFormSchema = z.object({
 });
 
 export type FAQFormData = z.infer<typeof faqFormSchema>;
+export type FAQ = z.infer<typeof faqSchema>;
 
 // FAQ list schema
 export const faqListSchema = z.array(faqSchema);

@@ -3,6 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Shield, AlertTriangle, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store"; // optional, stricter
+
 export default function UnauthorizedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">

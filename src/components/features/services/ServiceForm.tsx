@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+
 import { 
   Dialog, 
   DialogContent, 
@@ -25,7 +24,7 @@ import {
   FormLabel, 
   FormMessage 
 } from '@/components/ui/form';
-import { Plus, Edit, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 import { createServiceAction, CreateServiceState } from '@/features/services/actions/createServiceAction';
 import { updateServiceAction, UpdateServiceState } from '@/features/services/actions/updateServiceAction';
 import { createServiceSchema, updateServiceSchema, Service } from '@/features/services/schema/serviceSchema';

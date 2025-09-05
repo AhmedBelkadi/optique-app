@@ -3,17 +3,21 @@ import CustomerForm from '@/components/features/customers/CustomerForm';
 import { notFound } from 'next/navigation';
 import { requirePermission } from '@/lib/auth/authorization';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface EditCustomerPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditCustomerPage({ params }: EditCustomerPageProps) {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('customers', 'update');
 
-  const result = await getCustomerById(params.id);
+  const { id } = await params;
+  const result = await getCustomerById(id);
 
   if (!result.success || !result.data) {
     notFound();

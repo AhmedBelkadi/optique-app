@@ -5,17 +5,20 @@ import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 import { getAllCategoriesAction } from '@/features/categories/actions/getAllCategoriesAction';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface EditProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('products', 'update');
 
-  const { id } = params;
+  const { id } = await params;
 
   // Fetch product data
   const productResult = await getProductById(id);
@@ -27,7 +30,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   // Fetch categories
   const categoriesResult = await getAllCategoriesAction();
-  const categories = categoriesResult.success ? categoriesResult.data || [] : [];
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
 
   return (
     <>

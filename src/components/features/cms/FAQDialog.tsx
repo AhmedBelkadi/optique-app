@@ -56,15 +56,19 @@ export default function FAQDialog({ open, onOpenChange, faq, onSuccess }: FAQDia
       let result;
       
       if (isEditing && faq) {
-        result = await updateFAQAction(faq.id, data);
+        const formData = new FormData();
+        formData.append('id', faq.id);
+        formData.append('question', data.question);
+        formData.append('answer', data.answer);
+        result = await updateFAQAction({ success: false, error: '', fieldErrors: {}, values: {} }, formData);
       } else {
-        result = await createFAQAction(data);
+        result = await createFAQAction({ success: false, error: '', fieldErrors: {}, values: {} }, new FormData());
       }
 
       if (result.success) {
-        toast.success(result.message || 'FAQ saved successfully!');
-        if (result.data && onSuccess) {
-          onSuccess(result.data);
+        toast.success(isEditing ? 'FAQ updated successfully!' : 'FAQ created successfully!');
+        if (result.data && onSuccess && result.data.length > 0) {
+          onSuccess(result.data[0]);
         }
         onOpenChange(false);
         form.reset();

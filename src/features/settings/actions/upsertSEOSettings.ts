@@ -47,15 +47,15 @@ export async function upsertSEOSettingsAction(prevState: UpsertSEOSettingsState,
 
     // Extract and validate sanitized form data
     const seoData = {
-      metaTitle: validation.sanitizedData.metaTitle || undefined,
-      metaDescription: validation.sanitizedData.metaDescription || undefined,
-      productMetaTitle: validation.sanitizedData.productMetaTitle || undefined,
-      productMetaDescription: validation.sanitizedData.productMetaDescription || undefined,
-      categoryMetaTitle: validation.sanitizedData.categoryMetaTitle || undefined,
-      categoryMetaDescription: validation.sanitizedData.categoryMetaDescription || undefined,
-      ogImage: validation.sanitizedData.ogImage || undefined,
-      googleAnalyticsId: validation.sanitizedData.googleAnalyticsId || undefined,
-      facebookPixelId: validation.sanitizedData.facebookPixelId || undefined,
+      metaTitle: validation.sanitizedData.metaTitle || null,
+      metaDescription: validation.sanitizedData.metaDescription || null,
+      productMetaTitle: validation.sanitizedData.productMetaTitle || null,
+      productMetaDescription: validation.sanitizedData.productMetaDescription || null,
+      categoryMetaTitle: validation.sanitizedData.categoryMetaTitle || null,
+      categoryMetaDescription: validation.sanitizedData.categoryMetaDescription || null,
+      ogImage: validation.sanitizedData.ogImage || null,
+      googleAnalyticsId: validation.sanitizedData.googleAnalyticsId || null,
+      facebookPixelId: validation.sanitizedData.facebookPixelId || null,
     };
 
     const result = await upsertSEOSettings(seoData);

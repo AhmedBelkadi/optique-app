@@ -3,9 +3,6 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { updateProduct } from '@/features/products/services/updateProduct';
-import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
-import { prisma } from '@/lib/prisma';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { UpdateProductState } from '@/types/api';
 
@@ -41,6 +38,14 @@ export async function updateProductAction(prevState: UpdateProductState, formDat
     if (!id) {
       return {
         error: 'Product ID is required',
+        values: {
+          name: '',
+          description: '',
+          price: '',
+          brand: '',
+          reference: '',
+          categoryIds: []
+        }
       };
     }
 
@@ -90,7 +95,15 @@ export async function updateProductAction(prevState: UpdateProductState, formDat
       return {
         success: false,
         error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-        fieldErrors: {}
+        fieldErrors: {},
+        values: {
+          name: '',
+          description: '',
+          price: '',
+          brand: '',
+          reference: '',
+          categoryIds: []
+        }
       };
     }
 
@@ -100,19 +113,27 @@ export async function updateProductAction(prevState: UpdateProductState, formDat
       return {
         success: false,
         error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-        fieldErrors: {}
+        fieldErrors: {},
+        values: {
+          name: '',
+          description: '',
+          price: '',
+          brand: '',
+          reference: '',
+          categoryIds: []
+        }
       };
     }
     return {
       error: 'An unexpected error occurred while updating the product',
       fieldErrors: {},
       values: {
-        name,
-        description,
-        price,
-        brand,
-        reference,
-        categoryIds,
+        name: '',
+        description: '',
+        price: '',
+        brand: '',
+        reference: '',
+        categoryIds: [],
       },
     };
   }

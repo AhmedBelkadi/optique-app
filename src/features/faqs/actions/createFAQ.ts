@@ -61,7 +61,7 @@ export async function createFAQAction(prevState: CreateFAQState,
 
     // Get updated list of FAQs
     const updatedFAQsResult = await getAllFAQs();
-    const updatedFAQs = updatedFAQsResult.success ? updatedFAQsResult.data || [] : [];
+    const updatedFAQs = updatedFAQsResult.success ? (updatedFAQsResult as any).data || [] : [];
 
     return {
       success: true,
@@ -79,7 +79,8 @@ export async function createFAQAction(prevState: CreateFAQState,
         return {
           success: false,
           error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-          fieldErrors: {}
+          fieldErrors: {},
+          values: {}
         };
       }
 
@@ -89,7 +90,8 @@ export async function createFAQAction(prevState: CreateFAQState,
         return {
           success: false,
           error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-          fieldErrors: {}
+          fieldErrors: {},
+          values: {}
         };
       }
 

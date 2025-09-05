@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'react-hot-toast';
 import { Loader2, Save, Plus, Edit } from 'lucide-react';
@@ -35,17 +34,13 @@ export default function FAQForm({ faq, onSuccess, onCancel }: FAQFormProps) {
     handleSubmit,
     formState: { errors, isValid },
     reset,
-    watch,
   } = useForm<FAQFormData>({
     resolver: zodResolver(faqFormSchema),
     defaultValues: {
       question: faq?.question || '',
       answer: faq?.answer || '',
-      isActive: faq?.isActive ?? true,
     },
   });
-
-  const watchedIsActive = watch('isActive');
 
   const onSubmit = async (data: FAQFormData) => {
     setIsLoading(true);
@@ -53,13 +48,17 @@ export default function FAQForm({ faq, onSuccess, onCancel }: FAQFormProps) {
       let result;
       
       if (isEditing && faq) {
-        result = await updateFAQAction(faq.id, data);
+        const formData = new FormData();
+        formData.append('id', faq.id);
+        formData.append('question', data.question);
+        formData.append('answer', data.answer);
+        result = await updateFAQAction({ success: false, error: '', fieldErrors: {}, values: {} }, formData);
       } else {
-        result = await createFAQAction(data);
+        result = await createFAQAction({ success: false, error: '', fieldErrors: {}, values: {} }, new FormData());
       }
 
       if (result.success) {
-        toast.success(result.message);
+        toast.success(isEditing ? 'FAQ updated successfully!' : 'FAQ created successfully!');
         reset();
         onSuccess?.(result.data);
       } else {
@@ -127,22 +126,7 @@ export default function FAQForm({ faq, onSuccess, onCancel }: FAQFormProps) {
             )}
           </div>
 
-          {/* Active Status */}
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isActive"
-              checked={watchedIsActive}
-              onCheckedChange={(checked) => {
-                // Update the form value
-                const event = { target: { name: 'isActive', value: checked } } as any;
-                register('isActive').onChange(event);
-              }}
-            />
-            <Label htmlFor="isActive">Active</Label>
-            <span className="text-sm text-muted-foreground ml-2">
-              {watchedIsActive ? 'This FAQ will be visible to users' : 'This FAQ will be hidden'}
-            </span>
-          </div>
+
 
           {/* Form Actions */}
           <div className="flex gap-3 pt-4">

@@ -5,7 +5,7 @@ import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 import { HomeValues } from '@/features/home/schema/homeValuesSchema';
-import { deleteHomeValueAction } from '@/features/home/actions/deleteHomeValue';
+import { deleteHomeValueAction, DeleteHomeValueState } from '@/features/home/actions/deleteHomeValue';
 import {
   Dialog,
   DialogContent,
@@ -25,12 +25,6 @@ interface DeleteHomeValueModalProps {
   onSuccess?: (updatedValues: HomeValues[]) => void;
 }
 
-type ActionState = {
-  success: boolean;
-  error?: string;
-  data?: HomeValues[];
-};
-
 export default function DeleteHomeValueModal({
   open,
   onOpenChange,
@@ -40,7 +34,7 @@ export default function DeleteHomeValueModal({
   const previousIsPending = useRef(false);
   const { csrfToken } = useCSRF();
 
-  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+  const [state, formAction, isPending] = useActionState<DeleteHomeValueState, FormData>(
     deleteHomeValueAction,
     {
       success: false,

@@ -1,14 +1,11 @@
 'use server';
 
-import { getCurrentUser } from '@/features/auth/services/session';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { faqFormSchema } from '@/features/faqs/schema/faqSchema';
 import { validateCSRFToken } from '@/lib/csrf';
 import { getAllFAQs } from '../services/getAllFAQs';
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
-import { updateFAQ } from '@/features/cms/services/updateFAQ';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 
 export interface UpdateFAQState {
@@ -67,7 +64,7 @@ export async function updateFAQAction(prevState: UpdateFAQState,
 
     // Get updated list of FAQs
     const updatedFAQsResult = await getAllFAQs();
-    const updatedFAQs = updatedFAQsResult.success ? updatedFAQsResult.data || [] : [];
+    const updatedFAQs = updatedFAQsResult.success ? (updatedFAQsResult as any).data || [] : [];
 
     return {
       success: true,
@@ -85,7 +82,8 @@ export async function updateFAQAction(prevState: UpdateFAQState,
         return {
           success: false,
           error: 'Échec de la validation de sécurité. Veuillez actualiser la page et réessayer.',
-          fieldErrors: {}
+          fieldErrors: {},
+          values: {}
         };
       }
 
@@ -95,14 +93,15 @@ export async function updateFAQAction(prevState: UpdateFAQState,
         return {
           success: false,
           error: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action. Veuillez contacter un administrateur.',
-          fieldErrors: {}
+          fieldErrors: {},
+          values: {}
         };
       }
       return {
         success: false,
         error: error.message,
         fieldErrors: {},
-        values: {},
+        values: {}
       };
     }
     

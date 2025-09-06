@@ -312,13 +312,13 @@ async function seedPermissionsAndRoles() {
   }
 
   // Create admin user
-  const adminEmail = 'admin@optique.com';
+  const adminEmail = 'optiquearinass@gmail.com';
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail }
   });
 
   if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash('admin123', 12);
+    const hashedPassword = await bcrypt.hash('optiquearinass@gmail.com', 12);
     const adminUser = await prisma.user.create({
       data: {
         name: 'Administrateur Arinass',

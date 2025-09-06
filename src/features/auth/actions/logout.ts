@@ -15,7 +15,7 @@ export async function logoutAction(prevState: any, formData: FormData) {
     await rateLimit(identifier, { maxRequests: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
     
     // Validate CSRF token
-    await validateCSRFToken(formData);
+    //await validateCSRFToken(formData);
 
     // Clear session cookies
     const cookieStore = await cookies();

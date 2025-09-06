@@ -1,50 +1,41 @@
+version: "3.8"
+
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: optique-app
-    restart: unless-stopped
-    ports:
-      - "0.0.0.0:3000:3000"
+    build: .
+    container_name: optique_app
+    restart: always
     environment:
-      - NODE_ENV=production
-    env_file:
-      - env.docker.prod
+      DATABASE_URL: postgres://postgres:postgres@db:5432/optique_db
     volumes:
-      - uploads:/app/public/uploads
+      - ./uploads:/app/uploads
     depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - optique-network
+      - db
 
   db:
-    image: postgres:15-alpine
-    container_name: optique-db
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
+    image: postgres:15
+    container_name: optique_db
+    restart: always
     environment:
-      POSTGRES_DB: optique_app
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: optique_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d optique_app"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - optique-network
+      - pgdata:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: optique_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./uploads:/app/uploads:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro   # mount host certs
+    depends_on:
+      - app
 
 volumes:
-  postgres_data:
-    driver: local
-  uploads:
-    driver: local
-
-networks:
-  optique-network:
-    driver: bridge
+  pgdata:

@@ -9,16 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getAllCustomersAction } from '@/features/customers/actions/getAllCustomersAction';
 import { useDebounce } from '@/hooks/useDebounce';
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  notes?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Customer } from '@/features/appointments/types';
 
 interface CustomerSelectorProps {
   onCustomerSelect: (customer: Customer) => void;

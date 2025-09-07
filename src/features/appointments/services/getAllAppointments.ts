@@ -30,8 +30,8 @@ export async function getAllAppointments(options: GetAllAppointmentsOptions = {}
       search,
       status,
       isDeleted = false,
-      sortBy = 'startTime',
-      sortOrder = 'asc',
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
       page = 1,
       limit = 50
     } = options;

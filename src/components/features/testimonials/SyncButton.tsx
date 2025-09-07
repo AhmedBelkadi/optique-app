@@ -160,7 +160,7 @@ export default function SyncButton() {
         onClick={handleSync}
         disabled={isLoading || (!syncStatus?.hasGoogleConfig && !syncStatus?.hasFacebookConfig)}
         variant="default"
-        className="flex items-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-50"
+        className="flex items-center gap-2"
         title={
           !syncStatus?.hasGoogleConfig && !syncStatus?.hasFacebookConfig
             ? "Configurez au moins une API externe pour activer la synchronisation"

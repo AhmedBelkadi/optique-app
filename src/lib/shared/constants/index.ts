@@ -9,8 +9,13 @@ export const VALIDATION_CONSTANTS = {
       maxLength: 255,
     },
     password: {
-      minLength: 6,
-      maxLength: 100,
+      minLength: 12,
+      maxLength: 128,
+      requireUppercase: true,
+      requireLowercase: true,
+      requireNumbers: true,
+      requireSymbols: true,
+      minSymbols: 1,
     },
   },
   categories: {

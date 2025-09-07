@@ -44,8 +44,8 @@ export default async function AppointmentsPage({ searchParams }: AppointmentsPag
     search,
     status: status as any,
     isDeleted: false,
-    sortBy: sortBy as 'startTime' | 'title' | 'createdAt' | 'updatedAt' || 'startTime',
-    sortOrder: sortOrder as 'asc' | 'desc' || 'asc',
+    sortBy: sortBy as 'startTime' | 'title' | 'createdAt' | 'updatedAt' || 'createdAt',
+    sortOrder: sortOrder as 'asc' | 'desc' || 'desc',
     page: pageNum,
     limit: limitNum,
   });

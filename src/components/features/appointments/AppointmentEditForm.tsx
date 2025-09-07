@@ -14,35 +14,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'react-hot-toast';
 import { updateAppointmentAction } from '@/features/appointments/actions/updateAppointmentAction';
 import { getAppointmentStatusesAction } from '@/features/appointments/actions/getAppointmentStatusesAction';
+import { useCSRF } from '@/components/common/CSRFProvider';
+import { AppointmentStatus, Customer, Appointment, AppointmentFormValidation } from '@/features/appointments/types';
+import { updateAppointmentSchema } from '@/features/appointments/utils/validation';
 
-interface AppointmentStatus {
-  id: string;
-  name: string;
-  displayName: string;
-  color: string;
-  description?: string | null;
-}
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  notes?: string;
-}
-
-interface Appointment {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-  customer: Customer;
-  status: AppointmentStatus;
-}
+// Types are now imported from shared types file
 
 interface AppointmentEditFormProps {
   appointment: Appointment;
@@ -50,36 +26,29 @@ interface AppointmentEditFormProps {
   isSaving: boolean;
 }
 
-// Form validation schema
-const appointmentEditSchema = z.object({
-  title: z.string().min(2, 'Le titre doit contenir au moins 2 caractères').max(100, 'Le titre ne peut pas dépasser 100 caractères'),
-  description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
-  appointmentDate: z.string().min(1, 'La date est requise'),
-  appointmentTime: z.string().min(1, 'L\'heure est requise'),
-  duration: z.number().int().min(15, 'La durée minimale est de 15 minutes').max(480, 'La durée maximale est de 8 heures'),
-  notes: z.string().max(1000, 'Les notes ne peuvent pas dépasser 1000 caractères').optional(),
-  customerName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(100, 'Le nom ne peut pas dépasser 100 caractères'),
-  customerPhone: z.string().min(10, 'Le numéro de téléphone doit contenir au moins 10 chiffres').max(15, 'Le numéro de téléphone ne peut pas dépasser 15 chiffres'),
-  customerEmail: z.string().email('L\'email doit être valide').max(100, 'L\'email ne peut pas dépasser 100 caractères'),
-  customerNotes: z.string().max(500, 'Les notes ne peuvent pas dépasser 500 caractères').optional(),
-});
-
-type AppointmentEditFormData = z.infer<typeof appointmentEditSchema>;
+// Use shared validation schema
+type AppointmentEditFormData = z.infer<typeof updateAppointmentSchema>;
 
 export default function AppointmentEditForm({ appointment, onSave, isSaving }: AppointmentEditFormProps) {
   const router = useRouter();
+  const { csrfToken } = useCSRF();
   const [statuses, setStatuses] = useState<AppointmentStatus[]>([]);
   const [selectedStatusId, setSelectedStatusId] = useState(appointment.status.id);
   const [isLoadingStatuses, setIsLoadingStatuses] = useState(true);
 
+  // Store original values to compare against
+  const originalDate = new Date(appointment.startTime).toISOString().split('T')[0];
+  const originalTime = new Date(appointment.startTime).toISOString().split('T')[1].substring(0, 5);
+
   // Initialize form with appointment data
   const form = useForm<AppointmentEditFormData>({
-    resolver: zodResolver(appointmentEditSchema),
+    resolver: zodResolver(updateAppointmentSchema),
+    mode: 'onSubmit', // Only validate on submit, not on change
     defaultValues: {
       title: appointment.title,
       description: appointment.description || '',
-      appointmentDate: new Date(appointment.startTime).toISOString().split('T')[0],
-      appointmentTime: new Date(appointment.startTime).toISOString().split('T')[1].substring(0, 5),
+      appointmentDate: originalDate,
+      appointmentTime: originalTime,
       duration: Math.round((new Date(appointment.endTime).getTime() - new Date(appointment.startTime).getTime()) / (1000 * 60)),
       notes: appointment.notes || '',
       customerName: appointment.customer.name,
@@ -109,8 +78,46 @@ export default function AppointmentEditForm({ appointment, onSave, isSaving }: A
 
   const onSubmit = async (data: AppointmentEditFormData) => {
     try {
-      // Set loading state
-      onSave(data);
+      // Check if date/time has changed from original values
+      const dateChanged = data.appointmentDate !== originalDate;
+      const timeChanged = data.appointmentTime !== originalTime;
+      
+      // Only validate business rules if date/time has been changed
+      if (dateChanged || timeChanged) {
+        const appointmentDateTime = new Date(`${data.appointmentDate}T${data.appointmentTime}`);
+        const now = new Date();
+        
+        // Check if it's in the past (more than 1 hour ago)
+        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+        if (appointmentDateTime < oneHourAgo) {
+          form.setError('appointmentDate', {
+            type: 'manual',
+            message: 'La date de rendez-vous ne peut pas être dans le passé (plus d\'1 heure).'
+          });
+          return;
+        }
+        
+        // Check business hours
+        const dayOfWeek = appointmentDateTime.getDay();
+        const hour = appointmentDateTime.getHours();
+        const minutes = appointmentDateTime.getMinutes();
+        
+        if (dayOfWeek === 0) { // Sunday
+          form.setError('appointmentTime', {
+            type: 'manual',
+            message: 'Les rendez-vous ne sont pas disponibles le dimanche.'
+          });
+          return;
+        }
+        
+        if (hour < 9 || hour >= 19) {
+          form.setError('appointmentTime', {
+            type: 'manual',
+            message: 'Les rendez-vous ne sont disponibles que de 9h00 à 19h00.'
+          });
+          return;
+        }
+      }
 
       // Prepare data for update
       const updateData = {
@@ -124,14 +131,24 @@ export default function AppointmentEditForm({ appointment, onSave, isSaving }: A
         customerEmail: data.customerEmail,
         customerNotes: data.customerNotes,
         statusId: selectedStatusId,
+        csrf_token: csrfToken || undefined,
       };
 
       const result = await updateAppointmentAction(appointment.id, updateData);
       
       if (result.success) {
-        toast.success('Rendez-vous mis à jour avec succès');
-        router.push(`/admin/appointments/${appointment.id}`);
+        // Call the container's save handler for success handling
+        onSave(data);
       } else {
+        // Handle field-specific errors
+        if (result.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+          Object.entries(result.fieldErrors).forEach(([field, error]) => {
+            form.setError(field as keyof AppointmentEditFormData, {
+              type: 'manual',
+              message: error as string
+            });
+          });
+        }
         toast.error(result.error || 'Erreur lors de la mise à jour');
       }
     } catch (error) {

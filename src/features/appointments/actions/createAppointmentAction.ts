@@ -2,12 +2,13 @@
 
 import { createAppointment } from '../services/createAppointment';
 import { AppointmentFormData } from '../schema/appointmentFormSchema';
+import { AppointmentActionResult, APPOINTMENT_ERRORS } from '../types';
 import { revalidatePath } from 'next/cache';
 import { requirePermission } from '@/lib/auth/authorization';
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 
-export async function createAppointmentAction(formData: AppointmentFormData & { csrf_token?: string }) {
+export async function createAppointmentAction(formData: AppointmentFormData & { csrf_token?: string }): Promise<AppointmentActionResult> {
   try {
 
     // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
@@ -33,13 +34,14 @@ export async function createAppointmentAction(formData: AppointmentFormData & { 
       revalidatePath('/admin/appointments');
       return {
         success: true,
-        message: 'Rendez-vous créé avec succès ! Nous vous confirmerons par WhatsApp dans les 24h.',
+        message: APPOINTMENT_ERRORS.CREATE_SUCCESS,
         data: result.data
       };
     } else {
       return {
         success: false,
-        error: result.error || 'Erreur lors de la création du rendez-vous'
+        error: result.error || APPOINTMENT_ERRORS.CREATE_ERROR,
+        fieldErrors: {}
       };
     }
   } catch (error) {
@@ -71,7 +73,8 @@ export async function createAppointmentAction(formData: AppointmentFormData & { 
     }
     return {
       success: false,
-      error: 'Une erreur inattendue est survenue. Veuillez réessayer.'
+      error: 'Une erreur inattendue est survenue. Veuillez réessayer.',
+      fieldErrors: {}
     };
   }
 }

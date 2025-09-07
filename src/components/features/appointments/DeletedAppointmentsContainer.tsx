@@ -111,11 +111,11 @@ export default function DeletedAppointmentsContainer({
                   </div>
                 </div>
                 <Button
-                  variant="default"
+                  variant="destructive"
                   size="sm"
                   onClick={() => handleRestore(appointment.id)}
                   disabled={restoring === appointment.id}
-                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                  className="border-destructive/30 text-white hover:bg-destructive/80"
                 >
                   {restoring === appointment.id ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />

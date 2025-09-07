@@ -2,27 +2,34 @@
 
 import { authRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
-import { loginUser } from '@/features/auth/services/loginUser';
+import { requestPasswordReset } from '@/features/auth/services/passwordReset';
 import { authSchema } from '@/features/auth/schema/authSchema';
 import { logError } from '@/lib/errorHandling';
-import { LoginState } from '@/types/api';
 
-export async function loginAction(prevState: LoginState, formData: FormData): Promise<LoginState> {
+export interface ForgotPasswordState {
+  success: boolean;
+  error: string;
+  fieldErrors: Record<string, string[]>;
+  values: {
+    email: string;
+  };
+}
+
+export async function forgotPasswordAction(prevState: ForgotPasswordState, formData: FormData): Promise<ForgotPasswordState> {
   try {
     // Get client identifier for rate limiting
     const identifier = await getClientIdentifier();
     
-    // Apply rate limiting
+    // Apply rate limiting (stricter for password reset)
     await authRateLimit(identifier);
     
     // Validate CSRF token
     await validateCSRFToken(formData);
     
     const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     // Validate input
-    const validation = authSchema.login.safeParse({ email, password });
+    const validation = authSchema.forgotPassword.safeParse({ email });
     if (!validation.success) {
       return {
         error: '',
@@ -32,10 +39,10 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
       };
     }
 
-    // Attempt login
-    const result = await loginUser(validation.data.email, validation.data.password);
+    // Request password reset
+    const result = await requestPasswordReset(validation.data.email);
     
-    if (result.success && result.user) {
+    if (result.success) {
       return {
         error: '',
         fieldErrors: {},
@@ -44,7 +51,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
       };
     } else {
       return {
-        error: result.error || 'Invalid email or password',
+        error: result.error || 'Failed to send password reset email',
         fieldErrors: {},
         values: { email },
         success: false,
@@ -72,7 +79,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
     }
 
     // Log and handle other errors
-    logError(error as Error, { action: 'login', email: formData.get('email') });
+    logError(error as Error, { action: 'forgotPassword', email: formData.get('email') });
     
     return {
       error: 'An unexpected error occurred. Please try again.',
@@ -81,4 +88,4 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
       success: false,
     };
   }
-} 
+}

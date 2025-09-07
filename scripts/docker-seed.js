@@ -23,10 +23,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting Arinass Optique Docker seeding...');
 
+  // Define admin credentials at the top level
+  const adminEmail = 'optiquearinass@gmail.com';
+  const adminPassword = 'Admin123!@#';
+
   try {
     // 1. Create permissions, roles, and admin user
     console.log('👤 Creating permissions, roles, and admin user...');
-    await seedPermissionsAndRoles();
+    await seedPermissionsAndRoles(adminEmail, adminPassword);
 
     // 2. Create HomeValues
     console.log('🏠 Creating home values...');
@@ -67,7 +71,7 @@ async function main() {
     console.log('🎉 Arinass Optique Docker seeding completed successfully!');
     console.log('');
     console.log('📊 Summary:');
-    console.log('   - Admin user: admin@optique.com / admin123');
+    console.log(`   - Admin user: ${adminEmail} / ${adminPassword}`);
     console.log('   - 2 roles created:');
     console.log('     • Admin: FULL ACCESS to everything');
     console.log('     • Staff: Activité Principale only (create/read/update)');
@@ -80,7 +84,7 @@ async function main() {
     console.log('   - Contact settings with your address/phone');
     console.log('   - Theme settings with brand colors');
     console.log('');
-    console.log('🔐 You can now log in with admin@optique.com / admin123');
+    console.log(`🔐 You can now log in with ${adminEmail} / ${adminPassword}`);
     console.log('👥 Staff users will have limited access to main business operations only.');
 
   } catch (error) {
@@ -91,7 +95,7 @@ async function main() {
   }
 }
 
-async function seedPermissionsAndRoles() {
+async function seedPermissionsAndRoles(adminEmail, adminPassword) {
   // Create default permissions
   const permissions = [
     // Products
@@ -311,14 +315,15 @@ async function seedPermissionsAndRoles() {
     });
   }
 
-  // Create admin user
-  const adminEmail = 'optiquearinass@gmail.com';
+  // Create or update admin user
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail }
   });
 
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
+
   if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash('optiquearinass@gmail.com', 12);
+    // Create new admin user
     const adminUser = await prisma.user.create({
       data: {
         name: 'Administrateur Arinass',
@@ -335,6 +340,33 @@ async function seedPermissionsAndRoles() {
         assignedBy: null,
       },
     });
+  } else {
+    // Update existing admin user password
+    await prisma.user.update({
+      where: { email: adminEmail },
+      data: {
+        password: hashedPassword,
+        isActive: true,
+      },
+    });
+
+    // Ensure admin role is assigned
+    const existingRole = await prisma.userRole.findFirst({
+      where: {
+        userId: existingAdmin.id,
+        roleId: adminRole.id,
+      },
+    });
+
+    if (!existingRole) {
+      await prisma.userRole.create({
+        data: {
+          userId: existingAdmin.id,
+          roleId: adminRole.id,
+          assignedBy: null,
+        },
+      });
+    }
   }
 }
 

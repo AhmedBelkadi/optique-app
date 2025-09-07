@@ -74,22 +74,28 @@ export default async function TestimonialsPage({ searchParams }: TestimonialsPag
 
       <div className="min-h-screen bg-muted/50">
         <div className="py-4">
-          {/* Header Section */}
-          <div className="flex items-center justify-between mb-2">
-            <Link href="/admin/testimonials/new">
-              <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Testimonial
-              </Button>
-            </Link>
-            <Link href="/admin/testimonials/trash">
-              <Button variant="destructive">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Trash
-              </Button>
-            </Link>
-            <SyncButton />
-          </div>
+{/* Header Section - Responsive */}
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-2">
+  <div className="flex flex-col sm:flex-row gap-2">
+    <Link href="/admin/testimonials/new">
+      <Button className="w-full sm:w-auto bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200">
+        <Plus className="w-4 h-4 mr-2" />
+        <span className="hidden sm:inline">Create Testimonial</span>
+        <span className="sm:hidden">Create</span>
+      </Button>
+    </Link>
+    <Link href="/admin/testimonials/trash">
+      <Button variant="destructive" className="w-full sm:w-auto">
+        <Trash2 className="w-4 h-4 mr-2" />
+        <span className="hidden sm:inline">Trash</span>
+        <span className="sm:hidden">Trash</span>
+      </Button>
+    </Link>
+  </div>
+  <div className="flex justify-center sm:justify-end">
+    <SyncButton />
+  </div>
+</div>
           
           {/* Testimonials Content */}
           <Suspense fallback={<TestimonialsSkeleton />}>

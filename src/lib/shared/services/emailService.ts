@@ -1,3 +1,19 @@
+/**
+ * Generic Email Service
+ * 
+ * Required Environment Variables:
+ * - GMAIL_USER: Gmail email address for sending emails
+ * - GMAIL_APP_PASSWORD: Gmail app password (not regular password)
+ * - APP_NAME: Application name (defaults to "Application")
+ * - NEXT_PUBLIC_APP_URL: Public URL of the application
+ * - ADMIN_CONTACT_EMAIL: Admin email for contact form (optional, defaults to GMAIL_USER)
+ * - COMPANY_ADDRESS: Company address for email footers (optional)
+ * - COMPANY_PHONE: Company phone for email footers (optional)
+ * 
+ * This service provides generic email templates that can be used by any application
+ * by configuring the appropriate environment variables.
+ */
+
 import { logError } from '@/lib/errorHandling';
 import nodemailer from 'nodemailer';
 
@@ -14,6 +30,12 @@ export interface ContactMessageData {
   phone: string;
   email?: string;
   message: string;
+}
+
+export interface PasswordResetData {
+  to: string;
+  name: string;
+  resetUrl: string;
 }
 
 export interface EmailResult {
@@ -53,9 +75,9 @@ export async function sendUserCredentialsEmail(credentials: EmailCredentials): P
 
     // Send email
     const mailOptions = {
-      from: `"${process.env.APP_NAME || 'Optique App'} - Administration" <${process.env.GMAIL_USER}>`,
+      from: `"${process.env.APP_NAME || 'Application'} - Administration" <${process.env.GMAIL_USER}>`,
       to: credentials.to,
-      subject: 'Vos Identifiants de Compte Personnel - Bienvenue dans l\'Équipe !',
+      subject: `Vos Identifiants de Compte Personnel - ${process.env.APP_NAME || 'Application'}`,
       html: emailContent.html,
       text: emailContent.text,
     };
@@ -242,7 +264,7 @@ function generateEmailContent(credentials: EmailCredentials) {
         <div class="footer">
           <p style="margin: 0;">Ceci est un message automatisé. Veuillez ne pas y répondre.</p>
           <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">
-            Envoyé depuis ${process.env.APP_NAME || 'Optique App'} - Système d'Administration
+            Envoyé depuis ${process.env.APP_NAME || 'Application'} - Système d'Administration
           </p>
         </div>
       </div>
@@ -274,7 +296,7 @@ Si vous avez des questions ou besoin d'assistance, n'hésitez pas à contacter v
 
 ---
 Ceci est un message automatisé. Veuillez ne pas y répondre.
-Envoyé depuis ${process.env.APP_NAME || 'Optique App'} - Système d'Administration
+Envoyé depuis ${process.env.APP_NAME || 'Application'} - Système d'Administration
   `;
   
   return { html, text };
@@ -304,7 +326,7 @@ export async function sendContactMessageEmail(contactData: ContactMessageData): 
 
     // Send email to admin
     const mailOptions = {
-      from: `"${process.env.APP_NAME || 'Optique App'} Contact Form" <${process.env.GMAIL_USER}>`,
+      from: `"${process.env.APP_NAME || 'Application'} Contact Form" <${process.env.GMAIL_USER}>`,
       to: adminEmail,
       subject: `Nouveau message de contact de ${contactData.name}`,
       html: emailContent.html,
@@ -480,7 +502,7 @@ function generateContactEmailContent(contactData: ContactMessageData) {
         <div class="footer">
           <p style="margin: 0;">Ce message a été envoyé automatiquement depuis le formulaire de contact de votre site web.</p>
           <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">
-            ${process.env.APP_NAME || 'Optique App'} - Système de Contact
+            ${process.env.APP_NAME || 'Application'} - Système de Contact
           </p>
         </div>
       </div>
@@ -514,7 +536,239 @@ Heure de réception: ${new Date().toLocaleString('fr-FR', {
 
 ---
 Ce message a été envoyé automatiquement depuis le formulaire de contact de votre site web.
-${process.env.APP_NAME || 'Optique App'} - Système de Contact
+${process.env.APP_NAME || 'Application'} - Système de Contact
+  `;
+  
+  return { html, text };
+}
+
+export async function sendPasswordResetEmail(resetData: PasswordResetData): Promise<EmailResult> {
+  try {
+    // Check if Gmail credentials are configured
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      logError(new Error('Gmail credentials not configured'), {
+        action: 'sendPasswordResetEmail',
+        step: 'configuration',
+        message: 'GMAIL_USER and GMAIL_APP_PASSWORD environment variables are required',
+      });
+      
+      return {
+        success: false,
+        error: 'Service d\'email non configuré. Veuillez contacter l\'administrateur.',
+      };
+    }
+
+    const transporter = createTransporter();
+    const emailContent = generatePasswordResetEmailContent(resetData);
+
+    // Send email
+    const mailOptions = {
+      from: `"${process.env.APP_NAME || 'Application'} - Sécurité" <${process.env.GMAIL_USER}>`,
+      to: resetData.to,
+      subject: `Réinitialisation de Mot de Passe - ${process.env.APP_NAME || 'Application'}`,
+      html: emailContent.html,
+      text: emailContent.text,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    // Log the error
+    logError(error as Error, {
+      action: 'sendPasswordResetEmail',
+      step: 'sending',
+      resetData: {
+        to: resetData.to,
+        name: resetData.name,
+        hasResetUrl: !!resetData.resetUrl,
+      }
+    });
+    
+    return {
+      success: false,
+      error: 'Échec de l\'envoi de l\'email de réinitialisation. Veuillez réessayer plus tard.',
+    };
+  }
+}
+
+function generatePasswordResetEmailContent(resetData: PasswordResetData) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Réinitialisation de Mot de Passe</title>
+      <style>
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+          line-height: 1.6; 
+          color: #333; 
+          background-color: #f8f9fa;
+          margin: 0;
+          padding: 20px;
+        }
+        .container { 
+          max-width: 600px; 
+          margin: 0 auto; 
+          background-color: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+        }
+        .header { 
+          background: linear-gradient(135deg, #2D8B9C 0%, #4A90A2 100%);
+          color: white;
+          padding: 30px 20px;
+          text-align: center;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 600;
+        }
+        .content {
+          padding: 30px 20px;
+        }
+        .reset-box { 
+          background: #fff3cd; 
+          border: 1px solid #ffeaa7; 
+          padding: 20px; 
+          border-radius: 8px; 
+          margin: 20px 0;
+          border-left: 4px solid #ffc107;
+        }
+        .security-warning { 
+          background: #f8d7da; 
+          border: 1px solid #f5c6cb; 
+          padding: 20px; 
+          border-radius: 8px; 
+          margin: 20px 0;
+          border-left: 4px solid #dc3545;
+        }
+        .button { 
+          display: inline-block; 
+          background: linear-gradient(135deg, #2D8B9C 0%, #4A90A2 100%);
+          color: white; 
+          padding: 14px 28px; 
+          text-decoration: none; 
+          border-radius: 8px;
+          font-weight: 600;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        .button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(45, 139, 156, 0.4);
+        }
+        .footer { 
+          margin-top: 30px; 
+          padding-top: 20px; 
+          border-top: 1px solid #eee; 
+          font-size: 14px; 
+          color: #666;
+          text-align: center;
+        }
+        .url-box {
+          background: #f8f9fa;
+          border: 1px solid #e9ecef;
+          padding: 15px;
+          border-radius: 6px;
+          margin: 15px 0;
+          word-break: break-all;
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          color: #495057;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔐 Réinitialisation de Mot de Passe</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9;">Demande de réinitialisation de votre mot de passe</p>
+        </div>
+        
+        <div class="content">
+          <p>Bonjour <strong>${resetData.name}</strong>,</p>
+          
+          <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte ${process.env.APP_NAME || 'Application'}.</p>
+          
+          <div class="reset-box">
+            <h3 style="margin-top: 0; color: #856404;">🔄 Réinitialiser Votre Mot de Passe</h3>
+            <p>Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${resetData.resetUrl}" class="button">
+                🔑 Réinitialiser Mon Mot de Passe
+              </a>
+            </div>
+            
+            <p style="margin-bottom: 0; font-size: 14px; color: #856404;">
+              <strong>Ou copiez ce lien dans votre navigateur :</strong>
+            </p>
+            <div class="url-box">
+              ${resetData.resetUrl}
+            </div>
+          </div>
+          
+          <div class="security-warning">
+            <h4 style="margin-top: 0; color: #721c24;">⚠️ Avis de Sécurité Important</h4>
+            <ul style="margin-bottom: 0; color: #721c24; padding-left: 20px;">
+              <li>Ce lien expire dans <strong>1 heure</strong> pour des raisons de sécurité</li>
+              <li>Ce lien ne peut être utilisé qu'<strong>une seule fois</strong></li>
+              <li>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email</li>
+              <li>Votre mot de passe actuel reste valide jusqu'à ce que vous le changiez</li>
+            </ul>
+          </div>
+          
+          <p style="margin-bottom: 0;">
+            Si vous rencontrez des difficultés ou si vous n'avez pas demandé cette réinitialisation, 
+            contactez immédiatement votre administrateur système.
+          </p>
+        </div>
+        
+        <div class="footer">
+          <p style="margin: 0;">Ceci est un message automatisé. Veuillez ne pas y répondre.</p>
+          <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7;">
+            ${process.env.APP_NAME || 'Application'} - Système de Sécurité<br>
+            ${process.env.COMPANY_ADDRESS || 'Adresse non configurée'}<br>
+            ${process.env.COMPANY_PHONE ? `Téléphone: ${process.env.COMPANY_PHONE}` : ''}
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  const text = `
+🔐 Réinitialisation de Mot de Passe - ${process.env.APP_NAME || 'Application'}
+
+Bonjour ${resetData.name},
+
+Vous avez demandé la réinitialisation de votre mot de passe pour votre compte ${process.env.APP_NAME || 'Application'}.
+
+🔄 RÉINITIALISER VOTRE MOT DE PASSE :
+Cliquez sur ce lien pour créer un nouveau mot de passe :
+${resetData.resetUrl}
+
+⚠️ AVIS DE SÉCURITÉ IMPORTANT :
+- Ce lien expire dans 1 heure pour des raisons de sécurité
+- Ce lien ne peut être utilisé qu'une seule fois
+- Si vous n'avez pas demandé cette réinitialisation, ignorez cet email
+- Votre mot de passe actuel reste valide jusqu'à ce que vous le changiez
+
+Si vous rencontrez des difficultés ou si vous n'avez pas demandé cette réinitialisation, 
+contactez immédiatement votre administrateur système.
+
+---
+Ceci est un message automatisé. Veuillez ne pas y répondre.
+${process.env.APP_NAME || 'Application'} - Système de Sécurité
+${process.env.COMPANY_ADDRESS || 'Adresse non configurée'}
+${process.env.COMPANY_PHONE ? `Téléphone: ${process.env.COMPANY_PHONE}` : ''}
   `;
   
   return { html, text };

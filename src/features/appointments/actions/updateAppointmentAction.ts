@@ -1,12 +1,13 @@
 'use server';
 
 import { updateAppointment, UpdateAppointmentData } from '../services/updateAppointment';
+import { AppointmentActionResult, APPOINTMENT_ERRORS } from '../types';
 import { revalidatePath } from 'next/cache';
 import { requirePermission } from '@/lib/auth/authorization';
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 
-export async function updateAppointmentAction(id: string, data: UpdateAppointmentData) {
+export async function updateAppointmentAction(id: string, data: UpdateAppointmentData & { csrf_token?: string }): Promise<AppointmentActionResult> {
   try {
 
     // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
@@ -19,16 +20,29 @@ export async function updateAppointmentAction(id: string, data: UpdateAppointmen
     await apiRateLimit(identifier);
     
     // Validate CSRF token
-  // await validateCSRFToken(formData);
+    if (data.csrf_token) {
+      const formDataForCSRF = new FormData();
+      formDataForCSRF.append('csrf_token', data.csrf_token);
+      await validateCSRFToken(formDataForCSRF);
+    }
 
     const result = await updateAppointment(id, data);
     
     if (result.success) {
       revalidatePath('/admin/appointments');
       revalidatePath(`/admin/appointments/${id}`);
+      return {
+        success: true,
+        message: APPOINTMENT_ERRORS.UPDATE_SUCCESS,
+        data: result.data
+      };
+    } else {
+      return {
+        success: false,
+        error: result.error || APPOINTMENT_ERRORS.UPDATE_ERROR,
+        fieldErrors: {}
+      };
     }
-
-    return result;
   } catch (error) {
     console.error('Error in updateAppointmentAction:', error);
     // Handle CSRF errors
@@ -58,7 +72,8 @@ export async function updateAppointmentAction(id: string, data: UpdateAppointmen
     }
     return {
       success: false,
-      error: 'Erreur lors de la mise à jour du rendez-vous'
+      error: APPOINTMENT_ERRORS.UPDATE_ERROR,
+      fieldErrors: {}
     };
   }
 }

@@ -173,7 +173,7 @@ export default function UserGrid({ users, roles, onUserUpdated }: UserGridProps)
                 <Select
                   key={`role-${user.id}`}
                   onValueChange={(value) => handleRoleUpdate(user.id, value)}
-                  value={user.userRoles[0]?.roleId || ''}
+                  value={user.userRoles[0]?.role?.id || ''}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un rôle" />

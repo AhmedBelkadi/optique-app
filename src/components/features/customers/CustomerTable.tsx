@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Edit, Trash2, RotateCcw, Eye, Mail, Phone } from 'lucide-react';
+import { Edit, Trash2, RotateCcw, Eye, Mail, Phone, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -190,7 +190,7 @@ export default function CustomerTable({ customers, onDelete, onUpdate }: Custome
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm">
                       <span className="sr-only">Open menu</span>
-                      <Edit className="h-4 w-4" />
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

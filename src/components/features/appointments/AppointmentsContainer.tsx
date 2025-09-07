@@ -64,12 +64,12 @@ const appointmentStatuses = [
 ];
 
 const sortOptions = [
+  { value: 'createdAt-desc', label: 'Plus récents' },
+  { value: 'createdAt-asc', label: 'Plus anciens' },
   { value: 'startTime-asc', label: 'Date croissante' },
   { value: 'startTime-desc', label: 'Date décroissante' },
   { value: 'title-asc', label: 'Titre A-Z' },
   { value: 'title-desc', label: 'Titre Z-A' },
-  { value: 'createdAt-desc', label: 'Plus récents' },
-  { value: 'createdAt-asc', label: 'Plus anciens' },
 ];
 
 export default function AppointmentsContainer({ 
@@ -84,7 +84,7 @@ export default function AppointmentsContainer({
   const [searchValue, setSearchValue] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [sortValue, setSortValue] = useState(
-    `${searchParams.get('sortBy') || 'startTime'}-${searchParams.get('sortOrder') || 'asc'}`
+    `${searchParams.get('sortBy') || 'createdAt'}-${searchParams.get('sortOrder') || 'desc'}`
   );
   const [deleting, setDeleting] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,8 +113,8 @@ export default function AppointmentsContainer({
       const filters = {
         search: searchValue || undefined,
         status: statusFilter === 'all' ? undefined : statusFilter,
-        sortBy: (sortValue.split('-')[0] as 'title' | 'startTime' | 'createdAt' | 'updatedAt') || 'startTime',
-        sortOrder: (sortValue.split('-')[1] as 'asc' | 'desc') || 'asc',
+        sortBy: (sortValue.split('-')[0] as 'title' | 'startTime' | 'createdAt' | 'updatedAt') || 'createdAt',
+        sortOrder: (sortValue.split('-')[1] as 'asc' | 'desc') || 'desc',
         page: 1,
         limit: 12
       };
@@ -141,7 +141,7 @@ export default function AppointmentsContainer({
   const handleClearFilters = () => {
     setSearchValue('');
     setStatusFilter('all');
-    setSortValue('startTime-asc');
+    setSortValue('createdAt-desc');
     setAppointments(initialAppointments);
     // Clear URL parameters
     router.push('/admin/appointments');

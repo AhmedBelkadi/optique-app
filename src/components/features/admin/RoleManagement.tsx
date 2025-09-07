@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Plus, Edit, Trash2, Shield, Users, Settings, Package, Calendar, MessageSquare, Eye, Loader2, X, Zap, Star, UserCheck, Lock } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, Users, Settings, Package, Calendar, MessageSquare, Eye, Loader2, X, Zap, Star, UserCheck, Lock, Search, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { createRoleAction } from '@/features/auth/actions/createRole';
 import { updateRoleAction } from '@/features/auth/actions/updateRole';
 import { deleteRoleAction } from '@/features/auth/actions/deleteRole';
@@ -76,6 +76,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
   const [editingRole, setEditingRole] = useState<Partial<Role>>({});
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('manual');
+  
+  // Search and filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedActions, setSelectedActions] = useState<string[]>([]);
+  const [selectedResources, setSelectedResources] = useState<string[]>([]);
+  const [expandedResources, setExpandedResources] = useState<string[]>([]);
 
   // Create role state
   const [createState, createFormAction, createIsPending] = useActionState(createRoleAction, {
@@ -116,7 +122,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
   useEffect(() => {
     if (previousCreateIsPending.current && !createIsPending) {
       if (createState.success) {
-        toast.success('Role created successfully!', {
+        toast.success('Rôle créé avec succès!', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -126,10 +132,28 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
         setCreateModalOpen(false);
         setEditingRole({});
         setSelectedPermissions([]);
-        // For create, we need to refresh to get the new role with proper permissions
-        window.location.reload();
+        
+        // Update local state with the new role
+        if (createState.data) {
+          const newRole: Role = {
+            id: createState.data.role.id,
+            name: createState.data.role.name,
+            description: createState.data.role.description,
+            isActive: createState.data.role.isActive,
+            permissions: createState.data.permissions.map(p => ({
+              id: p.id,
+              name: p.name,
+              description: null, // Not provided by the service
+              resource: p.resource,
+              action: p.action,
+              isActive: true, // Assume active
+            })),
+            userCount: 0, // New role has no users initially
+          };
+          setRoles(prevRoles => [newRole, ...prevRoles]);
+        }
       } else if (createState.error) {
-        toast.error(createState.error || 'Failed to create role', {
+        toast.error(createState.error || 'Échec de la création du rôle', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -139,13 +163,13 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
       }
     }
     previousCreateIsPending.current = createIsPending;
-  }, [createIsPending, createState.success, createState.error]);
+  }, [createIsPending, createState.success, createState.error, createState.data]);
 
   // Handle update success/error
   useEffect(() => {
     if (previousUpdateIsPending.current && !updateIsPending) {
       if (updateState.success) {
-        toast.success('Role updated successfully!', {
+        toast.success('Rôle mis à jour avec succès!', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -155,10 +179,32 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
         setEditModalOpen(false);
         setEditingRole({});
         setSelectedPermissions([]);
-        // Refresh the page to get updated role data
-        window.location.reload();
+        
+        // Update local state with the updated role
+        if (updateState.data) {
+          const updatedRole: Role = {
+            id: updateState.data.role.id,
+            name: updateState.data.role.name,
+            description: updateState.data.role.description,
+            isActive: updateState.data.role.isActive,
+            permissions: updateState.data.permissions.map(p => ({
+              id: p.id,
+              name: p.name,
+              description: null, // Not provided by the service
+              resource: p.resource,
+              action: p.action,
+              isActive: true, // Assume active
+            })),
+            userCount: roles.find(r => r.id === updateState.data!.role.id)?.userCount || 0, // Preserve existing user count
+          };
+          setRoles(prevRoles => 
+            prevRoles.map(role => 
+              role.id === updatedRole.id ? updatedRole : role
+            )
+          );
+        }
       } else if (updateState.error) {
-        toast.error(updateState.error || 'Failed to update role', {
+        toast.error(updateState.error || 'Échec de la mise à jour du rôle', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -168,13 +214,13 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
       }
     }
     previousUpdateIsPending.current = updateIsPending;
-  }, [updateIsPending, updateState.success, updateState.error]);
+  }, [updateIsPending, updateState.success, updateState.error, updateState.data, roles]);
 
   // Handle delete success/error
   useEffect(() => {
     if (previousDeleteIsPending.current && !deleteIsPending) {
       if (deleteState.success) {
-        toast.success('Role deleted successfully!', {
+        toast.success('Rôle supprimé avec succès!', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -188,7 +234,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
           setRoles(prevRoles => prevRoles.filter(role => role.id !== selectedRole.id));
         }
       } else if (deleteState.error) {
-        toast.error(deleteState.error || 'Failed to delete role', {
+        toast.error(deleteState.error || 'Échec de la suppression du rôle', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -208,8 +254,16 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     testimonials: <MessageSquare className="h-4 w-4" />,
     users: <Users className="h-4 w-4" />,
     roles: <Shield className="h-4 w-4" />,
+    permissions: <Shield className="h-4 w-4" />,
     settings: <Settings className="h-4 w-4" />,
-    content: <Eye className="h-4 w-4" />,
+    about: <Eye className="h-4 w-4" />,
+    faqs: <MessageSquare className="h-4 w-4" />,
+    home: <Eye className="h-4 w-4" />,
+    seo: <Settings className="h-4 w-4" />,
+    operations: <Settings className="h-4 w-4" />,
+    banners: <Eye className="h-4 w-4" />,
+    services: <Package className="h-4 w-4" />,
+    dashboard: <Eye className="h-4 w-4" />,
   };
 
   const resourceLabels: Record<string, string> = {
@@ -220,8 +274,16 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     testimonials: 'Testimonials',
     users: 'Users',
     roles: 'Roles',
+    permissions: 'Permissions',
     settings: 'Settings',
-    content: 'Content',
+    about: 'About',
+    faqs: 'FAQs',
+    home: 'Home',
+    seo: 'SEO',
+    operations: 'Operations',
+    banners: 'Banners',
+    services: 'Services',
+    dashboard: 'Dashboard',
   };
 
   const actionLabels: Record<string, string> = {
@@ -233,6 +295,16 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     approve: 'Approve',
     export: 'Export',
     import: 'Import',
+  };
+
+  // Helper function to get resource label with fallback
+  const getResourceLabel = (resource: string): string => {
+    return resourceLabels[resource] || resource.charAt(0).toUpperCase() + resource.slice(1);
+  };
+
+  // Helper function to get resource icon with fallback
+  const getResourceIcon = (resource: string): React.ReactNode => {
+    return resourceIcons[resource] || <Settings className="h-4 w-4" />;
   };
 
   const handleCreateRole = () => {
@@ -294,7 +366,27 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     deleteFormAction(formData);
   };
 
-  const groupedPermissions = permissions.reduce((acc, permission) => {
+  // Filter permissions based on search and filters
+  const filteredPermissions = useMemo(() => {
+    return permissions.filter(permission => {
+      // Search filter
+      const matchesSearch = !searchTerm || 
+        permission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        permission.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        permission.resource.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        permission.action.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Action filter
+      const matchesAction = selectedActions.length === 0 || selectedActions.includes(permission.action);
+      
+      // Resource filter
+      const matchesResource = selectedResources.length === 0 || selectedResources.includes(permission.resource);
+      
+      return matchesSearch && matchesAction && matchesResource;
+    });
+  }, [permissions, searchTerm, selectedActions, selectedResources]);
+
+  const groupedPermissions = filteredPermissions.reduce((acc: Record<string, Permission[]>, permission: Permission) => {
     if (!acc[permission.resource]) {
       acc[permission.resource] = [];
     }
@@ -306,9 +398,9 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     const template = PERMISSION_TEMPLATES[templateKey as keyof typeof PERMISSION_TEMPLATES];
     if (template) {
       // Find permission IDs that match the template
-      const templatePermissionIds = template.permissions.map(permStr => {
+      const templatePermissionIds = template.permissions.map((permStr: string) => {
         const [resource, action] = permStr.split(':');
-        return permissions.find(p => p.resource === resource && p.action === action)?.id;
+        return permissions.find((p: Permission) => p.resource === resource && p.action === action)?.id;
       }).filter(Boolean) as string[];
       
       setSelectedPermissions(templatePermissionIds);
@@ -333,7 +425,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
   const handleSelectAllResource = (resource: string, select: boolean) => {
     const resourcePermissions = groupedPermissions[resource] || [];
-    const resourcePermissionIds = resourcePermissions.map(p => p.id);
+    const resourcePermissionIds = resourcePermissions.map((p: Permission) => p.id);
     
     if (select) {
       setSelectedPermissions(prev => [...new Set([...prev, ...resourcePermissionIds])]);
@@ -343,8 +435,8 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
   };
 
   const handleSelectAllAction = (action: string, select: boolean) => {
-    const actionPermissions = permissions.filter(p => p.action === action);
-    const actionPermissionIds = actionPermissions.map(p => p.id);
+    const actionPermissions = filteredPermissions.filter((p: Permission) => p.action === action);
+    const actionPermissionIds = actionPermissions.map((p: Permission) => p.id);
     
     if (select) {
       setSelectedPermissions(prev => [...new Set([...prev, ...actionPermissionIds])]);
@@ -353,11 +445,55 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
     }
   };
 
+  // Enhanced bulk operations
+  const selectByAction = (action: string) => {
+    const actionPermissions = filteredPermissions.filter((p: Permission) => p.action === action);
+    const actionPermissionIds = actionPermissions.map((p: Permission) => p.id);
+    setSelectedPermissions(prev => [...new Set([...prev, ...actionPermissionIds])]);
+  };
+
+  const selectByResource = (resource: string) => {
+    const resourcePermissions = filteredPermissions.filter((p: Permission) => p.resource === resource);
+    const resourcePermissionIds = resourcePermissions.map((p: Permission) => p.id);
+    setSelectedPermissions(prev => [...new Set([...prev, ...resourcePermissionIds])]);
+  };
+
+  const toggleActionFilter = (action: string) => {
+    setSelectedActions(prev => 
+      prev.includes(action) 
+        ? prev.filter(a => a !== action)
+        : [...prev, action]
+    );
+  };
+
+  const toggleResourceFilter = (resource: string) => {
+    setSelectedResources(prev => 
+      prev.includes(resource) 
+        ? prev.filter(r => r !== resource)
+        : [...prev, resource]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedActions([]);
+    setSelectedResources([]);
+  };
+
+  const toggleResourceExpansion = (resource: string) => {
+    setExpandedResources(prev => 
+      prev.includes(resource)
+        ? prev.filter(r => r !== resource)
+        : [...prev, resource]
+    );
+  };
+
   const handleCloseCreate = () => {
     if (!createIsPending) {
       setCreateModalOpen(false);
       setEditingRole({});
       setSelectedPermissions([]);
+      clearAllFilters();
     }
   };
 
@@ -366,6 +502,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
       setEditModalOpen(false);
       setEditingRole({});
       setSelectedPermissions([]);
+      clearAllFilters();
     }
   };
 
@@ -606,13 +743,83 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   </TabsContent>
 
                   <TabsContent value="manual" className="space-y-4 mt-4">
+                    {/* Search and Filter Section */}
+                    <div className="space-y-4">
+                      {/* Search Input */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                          placeholder="Search permissions..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+
+                      {/* Filter Buttons */}
+                      <div className="space-y-3">
+                        {/* Action Filters */}
+                        <div>
+                          <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Action</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(actionLabels).map(([action, label]) => (
+                              <Button
+                                key={action}
+                                type="button"
+                                variant={selectedActions.includes(action) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleActionFilter(action)}
+                                className="text-xs"
+                              >
+                                {label}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Resource Filters */}
+                        <div>
+                          <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Resource</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(resourceLabels).map(([resource, label]) => (
+                              <Button
+                                key={resource}
+                                type="button"
+                                variant={selectedResources.includes(resource) ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleResourceFilter(resource)}
+                                className="text-xs"
+                              >
+                                {getResourceIcon(resource)}
+                                <span className="ml-1">{label}</span>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Clear Filters */}
+                        {(searchTerm || selectedActions.length > 0 || selectedResources.length > 0) && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearAllFilters}
+                            className="text-xs"
+                          >
+                            <X className="h-3 w-3 mr-1" />
+                            Clear Filters
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Quick Selection Buttons */}
                     <div className="flex flex-wrap gap-2">
                       <Button
                         type="button"
                         variant="default"
                         size="sm"
-                        onClick={() => setSelectedPermissions(permissions.map(p => p.id))}
+                        onClick={() => setSelectedPermissions(filteredPermissions.map((p: Permission) => p.id))}
                       >
                         Select All
                       </Button>
@@ -628,24 +835,68 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         type="button"
                         variant="default"
                         size="sm"
-                        onClick={() => setSelectedPermissions(permissions.filter(p => p.action === 'read').map(p => p.id))}
+                        onClick={() => setSelectedPermissions(filteredPermissions.filter((p: Permission) => p.action === 'read').map((p: Permission) => p.id))}
                       >
                         Read Only
                       </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectByAction('create')}
+                      >
+                        All Create
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectByAction('update')}
+                      >
+                        All Update
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => selectByAction('delete')}
+                      >
+                        All Delete
+                      </Button>
                     </div>
+
+                    {/* Results Summary */}
+                    {filteredPermissions.length !== permissions.length && (
+                      <div className="text-sm text-muted-foreground">
+                        Showing {filteredPermissions.length} of {permissions.length} permissions
+                      </div>
+                    )}
 
                     {/* Permissions by Resource */}
                     <div className="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+                      {Object.keys(groupedPermissions).length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                          <p>No permissions found matching your criteria</p>
+                        </div>
+                      ) : (
                       <Accordion type="multiple" className="w-full">
-                        {Object.entries(groupedPermissions).map(([resource, perms]) => (
+                          {Object.entries(groupedPermissions).map(([resource, perms]) => {
+                          const typedPerms = perms as Permission[];
+                          return (
                           <AccordionItem key={resource} value={resource} className="border-none">
                             <AccordionTrigger className="p-2 hover:bg-muted/50 rounded-lg">
                               <div className="flex items-center space-x-3">
-                                {resourceIcons[resource] || <Settings className="h-4 w-4" />}
-                                <h4 className="font-medium text-sm capitalize">{resourceLabels[resource]}</h4>
+                                  {getResourceIcon(resource)}
+                                  <h4 className="font-medium text-sm capitalize">{getResourceLabel(resource)}</h4>
                                 <Badge variant="default" className="text-xs">
-                                  {perms.length} permission{perms.length !== 1 ? 's' : ''}
+                                    {typedPerms.length} permission{typedPerms.length !== 1 ? 's' : ''}
                                 </Badge>
+                                  {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      All Selected
+                                    </Badge>
+                                  )}
                               </div>
                             </AccordionTrigger>
                             <div className="flex justify-end mb-2">
@@ -654,42 +905,69 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                  const allSelected = perms.every(p => selectedPermissions.includes(p.id));
+                                  const allSelected = typedPerms.every((p: Permission) => selectedPermissions.includes(p.id));
                                   handleSelectAllResource(resource, !allSelected);
                                 }}
                                 className="text-xs"
                               >
-                                {perms.every(p => selectedPermissions.includes(p.id)) ? 'Deselect All' : 'Select All'}
+                                {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) ? 'Deselect All' : 'Select All'}
                               </Button>
                             </div>
                             <AccordionContent className="space-y-2 ml-6">
                               <div className="grid grid-cols-1 gap-2">
-                                {perms.map((permission) => (
-                                  <div key={permission.id} className="flex items-center space-x-3 p-2 hover:bg-muted/30 rounded-lg">
+                                {typedPerms.map((permission: Permission) => {
+                                  const isCritical = ['delete', 'manage'].includes(permission.action);
+                                  const isSelected = selectedPermissions.includes(permission.id);
+                                  
+                                  return (
+                                    <div 
+                                      key={permission.id} 
+                                      className={`flex items-start space-x-3 p-3 hover:bg-muted/30 rounded-lg transition-colors ${
+                                        isSelected ? 'bg-primary/5 border border-primary/20' : ''
+                                      } ${isCritical ? 'border-l-2 border-l-orange-400' : ''}`}
+                                    >
                                     <Checkbox
                                       id={`create-${permission.id}`}
-                                      checked={selectedPermissions.includes(permission.id)}
+                                        checked={isSelected}
                                       onCheckedChange={(checked) => handlePermissionToggle(permission.id, checked as boolean)}
                                       disabled={createIsPending}
+                                        className="mt-0.5 w-5 h-5"
                                     />
                                     <Label htmlFor={`create-${permission.id}`} className="flex-1 cursor-pointer">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-sm">{permission.name}</span>
-                                        <Badge variant="default" className="text-xs ml-2">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium">{permission.name}</span>
+                                            {isCritical && (
+                                              <Badge variant="destructive" className="text-xs">
+                                                Critical
+                                              </Badge>
+                                            )}
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <Badge 
+                                              variant={permission.action === 'create' ? 'default' : 
+                                                      permission.action === 'read' ? 'secondary' :
+                                                      permission.action === 'update' ? 'outline' : 'destructive'}
+                                              className="text-xs"
+                                            >
                                           {actionLabels[permission.action]}
                                         </Badge>
+                                          </div>
                                       </div>
                                       {permission.description && (
                                         <p className="text-xs text-muted-foreground mt-1">{permission.description}</p>
                                       )}
                                     </Label>
                                   </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </AccordionContent>
                           </AccordionItem>
-                        ))}
+                          );
+                        })}
                       </Accordion>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -825,13 +1103,83 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   </div>
                 </div>
 
+                {/* Search and Filter Section */}
+                <div className="space-y-4">
+                  {/* Search Input */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Search permissions..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+
+                  {/* Filter Buttons */}
+                  <div className="space-y-3">
+                    {/* Action Filters */}
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Action</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(actionLabels).map(([action, label]) => (
+                          <Button
+                            key={action}
+                            type="button"
+                            variant={selectedActions.includes(action) ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => toggleActionFilter(action)}
+                            className="text-xs"
+                          >
+                            {label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Resource Filters */}
+                    <div>
+                      <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Resource</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(resourceLabels).map(([resource, label]) => (
+                          <Button
+                            key={resource}
+                            type="button"
+                            variant={selectedResources.includes(resource) ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => toggleResourceFilter(resource)}
+                            className="text-xs"
+                          >
+                            {getResourceIcon(resource)}
+                            <span className="ml-1">{label}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Clear Filters */}
+                    {(searchTerm || selectedActions.length > 0 || selectedResources.length > 0) && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearAllFilters}
+                        className="text-xs"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
                 {/* Quick Selection Buttons */}
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
                     variant="default"
                     size="sm"
-                    onClick={() => setSelectedPermissions(permissions.map(p => p.id))}
+                    onClick={() => setSelectedPermissions(filteredPermissions.map((p: Permission) => p.id))}
                   >
                     Select All
                   </Button>
@@ -847,24 +1195,68 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                     type="button"
                     variant="default"
                     size="sm"
-                    onClick={() => setSelectedPermissions(permissions.filter(p => p.action === 'read').map(p => p.id))}
+                    onClick={() => setSelectedPermissions(filteredPermissions.filter((p: Permission) => p.action === 'read').map((p: Permission) => p.id))}
                   >
                     Read Only
                   </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => selectByAction('create')}
+                  >
+                    All Create
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => selectByAction('update')}
+                  >
+                    All Update
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => selectByAction('delete')}
+                  >
+                    All Delete
+                  </Button>
                 </div>
+
+                {/* Results Summary */}
+                {filteredPermissions.length !== permissions.length && (
+                  <div className="text-sm text-muted-foreground">
+                    Showing {filteredPermissions.length} of {permissions.length} permissions
+                  </div>
+                )}
 
                 {/* Permissions by Resource */}
                 <div className="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+                  {Object.keys(groupedPermissions).length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No permissions found matching your criteria</p>
+                    </div>
+                  ) : (
                   <Accordion type="multiple" className="w-full">
-                    {Object.entries(groupedPermissions).map(([resource, perms]) => (
+                      {Object.entries(groupedPermissions).map(([resource, perms]) => {
+                        const typedPerms = perms as Permission[];
+                        return (
                       <AccordionItem key={resource} value={resource} className="border-none">
                         <AccordionTrigger className="p-2 hover:bg-muted/50 rounded-lg">
                           <div className="flex items-center space-x-3">
-                            {resourceIcons[resource] || <Settings className="h-4 w-4" />}
-                            <h4 className="font-medium text-sm capitalize">{resourceLabels[resource]}</h4>
+                              {getResourceIcon(resource)}
+                              <h4 className="font-medium text-sm capitalize">{getResourceLabel(resource)}</h4>
                             <Badge variant="default" className="text-xs">
-                              {perms.length} permission{perms.length !== 1 ? 's' : ''}
+                                {typedPerms.length} permission{typedPerms.length !== 1 ? 's' : ''}
                             </Badge>
+                              {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) && (
+                                <Badge variant="secondary" className="text-xs">
+                                  All Selected
+                                </Badge>
+                              )}
                           </div>
                         </AccordionTrigger>
                         <div className="flex justify-end mb-2">
@@ -873,42 +1265,69 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                              const allSelected = perms.every(p => selectedPermissions.includes(p.id));
+                                const allSelected = typedPerms.every((p: Permission) => selectedPermissions.includes(p.id));
                               handleSelectAllResource(resource, !allSelected);
                             }}
                             className="text-xs"
                           >
-                            {perms.every(p => selectedPermissions.includes(p.id)) ? 'Deselect All' : 'Select All'}
+                              {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) ? 'Deselect All' : 'Select All'}
                           </Button>
                         </div>
                         <AccordionContent className="space-y-2 ml-6">
                           <div className="grid grid-cols-1 gap-2">
-                            {perms.map((permission) => (
-                              <div key={permission.id} className="flex items-center space-x-2 p-2 hover:bg-muted/30 rounded-lg">
+                              {typedPerms.map((permission: Permission) => {
+                                const isCritical = ['delete', 'manage'].includes(permission.action);
+                                const isSelected = selectedPermissions.includes(permission.id);
+                                
+                                return (
+                                  <div 
+                                    key={permission.id} 
+                                    className={`flex items-start space-x-3 p-3 hover:bg-muted/30 rounded-lg transition-colors ${
+                                      isSelected ? 'bg-primary/5 border border-primary/20' : ''
+                                    } ${isCritical ? 'border-l-2 border-l-orange-400' : ''}`}
+                                  >
                                 <Checkbox
                                   id={`edit-${permission.id}`}
-                                  checked={selectedPermissions.includes(permission.id)}
+                                      checked={isSelected}
                                   onCheckedChange={(checked) => handlePermissionToggle(permission.id, checked as boolean)}
                                   disabled={updateIsPending}
+                                      className="mt-0.5 w-5 h-5"
                                 />
                                 <Label htmlFor={`edit-${permission.id}`} className="flex-1 cursor-pointer">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-sm">{permission.name}</span>
-                                    <Badge variant="default" className="text-xs ml-2">
+                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium">{permission.name}</span>
+                                          {isCritical && (
+                                            <Badge variant="destructive" className="text-xs">
+                                              Critical
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Badge 
+                                            variant={permission.action === 'create' ? 'default' : 
+                                                    permission.action === 'read' ? 'secondary' :
+                                                    permission.action === 'update' ? 'outline' : 'destructive'}
+                                            className="text-xs"
+                                          >
                                       {actionLabels[permission.action]}
                                     </Badge>
+                                        </div>
                                   </div>
                                   {permission.description && (
                                     <p className="text-xs text-muted-foreground mt-1">{permission.description}</p>
                                   )}
                                 </Label>
                               </div>
-                            ))}
+                                );
+                              })}
                           </div>
                         </AccordionContent>
                       </AccordionItem>
-                    ))}
+                        );
+                      })}
                   </Accordion>
+                  )}
                 </div>
               </div>
             </div>

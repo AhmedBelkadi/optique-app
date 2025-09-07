@@ -2,10 +2,11 @@
 
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
-import { updateRole } from '@/features/auth/services/roleService';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
 import { getCurrentUser } from '@/features/auth/services/session';
+import { updateRoleSchema, UpdateRoleInput, ROLE_ERRORS } from '../schema/roleSchema';
+import { updateRoleWithValidation } from '../services/roleOperationService';
 
 export interface UpdateRoleState {
   success: boolean;
@@ -16,6 +17,22 @@ export interface UpdateRoleState {
     description: string;
     permissions: string[];
   };
+  data?: {
+    role: {
+      id: string;
+      name: string;
+      description: string | null;
+      isActive: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+    permissions: Array<{
+      id: string;
+      name: string;
+      resource: string;
+      action: string;
+    }>;
+  };
 }
 
 export async function updateRoleAction(prevState: UpdateRoleState, formData: FormData): Promise<UpdateRoleState> {
@@ -25,7 +42,7 @@ export async function updateRoleAction(prevState: UpdateRoleState, formData: For
     if (!currentUser) {
       return {
         success: false,
-        error: 'Authentication required. Please log in.',
+        error: ROLE_ERRORS.SESSION_NOT_FOUND,
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -39,7 +56,7 @@ export async function updateRoleAction(prevState: UpdateRoleState, formData: For
     if (!currentUser.isAdmin) {
       return {
         success: false,
-        error: 'Access denied. Only administrators can update roles.',
+        error: ROLE_ERRORS.PERMISSION_DENIED,
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -58,99 +75,65 @@ export async function updateRoleAction(prevState: UpdateRoleState, formData: For
     // Validate CSRF token
     await validateCSRFToken(formData);
 
-    const roleId = formData.get('roleId') as string;
+    // Extract and sanitize form data
     const rawData = {
-      name: formData.get('name') as string,
-      description: formData.get('description') as string,
+      roleId: (formData.get('roleId') as string)?.trim() || '',
+      name: (formData.get('name') as string)?.trim() || '',
+      description: (formData.get('description') as string)?.trim() || '',
       permissions: formData.getAll('permissions') as string[],
     };
 
-    if (!roleId) {
+    // Validate input using Zod schema
+    const validation = updateRoleSchema.safeParse(rawData);
+    if (!validation.success) {
       return {
         success: false,
-        error: 'Role ID is required',
+        error: ROLE_ERRORS.VALIDATION_FAILED,
+        fieldErrors: validation.error.flatten().fieldErrors,
+        values: rawData,
+      };
+    }
+
+    const validatedData = validation.data;
+
+    // Update role using service layer
+    const result = await updateRoleWithValidation(validatedData, currentUser.id);
+
+    if (result.success) {
+      // Invalidate cache to refresh the UI
+      revalidateTag('roles');
+      revalidateTag('permissions');
+      
+      return {
+        success: true,
+        error: '',
         fieldErrors: {},
-        values: rawData,
-      };
-    }
-
-    // Prevent editing the admin role
-    if (rawData.name.toLowerCase() === 'admin') {
-      return {
-        success: false,
-        error: 'Cannot modify the admin role',
-        fieldErrors: {},
-        values: rawData,
-      };
-    }
-
-    // Basic validation
-    if (!rawData.name || rawData.name.trim().length === 0) {
-      return {
-        success: false,
-        error: '',
-        fieldErrors: {
-          name: ['Role name is required'],
+        values: {
+          name: '',
+          description: '',
+          permissions: [],
         },
-        values: rawData,
+        data: result.data,
       };
-    }
-
-    if (rawData.name.trim().length < 2) {
+    } else {
       return {
         success: false,
-        error: '',
-        fieldErrors: {
-          name: ['Role name must be at least 2 characters long'],
-        },
+        error: result.error || ROLE_ERRORS.ROLE_UPDATE_FAILED,
+        fieldErrors: result.fieldErrors || {},
         values: rawData,
       };
     }
 
-    // Validate permissions
-    if (!rawData.permissions || rawData.permissions.length === 0) {
-      return {
-        success: false,
-        error: '',
-        fieldErrors: {
-          permissions: ['At least one permission is required'],
-        },
-        values: rawData,
-      };
-    }
-
-    // Update role
-    const role = await updateRole(roleId, {
-      name: rawData.name.trim(),
-      description: rawData.description.trim() || undefined,
-      permissions: rawData.permissions,
-      assignedBy: currentUser.id,
-    });
-
-    // Invalidate cache to refresh the UI
-    revalidateTag('roles');
-    revalidateTag('permissions');
-    
-    return {
-      success: true,
-      error: '',
-      fieldErrors: {},
-      values: {
-        name: '',
-        description: '',
-        permissions: [],
-      },
-    };
   } catch (error) {
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       return {
         success: false,
-        error: error.message,
+        error: ROLE_ERRORS.RATE_LIMIT_EXCEEDED,
         fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
+          name: (formData.get('name') as string) || '',
+          description: (formData.get('description') as string) || '',
           permissions: formData.getAll('permissions') as string[],
         },
       };
@@ -160,74 +143,48 @@ export async function updateRoleAction(prevState: UpdateRoleState, formData: For
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
         success: false,
-        error: 'Security validation failed. Please refresh the page and try again.',
+        error: ROLE_ERRORS.CSRF_ERROR,
         fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
+          name: (formData.get('name') as string) || '',
+          description: (formData.get('description') as string) || '',
           permissions: formData.getAll('permissions') as string[],
         },
       };
     }
 
-    // Handle role not found
-    if (error instanceof Error && error.message.includes('Record to update not found')) {
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       return {
         success: false,
-        error: 'Role not found or has been deleted.',
+        error: ROLE_ERRORS.PERMISSION_DENIED,
         fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          permissions: formData.getAll('permissions') as string[],
-        },
-      };
-    }
-
-    // Handle duplicate role name
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return {
-        success: false,
-        error: 'A role with this name already exists.',
-        fieldErrors: {
-          name: ['A role with this name already exists'],
-        },
-        values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          permissions: formData.getAll('permissions') as string[],
-        },
-      };
-    }
-
-    // Handle permission-related errors
-    if (error instanceof Error && error.message.includes('permission')) {
-      return {
-        success: false,
-        error: 'Failed to update role permissions. Please try again.',
-        fieldErrors: {},
-        values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          permissions: formData.getAll('permissions') as string[],
-        },
+          name: '',
+          description: '',
+          permissions: [],
+        }
       };
     }
 
     // Log error and return generic message
     logError(error as Error, { 
-      action: 'updateRole',
-      userId: (await getCurrentUser())?.id,
-      roleId: formData.get('roleId') as string,
+      action: 'updateRoleAction',
+      formData: {
+        roleId: formData.get('roleId'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+        permissions: formData.getAll('permissions'),
+      }
     });
 
     return {
       success: false,
-      error: 'Failed to update role. Please try again.',
+      error: ROLE_ERRORS.UNEXPECTED_ERROR,
       fieldErrors: {},
       values: {
-        name: formData.get('name') as string,
-        description: formData.get('description') as string,
+        name: (formData.get('name') as string) || '',
+        description: (formData.get('description') as string) || '',
         permissions: formData.getAll('permissions') as string[],
       },
     };

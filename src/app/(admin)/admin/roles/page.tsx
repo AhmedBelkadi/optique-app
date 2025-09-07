@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { getAllRolesWithDetails, getAllPermissions } from '@/features/auth/services/roleService';
 import RoleManagement from '@/components/features/admin/RoleManagement';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
-import { Shield } from 'lucide-react';
 import { requirePermission } from '@/lib/auth/authorization';
 
 // Force dynamic rendering

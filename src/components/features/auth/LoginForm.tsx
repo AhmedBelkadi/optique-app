@@ -31,7 +31,7 @@ export default function LoginForm() {
   // Handle login success/error
   useEffect(() => {
     if (previousIsPending.current && !isPending && !state.error && state.success) {
-      // Success - show toast and redirect
+      // Success - redirect to admin
       toast.success('Login successful!');
       router.push('/admin/');
     } else if (previousIsPending.current && !isPending && state.error) {
@@ -190,10 +190,13 @@ export default function LoginForm() {
             )}
           </Button>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Staff and admin access only
             </p>
+            <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </CardContent>

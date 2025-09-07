@@ -15,15 +15,11 @@ export async function logoutAction(prevState: any, formData: FormData) {
     await rateLimit(identifier, { maxRequests: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
     
     // Validate CSRF token
-    //await validateCSRFToken(formData);
+    await validateCSRFToken(formData);
 
-    // Clear session cookies
-    const cookieStore = await cookies();
-    
-    // Remove session-related cookies
-    cookieStore.delete('session_token');
-    cookieStore.delete('user_data');
-    cookieStore.delete('csrf_token');
+    // Import and call destroySession to clean up database
+    const { destroySession } = await import('@/features/auth/services/session');
+    await destroySession();
     
     // Redirect to login page
     redirect('/auth/login');

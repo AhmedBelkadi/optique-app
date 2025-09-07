@@ -1,29 +1,31 @@
 'use client';
 
 import { Button } from '../ui/button';
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { logoutAction } from '@/features/auth/actions/logout';
 
 interface UserNavProps {
-  onLogout?: () => void;
+  csrfToken?: string | null;
 }
 
-export default function UserNav({ onLogout }: UserNavProps) {
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
+export default function UserNav({ csrfToken }: UserNavProps) {
+  const handleLogout = async (formData: FormData) => {
+    await logoutAction({}, formData);
   };
 
   return (
     <div className="flex items-center space-x-4">
-      <Button
-        onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-600"
-        size="sm"
-      >
-        <LogOut className="w-4 h-4 mr-2" />
-        Logout
-      </Button>
+      <form action={handleLogout}>
+        <input type="hidden" name="csrf_token" value={csrfToken || ''} />
+        <Button
+          type="submit"
+          className="bg-red-500 hover:bg-red-600"
+          size="sm"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </Button>
+      </form>
     </div>
   );
 }

@@ -20,42 +20,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session token on mount
-    const storedToken = localStorage.getItem('session_token');
-    const storedUser = localStorage.getItem('user_data');
-    
-    if (storedToken && storedUser) {
+    // Check for existing session on mount by calling server
+    const checkSession = async () => {
       try {
-        const userData = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(userData);
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          setToken('session_exists'); // We don't store the actual token client-side
+        } else {
+          setUser(null);
+          setToken(null);
+        }
       } catch (error) {
-        console.error('Error parsing stored user data:', error);
-        localStorage.removeItem('session_token');
-        localStorage.removeItem('user_data');
+        console.error('Error checking session:', error);
+        setUser(null);
+        setToken(null);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
     
-    setIsLoading(false);
+    checkSession();
   }, []);
 
-  const login = (newToken: string, userData: UserWithRoles) => {
-    setToken(newToken);
+  const login = (userData: UserWithRoles) => {
+    setToken('session_exists');
     setUser(userData);
-    localStorage.setItem('session_token', newToken);
-    localStorage.setItem('user_data', JSON.stringify(userData));
+    // No localStorage usage - sessions are server-side only
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('session_token');
-    localStorage.removeItem('user_data');
+  const logout = async () => {
+    try {
+      // Call server to destroy session
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      setToken(null);
+      setUser(null);
+    }
   };
 
   const updateUser = (userData: UserWithRoles) => {
     setUser(userData);
-    localStorage.setItem('user_data', JSON.stringify(userData));
+    // No localStorage usage - user data is fetched from server
   };
 
   return (

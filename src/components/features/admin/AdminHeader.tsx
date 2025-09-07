@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import UserNav from '@/components/common/UserNav';
 import { useAdminPage } from './AdminPageContext';
-import { logoutAction } from '@/features/auth/actions/logout';
+import { useCSRF } from '@/components/common/CSRFProvider';
 
 
 interface AdminHeaderProps {
@@ -23,6 +23,7 @@ export default function AdminHeader({
 }: AdminHeaderProps) {
   const { pageInfo } = useAdminPage();
   const [searchQuery, setSearchQuery] = useState('');
+  const { csrfToken } = useCSRF();
 
   return (
     <header className={`bg-background/80 backdrop-blur-xl shadow-sm border-b border-border/60 sticky top-0 z-20 ${className}`}>
@@ -104,7 +105,7 @@ export default function AdminHeader({
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
-              <UserNav onLogout={() => logoutAction({}, new FormData())} />
+              <UserNav csrfToken={csrfToken} />
             </div>
           ) : (
             <div className="flex items-center space-x-2">

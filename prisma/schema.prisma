@@ -19,6 +19,7 @@ model User {
   lastLoginAt DateTime?
   sessions  Session[]
   userRoles UserRole[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
   @@index([createdAt])
@@ -39,6 +40,22 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([used])
+  @@map("password_reset_tokens")
 }
 
 model Role {

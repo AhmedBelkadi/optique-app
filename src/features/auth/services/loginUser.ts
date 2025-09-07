@@ -1,13 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/shared/utils/crypto';
 import { createSession } from './session';
-import { authSchema } from '../schema/authSchema';
 import { sanitizeEmail } from '@/lib/shared/utils/sanitize';
 
 export interface LoginResult {
   success: boolean;
   error?: string;
-  fieldErrors?: Record<string, string[]>;
   user?: {
     id: string;
     name: string;
@@ -19,18 +17,6 @@ export async function loginUser(email: string, password: string): Promise<LoginR
   try {
     // Sanitize email input
     const sanitizedEmail = sanitizeEmail(email);
-    
-    // Validate sanitized input
-    const validation = authSchema.login.safeParse({ 
-      email: sanitizedEmail, 
-      password 
-    });
-    if (!validation.success) {
-      return {
-        success: false,
-        fieldErrors: validation.error.flatten().fieldErrors,
-      };
-    }
 
     // Find user by email
     const user = await prisma.user.findUnique({

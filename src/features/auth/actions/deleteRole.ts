@@ -2,11 +2,11 @@
 
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
-import { deleteRole } from '@/features/auth/services/roleService';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
 import { getCurrentUser } from '@/features/auth/services/session';
-import { prisma } from '@/lib/prisma';
+import { ROLE_ERRORS } from '../schema/roleSchema';
+import { deleteRoleWithValidation } from '../services/roleOperationService';
 
 export interface DeleteRoleState {
   success: boolean;
@@ -20,7 +20,7 @@ export async function deleteRoleAction(prevState: DeleteRoleState, formData: For
     if (!currentUser) {
       return {
         success: false,
-        error: 'Authentication required. Please log in.',
+        error: ROLE_ERRORS.SESSION_NOT_FOUND,
       };
     }
 
@@ -28,7 +28,7 @@ export async function deleteRoleAction(prevState: DeleteRoleState, formData: For
     if (!currentUser.isAdmin) {
       return {
         success: false,
-        error: 'Access denied. Only administrators can delete roles.',
+        error: ROLE_ERRORS.PERMISSION_DENIED,
       };
     }
 
@@ -41,7 +41,7 @@ export async function deleteRoleAction(prevState: DeleteRoleState, formData: For
     // Validate CSRF token
     await validateCSRFToken(formData);
 
-    const roleId = formData.get('roleId') as string;
+    const roleId = (formData.get('roleId') as string)?.trim();
     
     if (!roleId) {
       return {
@@ -50,46 +50,31 @@ export async function deleteRoleAction(prevState: DeleteRoleState, formData: For
       };
     }
 
-    // Check if role is used by any users
-    const usersWithRole = await prisma.userRole.count({
-      where: { roleId },
-    });
+    // Delete role using service layer
+    const result = await deleteRoleWithValidation(roleId);
 
-    if (usersWithRole > 0) {
+    if (result.success) {
+      // Invalidate cache to refresh the UI
+      revalidateTag('roles');
+      revalidateTag('permissions');
+      
+      return {
+        success: true,
+        error: '',
+      };
+    } else {
       return {
         success: false,
-        error: `Cannot delete role. It is assigned to ${usersWithRole} user(s). Please reassign or remove users from this role first.`,
+        error: result.error || ROLE_ERRORS.ROLE_DELETE_FAILED,
       };
     }
 
-    // Check if trying to delete admin role
-    const role = await prisma.role.findUnique({
-      where: { id: roleId },
-    });
-
-    if (role?.name === 'admin') {
-      return {
-        success: false,
-        error: 'Cannot delete the admin role. This role is required for system administration.',
-      };
-    }
-
-    // Delete role
-    await deleteRole(roleId);
-
-    // Invalidate cache to refresh the UI
-    revalidateTag('roles');
-    
-    return {
-      success: true,
-      error: '',
-    };
   } catch (error) {
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       return {
         success: false,
-        error: error.message,
+        error: ROLE_ERRORS.RATE_LIMIT_EXCEEDED,
       };
     }
     
@@ -97,28 +82,27 @@ export async function deleteRoleAction(prevState: DeleteRoleState, formData: For
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
         success: false,
-        error: 'Security validation failed. Please refresh the page and try again.',
+        error: ROLE_ERRORS.CSRF_ERROR,
       };
     }
 
-    // Handle role not found
-    if (error instanceof Error && error.message.includes('Record to update not found')) {
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       return {
         success: false,
-        error: 'Role not found or has already been deleted.',
+        error: ROLE_ERRORS.PERMISSION_DENIED,
       };
     }
 
     // Log error and return generic message
     logError(error as Error, { 
-      action: 'deleteRole',
-      userId: (await getCurrentUser())?.id,
+      action: 'deleteRoleAction',
       roleId: formData.get('roleId') as string,
     });
 
     return {
       success: false,
-      error: 'Failed to delete role. Please try again.',
+      error: ROLE_ERRORS.UNEXPECTED_ERROR,
     };
   }
 }

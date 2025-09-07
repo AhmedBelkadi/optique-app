@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Inter } from 'next/font/google';
 import { useRouter } from 'next/navigation';
 import AdminSidebar from './AdminSidebar';
@@ -34,9 +34,9 @@ export default function AdminLayout({
     setIsSidebarOpen(false);
   };
 
-  const handleSidebarCollapse = (collapsed: boolean) => {
+  const handleSidebarCollapse = useCallback((collapsed: boolean) => {
     setIsSidebarCollapsed(collapsed);
-  };
+  }, []);
 
   // Close sidebar on escape key
   useEffect(() => {

@@ -2,10 +2,11 @@
 
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
-import { createRole } from '@/features/auth/services/roleService';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
 import { getCurrentUser } from '@/features/auth/services/session';
+import { createRoleSchema, CreateRoleInput, ROLE_ERRORS } from '../schema/roleSchema';
+import { createRoleWithValidation } from '../services/roleOperationService';
 
 export interface CreateRoleState {
   success: boolean;
@@ -16,6 +17,22 @@ export interface CreateRoleState {
     description: string;
     permissions: string[];
   };
+  data?: {
+    role: {
+      id: string;
+      name: string;
+      description: string | null;
+      isActive: boolean;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+    permissions: Array<{
+      id: string;
+      name: string;
+      resource: string;
+      action: string;
+    }>;
+  };
 }
 
 export async function createRoleAction(prevState: CreateRoleState, formData: FormData): Promise<CreateRoleState> {
@@ -25,7 +42,7 @@ export async function createRoleAction(prevState: CreateRoleState, formData: For
     if (!currentUser) {
       return {
         success: false,
-        error: 'Authentication required. Please log in.',
+        error: ROLE_ERRORS.SESSION_NOT_FOUND,
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -39,7 +56,7 @@ export async function createRoleAction(prevState: CreateRoleState, formData: For
     if (!currentUser.isAdmin) {
       return {
         success: false,
-        error: 'Access denied. Only administrators can create roles.',
+        error: ROLE_ERRORS.PERMISSION_DENIED,
         fieldErrors: {},
         values: {
           name: formData.get('name') as string,
@@ -58,65 +75,64 @@ export async function createRoleAction(prevState: CreateRoleState, formData: For
     // Validate CSRF token
     await validateCSRFToken(formData);
 
+    // Extract and sanitize form data
     const rawData = {
-      name: formData.get('name') as string,
-      description: formData.get('description') as string,
+      name: (formData.get('name') as string)?.trim() || '',
+      description: (formData.get('description') as string)?.trim() || '',
       permissions: formData.getAll('permissions') as string[],
     };
 
-    // Basic validation
-    if (!rawData.name || rawData.name.trim().length === 0) {
+    // Validate input using Zod schema
+    const validation = createRoleSchema.safeParse(rawData);
+    if (!validation.success) {
       return {
         success: false,
-        error: '',
-        fieldErrors: {
-          name: ['Role name is required'],
-        },
+        error: ROLE_ERRORS.VALIDATION_FAILED,
+        fieldErrors: validation.error.flatten().fieldErrors,
         values: rawData,
       };
     }
 
-    if (rawData.name.trim().length < 2) {
+    const validatedData = validation.data;
+
+    // Create role using service layer
+    const result = await createRoleWithValidation(validatedData, currentUser.id);
+
+    if (result.success) {
+      // Invalidate cache to refresh the UI
+      revalidateTag('roles');
+      revalidateTag('permissions');
+      
+      return {
+        success: true,
+        error: '',
+        fieldErrors: {},
+        values: {
+          name: '',
+          description: '',
+          permissions: [],
+        },
+        data: result.data,
+      };
+    } else {
       return {
         success: false,
-        error: '',
-        fieldErrors: {
-          name: ['Role name must be at least 2 characters long'],
-        },
+        error: result.error || ROLE_ERRORS.ROLE_CREATION_FAILED,
+        fieldErrors: result.fieldErrors || {},
         values: rawData,
       };
     }
 
-    // Create role
-    const role = await createRole({
-      name: rawData.name.trim(),
-      description: rawData.description.trim() || undefined,
-      permissions: rawData.permissions,
-    });
-
-    // Invalidate cache to refresh the UI
-    revalidateTag('roles');
-    
-    return {
-      success: true,
-      error: '',
-      fieldErrors: {},
-      values: {
-        name: '',
-        description: '',
-        permissions: [],
-      },
-    };
   } catch (error) {
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       return {
         success: false,
-        error: error.message,
+        error: ROLE_ERRORS.RATE_LIMIT_EXCEEDED,
         fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
+          name: (formData.get('name') as string) || '',
+          description: (formData.get('description') as string) || '',
           permissions: formData.getAll('permissions') as string[],
         },
       };
@@ -126,45 +142,47 @@ export async function createRoleAction(prevState: CreateRoleState, formData: For
     if (error instanceof Error && error.name === 'CSRFError') {
       return {
         success: false,
-        error: 'Security validation failed. Please refresh the page and try again.',
+        error: ROLE_ERRORS.CSRF_ERROR,
         fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
+          name: (formData.get('name') as string) || '',
+          description: (formData.get('description') as string) || '',
           permissions: formData.getAll('permissions') as string[],
         },
       };
     }
 
-    // Handle duplicate role name
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
+    // Handle permission/authorization errors
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       return {
         success: false,
-        error: 'A role with this name already exists.',
-        fieldErrors: {
-          name: ['A role with this name already exists'],
-        },
+        error: ROLE_ERRORS.PERMISSION_DENIED,
+        fieldErrors: {},
         values: {
-          name: formData.get('name') as string,
-          description: formData.get('description') as string,
-          permissions: formData.getAll('permissions') as string[],
-        },
+          name: '',
+          description: '',
+          permissions: [],
+        }
       };
     }
 
     // Log error and return generic message
     logError(error as Error, { 
-      action: 'createRole',
-      userId: (await getCurrentUser())?.id,
+      action: 'createRoleAction',
+      formData: {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        permissions: formData.getAll('permissions'),
+      }
     });
 
     return {
       success: false,
-      error: 'Failed to create role. Please try again.',
+      error: ROLE_ERRORS.UNEXPECTED_ERROR,
       fieldErrors: {},
       values: {
-        name: formData.get('name') as string,
-        description: formData.get('description') as string,
+        name: (formData.get('name') as string) || '',
+        description: (formData.get('description') as string) || '',
         permissions: formData.getAll('permissions') as string[],
       },
     };

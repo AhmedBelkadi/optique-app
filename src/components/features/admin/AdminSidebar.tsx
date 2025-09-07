@@ -219,7 +219,7 @@ export default function AdminSidebar({ user, className = "", onSidebarCollapse }
   // Notify parent of initial state
   useEffect(() => {
     onSidebarCollapse?.(isSidebarCollapsed);
-  }, []); // Only run once on mount
+  }, [isSidebarCollapsed, onSidebarCollapse]); // Run when state changes
 
   const toggleGroup = (groupTitle: string) => {
     setCollapsedGroups(prev => {

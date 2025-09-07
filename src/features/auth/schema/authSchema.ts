@@ -12,14 +12,7 @@ export const authSchema = {
       ),
     password: z
       .string()
-      .min(
-        VALIDATION_CONSTANTS.auth.password.minLength,
-        ERROR_MESSAGES.validation.minLength(VALIDATION_CONSTANTS.auth.password.minLength)
-      )
-      .max(
-        VALIDATION_CONSTANTS.auth.password.maxLength,
-        ERROR_MESSAGES.validation.maxLength(VALIDATION_CONSTANTS.auth.password.maxLength)
-      ),
+      .min(1, "Password is required"),
   }),
 
   user: z.object({
@@ -32,7 +25,56 @@ export const authSchema = {
     createdAt: z.date(),
     updatedAt: z.date(),
   }),
+
+  forgotPassword: z.object({
+    email: z
+      .string()
+      .email(ERROR_MESSAGES.validation.email)
+      .max(
+        VALIDATION_CONSTANTS.auth.email.maxLength,
+        ERROR_MESSAGES.validation.maxLength(VALIDATION_CONSTANTS.auth.email.maxLength)
+      ),
+  }),
+
+  resetPassword: z.object({
+    token: z.string().min(1, 'Reset token is required'),
+    password: z
+      .string()
+      .min(
+        VALIDATION_CONSTANTS.auth.password.minLength,
+        ERROR_MESSAGES.validation.minLength(VALIDATION_CONSTANTS.auth.password.minLength)
+      )
+      .max(
+        VALIDATION_CONSTANTS.auth.password.maxLength,
+        ERROR_MESSAGES.validation.maxLength(VALIDATION_CONSTANTS.auth.password.maxLength)
+      )
+      .refine(
+        (password) => /[A-Z]/.test(password),
+        "Password must contain at least one uppercase letter"
+      )
+      .refine(
+        (password) => /[a-z]/.test(password),
+        "Password must contain at least one lowercase letter"
+      )
+      .refine(
+        (password) => /[0-9]/.test(password),
+        "Password must contain at least one number"
+      )
+      .refine(
+        (password) => /[^A-Za-z0-9]/.test(password),
+        "Password must contain at least one special character"
+      ),
+    confirmPassword: z.string(),
+  }).refine(
+    (data) => data.password === data.confirmPassword,
+    {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+    }
+  ),
 };
 
 export type LoginInput = z.infer<typeof authSchema.login>;
 export type User = z.infer<typeof authSchema.user>;
+export type ForgotPasswordInput = z.infer<typeof authSchema.forgotPassword>;
+export type ResetPasswordInput = z.infer<typeof authSchema.resetPassword>;

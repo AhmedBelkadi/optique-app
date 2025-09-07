@@ -19,24 +19,10 @@ import CustomerSelector from './CustomerSelector';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import { checkAppointmentAvailabilityAction } from '@/features/appointments/actions/checkAppointmentAvailabilityAction';
 import type { AvailabilityCheckResult } from '@/features/appointments/services/checkAppointmentAvailability';
+import { AppointmentStatus, Customer, AppointmentFormValidation } from '@/features/appointments/types';
+import { createAppointmentSchema } from '@/features/appointments/utils/validation';
 
-interface AppointmentStatus {
-  id: string;
-  name: string;
-  displayName: string;
-  color: string;
-  description?: string | null;
-}
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  notes?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Types are now imported from shared types file
 
 interface AppointmentCreateFormProps {
   onCreate: (formData: any) => void;
@@ -44,22 +30,8 @@ interface AppointmentCreateFormProps {
   setIsCreating: (isCreating: boolean) => void;
 }
 
-// Form validation schema
-const appointmentCreateSchema = z.object({
-  title: z.string().min(2, 'Le titre doit contenir au moins 2 caractères').max(100, 'Le titre ne peut pas dépasser 100 caractères'),
-  description: z.string().max(500, 'La description ne peut pas dépasser 500 caractères').optional(),
-  appointmentDate: z.string().min(1, 'La date est requise'),
-  appointmentTime: z.string().min(1, 'L\'heure est requise'),
-  duration: z.number().int().min(15, 'La durée minimale est de 15 minutes').max(480, 'La durée maximale est de 8 heures'),
-  notes: z.string().max(1000, 'Les notes ne peuvent pas dépasser 1000 caractères').optional(),
-  // Customer fields are optional when using CustomerSelector
-  customerName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(100, 'Le nom ne peut pas dépasser 100 caractères').optional(),
-  customerPhone: z.string().min(10, 'Le numéro de téléphone doit contenir au moins 10 chiffres').max(15, 'Le numéro de téléphone ne peut pas dépasser 15 chiffres').optional(),
-  customerEmail: z.string().email('L\'email doit être valide').max(100, 'L\'email ne peut pas dépasser 100 caractères').optional(),
-  customerNotes: z.string().max(500, 'Les notes ne peuvent pas dépasser 500 caractères').optional(),
-});
-
-type AppointmentCreateFormData = z.infer<typeof appointmentCreateSchema>;
+// Use shared validation schema
+type AppointmentCreateFormData = z.infer<typeof createAppointmentSchema>;
 
 export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreating }: AppointmentCreateFormProps) {
   const router = useRouter();
@@ -78,7 +50,8 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
 
   // Initialize form with default values
   const form = useForm<AppointmentCreateFormData>({
-    resolver: zodResolver(appointmentCreateSchema),
+    resolver: zodResolver(createAppointmentSchema),
+    mode: 'onSubmit', // Only validate on submit, not on change
     defaultValues: {
       title: '',
       description: '',
@@ -262,6 +235,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
       // Check if it's Sunday
       if (dayOfWeek === 0) {
         toast.error('Les rendez-vous ne sont pas disponibles le dimanche');
+        form.setError('appointmentTime', {
+          type: 'manual',
+          message: 'Les rendez-vous ne sont pas disponibles le dimanche'
+        });
         setIsCreating(false);
         return;
       }
@@ -269,6 +246,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
       // Check business hours (9:00 AM to 7:00 PM)
       if (hours < 9 || hours >= 19) {
         toast.error('Les rendez-vous ne sont disponibles que de 9h00 à 19h00');
+        form.setError('appointmentTime', {
+          type: 'manual',
+          message: 'Les rendez-vous ne sont disponibles que de 9h00 à 19h00'
+        });
         setIsCreating(false);
         return;
       }
@@ -276,6 +257,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
       // Check if appointment is at least 30 minutes before closing
       if (hours === 18 && minutes > 30) {
         toast.error('Le dernier rendez-vous possible est à 18h30');
+        form.setError('appointmentTime', {
+          type: 'manual',
+          message: 'Le dernier rendez-vous possible est à 18h30'
+        });
         setIsCreating(false);
         return;
       }
@@ -283,6 +268,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
       // Check if appointment is in the past
       if (appointmentDateTime < new Date()) {
         toast.error('La date de rendez-vous ne peut pas être dans le passé');
+        form.setError('appointmentDate', {
+          type: 'manual',
+          message: 'La date de rendez-vous ne peut pas être dans le passé'
+        });
         setIsCreating(false);
         return;
       }
@@ -290,6 +279,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
       // Check availability before submission
       if (availabilityStatus && !availabilityStatus.isAvailable) {
         toast.error('Ce créneau n\'est pas disponible. Veuillez choisir un autre horaire.');
+        form.setError('appointmentTime', {
+          type: 'manual',
+          message: 'Ce créneau n\'est pas disponible. Veuillez choisir un autre horaire.'
+        });
         setIsCreating(false);
         return;
       }

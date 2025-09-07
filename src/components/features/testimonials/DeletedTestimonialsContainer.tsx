@@ -104,11 +104,11 @@ export default function DeletedTestimonialsContainer({
                   </div>
                 </div>
                 <Button
-                  variant="default"
+                  variant="destructive"
                   size="sm"
                   onClick={() => handleRestore(testimonial.id)}
                   disabled={restoring === testimonial.id || csrfLoading}
-                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                  className="border-destructive/30 text-white hover:bg-destructive/80"
                 >
                   {restoring === testimonial.id ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />

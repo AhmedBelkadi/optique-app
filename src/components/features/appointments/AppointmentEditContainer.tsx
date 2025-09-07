@@ -50,7 +50,8 @@ export default function AppointmentEditContainer({ appointment }: AppointmentEdi
   const handleSave = async (formData: any) => {
     setIsSaving(true);
     try {
-      // This will be handled by the form component
+      // The form component will handle the actual update
+      // This function is called by the form after successful update
       toast.success('Rendez-vous mis à jour avec succès');
       router.push(`/admin/appointments/${appointment.id}`);
     } catch (error) {

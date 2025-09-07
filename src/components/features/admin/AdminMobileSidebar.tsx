@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { X, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AdminNavItem from './AdminNavItem';
 import {
@@ -15,12 +15,10 @@ import {
   Calendar,
   Home,
   User,
-  HelpCircle,
   Image,
   Shield,
   UserCheck,
   Info,
-  Search,
   Wrench,
 } from 'lucide-react';
 
@@ -104,7 +102,7 @@ const navGroups: NavGroup[] = [
         staffAccessible: true
       },
       {
-        href: '/admin/content/banners',
+        href: '/admin/banners',
         label: 'Bannières',
         icon: Image,
         description: 'Gérer les bannières du site',

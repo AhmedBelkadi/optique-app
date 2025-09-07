@@ -43,40 +43,14 @@ export default function AppointmentCreateContainer() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin/appointments">
-            <Button variant="default">
-              Annuler
-            </Button>
-          </Link>
-          <Button 
-            type="submit" 
-            form="appointment-create-form"
-            disabled={isCreating}
-            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {isCreating ? 'Création...' : 'Créer le rendez-vous'}
-          </Button>
-        </div>
       </div>
 
       {/* Create Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations du rendez-vous</CardTitle>
-          <CardDescription>
-            Remplissez les détails du rendez-vous et les informations du client
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AppointmentCreateForm 
-            onCreate={handleCreate}
-            isCreating={isCreating}
-            setIsCreating={setIsCreating}
-          />
-        </CardContent>
-      </Card>
+      <AppointmentCreateForm 
+        onCreate={handleCreate}
+        isCreating={isCreating}
+        setIsCreating={setIsCreating}
+      />
     </div>
   );
 }

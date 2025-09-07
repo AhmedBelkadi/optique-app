@@ -44,7 +44,7 @@ export default function FloatingCTA() {
           </div>
 
           <Link href="/appointment">
-            <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg animate-pulse hover:animate-none">
+            <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg">
               <Calendar className="mr-2 h-4 w-4 animate-bounce" />
               Prendre RDV
             </Button>

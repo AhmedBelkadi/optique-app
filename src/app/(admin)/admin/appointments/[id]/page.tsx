@@ -43,12 +43,14 @@ export default async function AppointmentDetailPage({ params }: AppointmentDetai
 
       <div className="min-h-screen bg-muted/50">
         <div className="py-4">
-          <Suspense fallback={<AppointmentDetailSkeleton />}>
-            <AppointmentDetailContainer 
-              appointment={appointment} 
-              appointmentStatuses={appointmentStatuses}
-            />
-          </Suspense>
+          <div className="px-3 sm:px-4 md:px-6 lg:px-0">
+            <Suspense fallback={<AppointmentDetailSkeleton />}>
+              <AppointmentDetailContainer 
+                appointment={appointment} 
+                appointmentStatuses={appointmentStatuses}
+              />
+            </Suspense>
+          </div>
         </div>
       </div>
     </>

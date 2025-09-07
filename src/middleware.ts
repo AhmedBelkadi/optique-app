@@ -1,42 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Define route permissions for different roles
-const routePermissions = {
-  // Admin-only routes (full access)
-  adminOnly: [
-    '/admin/settings',
-    '/admin/users',
-    '/admin/roles',
-    '/admin/content',
-    '/admin/analytics',
-  ],
-  
-  // Staff-accessible routes (operational access)
-  staffAccessible: [
-    '/admin',
-    '/admin/products',
-    '/admin/categories', 
-    '/admin/customers',
-    '/admin/appointments',
-    '/admin/testimonials',
-  ],
-  
-  // Protected routes that require authentication
-  protectedRoutes: [
-    '/admin/products/new',
-    '/admin/products/[id]/edit',
-    '/admin/products/trash',
-    '/admin/categories/new',
-    '/admin/categories/[id]/edit',
-    '/admin/customers/new',
-    '/admin/customers/[id]/edit',
-    '/admin/appointments/new',
-    '/admin/appointments/[id]/edit',
-    '/admin/testimonials/new',
-    '/admin/testimonials/[id]/edit',
-  ]
-};
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

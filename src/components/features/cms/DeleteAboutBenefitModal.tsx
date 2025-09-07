@@ -78,11 +78,12 @@ export default function DeleteAboutBenefitModal({ benefit, isOpen, onClose, onSu
         <DialogFooter>
           <Button
             type="button"
-            variant="default"
+            className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+
             onClick={handleClose}
             disabled={isDeleting}
           >
-            Cancel
+            Annuler
           </Button>
           <Button
             type="button"

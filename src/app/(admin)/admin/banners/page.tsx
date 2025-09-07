@@ -29,9 +29,11 @@ export default async function ContentBannersPage() {
       />
 
       <div className="space-y-6">
-        <Suspense fallback={<BannersSkeleton />}>
-          <BannerScheduler banners={banners} />
-        </Suspense>
+        <div className="px-3 sm:px-4 md:px-6 lg:px-0">
+          <Suspense fallback={<BannersSkeleton />}>
+            <BannerScheduler banners={banners} />
+          </Suspense>
+        </div>
       </div>
     </>
   );

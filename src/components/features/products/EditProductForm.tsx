@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast';
 import { updateProductAction } from '@/features/products/actions/updateProduct';
 import ImageUpload from '@/components/features/products/ImageUpload';
 import CategoryMultiSelect from '@/components/features/categories/CategoryMultiSelect';
+import { Button } from '@/components/ui/button';
 
 interface ImageFile {
   id: string;
@@ -266,20 +267,20 @@ export default function EditProductForm({ product, categories, csrfToken }: Edit
 
         {/* Submit Button */}
         <div className="flex justify-end space-x-3">
-          <button
+          <Button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium text-foreground bg-background hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
           >
             Annuler
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isPending}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
           >
             {isPending ? 'Mise à jour...' : 'Mettre à Jour le Produit'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

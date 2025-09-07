@@ -39,7 +39,8 @@ export default async function PublicLayout({ children }: { children: React.React
       <main className="flex-1">{children}</main>
       <Footer siteSettings={siteSettings ? {
         siteName: siteSettings.siteName || undefined,
-        slogan: siteSettings.slogan || undefined
+        slogan: siteSettings.slogan || undefined,
+        logoUrl: siteSettings.logoUrl || undefined
       } : undefined} contactSettings={contactSettings} services={services} />
       <FloatingCTA />
     </MaintenanceModeWrapper>

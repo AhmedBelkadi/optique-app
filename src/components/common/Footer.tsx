@@ -1,7 +1,8 @@
 "use client"
 
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Clock, Globe, Shield, Award, Instagram, Facebook, Twitter, Linkedin, Youtube, ArrowUp } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Instagram, Facebook, ArrowUp } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 interface Service {
@@ -15,6 +16,7 @@ interface FooterProps {
   siteSettings?: {
     siteName?: string;
     slogan?: string;
+    logoUrl?: string;
   } | null;
   contactSettings?: {
     address?: string;
@@ -50,6 +52,11 @@ export default function Footer({ siteSettings, contactSettings, services = [] }:
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white">{siteSettings?.siteName || 'Notre Boutique'}</h3>
                   <p className="text-white/80 text-sm">{siteSettings?.slogan || 'Votre vision, notre passion'}</p>
+                  {siteSettings?.logoUrl ? (
+                    <Image src={siteSettings?.logoUrl || '/logo.png'} alt={siteSettings?.siteName || 'Notre Boutique'} width={100} height={100} />
+                  ) : (
+                    <span className="text-xl md:text-2xl font-bold text-white">O</span>
+                  )}  
                 </div>
               </div>
               <p className="text-white/90 text-sm md:text-base leading-relaxed max-w-md">
@@ -184,21 +191,22 @@ export default function Footer({ siteSettings, contactSettings, services = [] }:
                 </li>
                 <li>
                   <Link 
-                    href="/blog" 
+                    href="/testimonials" 
                     className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
                   >
                     <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Blog & Actualités
+                    Témoignages
                   </Link>
                 </li>
                 <li>
                   <Link 
-                    href="/careers" 
+                    href="/contact" 
                     className="text-white/80 hover:text-white transition-all duration-300 text-sm flex items-center group py-2 -mx-2 px-2 rounded-md hover:bg-white/10"
                   >
                     <span className="w-2 h-2 bg-white/60 rounded-full mr-3 group-hover:bg-white transition-colors"></span>
-                    Carrières
+                    Contact
                   </Link>
+                
                 </li>
               </ul>
             </div>

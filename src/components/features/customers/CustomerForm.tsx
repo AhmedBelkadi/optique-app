@@ -389,11 +389,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
               <div className="flex justify-end space-x-3 pt-6 border-t border-border">
                 <Button 
                   type="button" 
-                  variant="default" 
                   onClick={() => router.back()}
                   disabled={isPending}
-                  className="bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
-                >
+                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+                  >
                   Annuler
                 </Button>
                 <Button 

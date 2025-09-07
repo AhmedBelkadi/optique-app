@@ -213,11 +213,12 @@ export default function AboutSectionDialog({
             <div className="flex justify-end space-x-4">
               <Button
                 type="button"
-                variant="default"
                 onClick={() => onOpenChange(false)}
+                className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+
               >
                 <X className="mr-2 h-4 w-4" />
-                Cancel
+                Annuler
               </Button>
               <Button
                 type="submit"

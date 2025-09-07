@@ -131,12 +131,13 @@ export default function FAQDialog({ open, onOpenChange, faq, onSuccess }: FAQDia
           <div className="flex justify-end space-x-3 pt-4">
             <Button
               type="button"
-              variant="default"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
+              className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+
             >
               <X className="w-4 h-4 mr-2" />
-              Cancel
+              Annuler
             </Button>
             <Button type="submit" disabled={isLoading}>
               <Save className="w-4 h-4 mr-2" />

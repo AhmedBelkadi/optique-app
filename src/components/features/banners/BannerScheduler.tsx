@@ -341,8 +341,8 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
     <TooltipProvider>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-start justify-between gap-3 flex-col sm:flex-row">
+            <div className="min-w-0">
               <CardTitle className="flex items-center gap-2">
                 <Megaphone className="h-5 w-5 text-primary" />
                 Banner Scheduler
@@ -351,7 +351,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                 Create and manage promotional banners with scheduling
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="default" className="text-xs">
                 {activeBanners.length} Active
               </Badge>
@@ -409,7 +409,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="startDate"
@@ -523,15 +523,14 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     </Button>
                     <Button 
                       type="button" 
-                      variant="default"
+                      className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
                       onClick={() => {
                         setShowForm(false);
                         setEditingBanner(null);
                         form.reset();
                       }}
-                      className="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                     >
-                      Cancel
+                      Annuler
                     </Button>
                   </div>
                 </form>
@@ -544,7 +543,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
             {/* Active Banners */}
             {activeBanners.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="text-sm font-medium text-foreground">Active Banners</h4>
                   <Badge variant="default" className="text-xs">{activeBanners.length}</Badge>
                 </div>
@@ -554,9 +553,9 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     const timeRemaining = getTimeRemaining(banner);
                     return (
                       <Card key={banner.id} className="p-4 border-l-4 border-l-green-500 hover:shadow-md transition-all duration-200 group">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 space-y-3 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <Badge variant={status.variant} className={`${status.color} transition-colors`}>
                                 {status.label}
                               </Badge>
@@ -567,8 +566,8 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm font-medium leading-relaxed text-foreground">{banner.text}</p>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <p className="text-sm font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
                                 <Calendar className="h-3 w-3" />
                                 Starts: {formatDate(banner.startDate)}
@@ -579,7 +578,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -631,7 +630,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200">Annuler</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => handleDelete(banner.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -653,7 +652,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
             {/* Inactive Banners */}
             {inactiveBanners.length > 0 && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h4 className="text-sm font-medium text-foreground">Inactive Banners</h4>
                   <Badge variant="secondary" className="text-xs">{inactiveBanners.length}</Badge>
                 </div>
@@ -662,16 +661,16 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     const status = getBannerStatus(banner);
                     return (
                       <Card key={banner.id} className="p-4 border-l-4 border-l-gray-300 opacity-75 hover:opacity-100 hover:shadow-md transition-all duration-200 group">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 space-y-3 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <Badge variant={status.variant} className={`${status.color} transition-colors`}>
                                 {status.label}
                               </Badge>
                               <EyeOff className="h-4 w-4 text-gray-400" />
                             </div>
-                            <p className="text-sm font-medium leading-relaxed text-foreground">{banner.text}</p>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <p className="text-sm font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
                                 <Calendar className="h-3 w-3" />
                                 Started: {formatDate(banner.startDate)}
@@ -682,7 +681,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -734,8 +733,8 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
+                                <AlertDialogCancel className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200">Annuler</AlertDialogCancel>
+                                <AlertDialogAction
                                     onClick={() => handleDelete(banner.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >

@@ -711,12 +711,11 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="default"
                   onClick={handleCloseCreate}
                   disabled={createIsPending}
-                  className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
+                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
                 >
-                  Cancel
+                  Annuler
                 </Button>
                 <Button
                   type="submit"
@@ -929,12 +928,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="default"
                   onClick={handleCloseEdit}
                   disabled={updateIsPending}
-                  className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
+                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+
                 >
-                  Cancel
+                  Annuler
                 </Button>
                 <Button
                   type="submit"
@@ -1013,12 +1012,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               <div className="flex space-x-3 w-full">
                 <Button
                   type="button"
-                  variant="default"
                   onClick={handleCloseDelete}
                   disabled={deleteIsPending}
-                  className="flex-1 bg-background/50 backdrop-blur-sm border-border hover:bg-muted/50"
+                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+
                 >
-                  Cancel
+                  Annuler
                 </Button>
                 <Button
                   type="submit"

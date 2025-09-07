@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
-import UserNavWrapper from "./UserNavWrapper";
+// import UserNavWrapper from "./UserNavWrapper";
 import { getCurrentUser } from "@/features/auth/services/session";
 import NavBarClient from "./NavBarClient";
 import ResponsiveNavBar from "./ResponsiveNavBar";
@@ -36,7 +36,7 @@ export default async function NavBar() {
                     <div className="flex items-center space-x-2 md:space-x-4">
                         {user ? (
                             <div className="flex items-center space-x-2">
-                                <UserNavWrapper user={user} />
+                                {/* <UserNavWrapper user={user} /> */}
                                 <Link href="/admin">
                                     <Button variant="default" size="sm" className="hidden sm:inline-flex">
                                         Admin

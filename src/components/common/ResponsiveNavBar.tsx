@@ -67,7 +67,7 @@ export default function ResponsiveNavBar() {
             <div className={`fixed inset-0 top-16 bg-background/95 backdrop-blur-sm z-50 md:hidden transition-all duration-300 ${
                 isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
             }`}>
-                <div className="px-4 py-6 space-y-2">
+                <div className="px-4 py-6 space-y-2 bg-white">
                     {navigationItems.map((item, index) => (
                         <Link
                             key={item.href}

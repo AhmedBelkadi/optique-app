@@ -14,14 +14,12 @@ import {
   ChevronRight,
   Home,
   User,
-  HelpCircle,
   Image,
   ChevronDown,
   ChevronUp,
   Shield,
   UserCheck,
   Info,
-  Search,
   Wrench,
 } from 'lucide-react';
 import AdminNavItem from './AdminNavItem';

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, Clock, User, Edit, ArrowLeft, MapPin, Phone, Mail, Trash2, CheckCircle, X, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, User, Edit, ArrowLeft, Phone, Trash2, Mail } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -183,25 +183,42 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/appointments">
-            <Button variant="default" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour aux rendez-vous
+      {/* Top header */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-start gap-3">
+          <Link href="/admin/appointments" className="inline-flex">
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
+
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{appointment.title}</h1>
-            <p className="text-muted-foreground mt-1">Détails du rendez-vous</p>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl md:text-2xl font-semibold leading-tight">
+                {appointment.title}
+              </h1>
+              <Badge
+                variant={getStatusBadgeVariant(appointment.status.name)}
+                style={{ backgroundColor: appointment.status.color + '20', color: appointment.status.color }}
+              >
+                {appointment.status.displayName}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {formatDateTime(appointment.startTime)} • {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+          <Link href={`/admin/customers/${appointment.customer.id}`}>
+            <Button variant="outline" className="gap-2 w-full sm:w-auto">
+              <User className="w-4 h-4" /> Voir le client
+            </Button>
+          </Link>
           <Link href={`/admin/appointments/${appointment.id}/edit`}>
-            <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground">
-              <Edit className="w-4 h-4 mr-2" />
-              Modifier
+            <Button variant="secondary" className="gap-2 w-full sm:w-auto">
+              <Edit className="w-4 h-4" /> Modifier
             </Button>
           </Link>
         </div>
@@ -210,7 +227,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointment Information */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="border-border/60">
             <CardHeader>
               <CardTitle>Informations du rendez-vous</CardTitle>
               <CardDescription>
@@ -225,6 +242,14 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
                     Date & Heure
                   </div>
                   <p className="font-medium">{formatDateTime(appointment.startTime)}</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Badge variant="outline" className="px-2 py-1 text-xs">
+                      {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+                    </Badge>
+                    <Badge variant="secondary" className="px-2 py-1 text-xs">
+                      {calculateDuration()}
+                    </Badge>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -256,14 +281,14 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
               {appointment.notes && (
                 <div className="space-y-2">
                   <div className="text-sm text-muted-foreground">Notes</div>
-                  <p className="text-foreground whitespace-pre-wrap">{appointment.notes}</p>
+                  <p className="text-foreground whitespace-pre-wrap break-words">{appointment.notes}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Customer Information */}
-          <Card>
+          <Card className="border-border/60">
             <CardHeader>
               <CardTitle>Informations du client</CardTitle>
               <CardDescription>
@@ -280,9 +305,14 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
               </div>
 
               {appointment.customer.phone && (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <Phone className="w-5 h-5 text-muted-foreground/60" />
-                  <span className="text-sm">{appointment.customer.phone}</span>
+                  <span className="text-sm break-all">{appointment.customer.phone}</span>
+                  <div className="ml-auto flex gap-2 w-full sm:w-auto">
+                    <Link href={`tel:${appointment.customer.phone}`}>
+                      <Button size="sm" variant="outline" className="w-full sm:w-auto">Appeler</Button>
+                    </Link>
+                  </div>
                 </div>
               )}
 
@@ -292,14 +322,26 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
                   <p className="text-sm text-foreground">{appointment.customer.notes}</p>
                 </div>
               )}
+
+              {appointment.customer.email && (
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Mail className="w-5 h-5 text-muted-foreground/60" />
+                  <span className="text-sm break-all">{appointment.customer.email}</span>
+                  <div className="ml-auto flex gap-2 w-full sm:w-auto">
+                    <Link href={`mailto:${appointment.customer.email}`}>
+                      <Button size="sm" variant="outline" className="w-full sm:w-auto">Envoyer un email</Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-24 h-max">
           {/* Status Management */}
-          <Card>
+          <Card className="border-border/60">
             <CardHeader>
               <CardTitle>Statut</CardTitle>
               <CardDescription>
@@ -317,6 +359,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
               </div>
               
               <div className="space-y-3">
+                <p className="text-xs text-muted-foreground">Sélectionnez un nouveau statut puis cliquez sur « Mettre à jour le statut ».</p>
                 <Select value={selectedStatusId} onValueChange={setSelectedStatusId}>
                   <SelectTrigger>
                     <SelectValue placeholder="Changer le statut" />
@@ -352,7 +395,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
           </Card>
 
           {/* Timestamps */}
-          <Card>
+          <Card className="border-border/60">
             <CardHeader>
               <CardTitle>Horodatage</CardTitle>
             </CardHeader>
@@ -384,11 +427,11 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
           </Card>
 
           {/* Quick Actions */}
-          <Card>
+          <Card className="border-border/60">
             <CardHeader>
               <CardTitle>Actions rapides</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-col gap-1">
               <Link href={`/admin/customers/${appointment.customer.id}`}>
                 <Button variant="default" className="w-full justify-start">
                   <User className="w-4 h-4 mr-2" />
@@ -396,7 +439,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
                 </Button>
               </Link>
               <Link href={`/admin/appointments/${appointment.id}/edit`}>
-                <Button variant="default" className="w-full justify-start">
+                <Button variant="success" className="w-full justify-start">
                   <Edit className="w-4 h-4 mr-2" />
                   Modifier le rendez-vous
                 </Button>
@@ -415,7 +458,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
             <CardContent className="space-y-3">
               <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="default" className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10">
+                  <Button variant="destructive" className="w-full justify-start">
                     <Trash2 className="w-4 h-4 mr-2" />
                     Supprimer
                   </Button>
@@ -428,7 +471,7 @@ export default function AppointmentDetailContainer({ appointment, appointmentSta
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end gap-3">
-                    <Button variant="default" onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200" onClick={() => setIsDeleteDialogOpen(false)}>
                       Annuler
                     </Button>
                     <Button 

@@ -365,7 +365,7 @@ export default function HomeValuesForm({
               <div className="flex space-x-2">
                 <Button
                   type="button"
-                  variant="default"
+                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
                   onClick={onCancel}
                 >
                   Annuler

@@ -63,24 +63,11 @@ export default function AppointmentEditContainer({ appointment }: AppointmentEdi
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href={`/admin/appointments/${appointment.id}`}>
-            <Button variant="default" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour aux détails
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Modifier le rendez-vous</h1>
-            <p className="text-muted-foreground mt-1">
-              Modifier les détails et la planification du rendez-vous
-            </p>
-          </div>
-        </div>
+      <div className="flex items-center justify-end">
+      
         <div className="flex items-center gap-3">
           <Link href={`/admin/appointments/${appointment.id}`}>
-            <Button variant="default">
+            <Button className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200">
               <X className="w-4 h-4 mr-2" />
               Annuler
             </Button>

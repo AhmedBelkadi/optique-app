@@ -137,7 +137,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
               variant="default"
               size="sm"
               onClick={prevSlide}
-              className="h-10 w-10 rounded-full p-0 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200"
+              className="h-10 w-10 rounded-full p-0 backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200"
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -160,7 +160,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
               variant="default"
               size="sm"
               onClick={nextSlide}
-              className="h-10 w-10 rounded-full p-0 bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200"
+              className="h-10 w-10 rounded-full p-0  backdrop-blur-sm border-2 border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-200"
             >
               <ChevronRight className="h-5 w-5" />
             </Button>

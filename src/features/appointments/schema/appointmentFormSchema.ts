@@ -14,6 +14,9 @@ export const appointmentFormSchema = z.object({
   duration: z.number().int().min(15, 'La durée minimale est de 15 minutes').max(480, 'La durée maximale est de 8 heures'),
   reason: z.string().min(1, 'Le motif est requis').max(500, 'Le motif ne peut pas dépasser 500 caractères'),
   notes: z.string().max(1000, 'Les notes ne peuvent pas dépasser 1000 caractères').optional(),
+  
+  // Security
+  csrf_token: z.string().optional(),
 });
 
 export type AppointmentFormData = z.infer<typeof appointmentFormSchema>;

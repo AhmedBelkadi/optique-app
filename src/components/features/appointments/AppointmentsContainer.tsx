@@ -460,7 +460,7 @@ export default function AppointmentsContainer({
                             </DialogDescription>
                           </DialogHeader>
                           <div className="flex justify-end gap-3">
-                            <Button variant="secondary" onClick={() => document.querySelector('[role="dialog"]')?.remove()}>
+                            <Button className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200" onClick={() => document.querySelector('[role="dialog"]')?.remove()}>
                               Annuler
                             </Button>
                             <Button 

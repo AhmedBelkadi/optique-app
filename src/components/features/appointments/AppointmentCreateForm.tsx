@@ -5,16 +5,20 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, User,  AlertCircle } from 'lucide-react';
+import { Calendar, User, AlertCircle, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 import { createAppointmentAction } from '@/features/appointments/actions/createAppointmentAction';
 import { getAppointmentStatusesAction } from '@/features/appointments/actions/getAppointmentStatusesAction';
 import CustomerSelector from './CustomerSelector';
+import { useCSRF } from '@/components/common/CSRFProvider';
+import { checkAppointmentAvailabilityAction } from '@/features/appointments/actions/checkAppointmentAvailabilityAction';
+import type { AvailabilityCheckResult } from '@/features/appointments/services/checkAppointmentAvailability';
 
 interface AppointmentStatus {
   id: string;
@@ -59,6 +63,7 @@ type AppointmentCreateFormData = z.infer<typeof appointmentCreateSchema>;
 
 export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreating }: AppointmentCreateFormProps) {
   const router = useRouter();
+  const { csrfToken } = useCSRF();
   const [statuses, setStatuses] = useState<AppointmentStatus[]>([]);
   const [selectedStatusId, setSelectedStatusId] = useState<string>('');
   const [isLoadingStatuses, setIsLoadingStatuses] = useState(true);
@@ -66,6 +71,10 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
   // Customer selection state
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerMode, setCustomerMode] = useState<'select' | 'create'>('select');
+  
+  // Availability checking state
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityCheckResult | null>(null);
 
   // Initialize form with default values
   const form = useForm<AppointmentCreateFormData>({
@@ -107,6 +116,57 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
     loadStatuses();
   }, []);
 
+  // Real-time availability checking
+  const checkAvailability = async (date: string, time: string, duration: number) => {
+    if (!date || !time || !duration) {
+      setAvailabilityStatus(null);
+      return;
+    }
+
+    setIsCheckingAvailability(true);
+    try {
+      const startTime = new Date(`${date}T${time}`);
+      const endTime = new Date(startTime.getTime() + duration * 60 * 1000);
+      
+      const result = await checkAppointmentAvailabilityAction(
+        startTime.toISOString(),
+        endTime.toISOString()
+      );
+      
+      if (result.success && result.data) {
+        setAvailabilityStatus(result.data!);
+      } else {
+        setAvailabilityStatus({
+          isAvailable: false,
+          error: result.error || 'Erreur lors de la vérification de disponibilité'
+        } as AvailabilityCheckResult);
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      setAvailabilityStatus({
+        isAvailable: false,
+        error: 'Erreur lors de la vérification de disponibilité'
+      } as AvailabilityCheckResult);
+    } finally {
+      setIsCheckingAvailability(false);
+    }
+  };
+
+  // Watch form fields for real-time availability checking
+  const watchedDate = form.watch('appointmentDate');
+  const watchedTime = form.watch('appointmentTime');
+  const watchedDuration = form.watch('duration');
+
+  useEffect(() => {
+    if (watchedDate && watchedTime && watchedDuration) {
+      const timeoutId = setTimeout(() => {
+        checkAvailability(watchedDate, watchedTime, watchedDuration);
+      }, 500); // Debounce for 500ms
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [watchedDate, watchedTime, watchedDuration]);
+
   // Customer selection handlers
   const handleCustomerSelect = (customer: Customer | null) => {
     setSelectedCustomer(customer);
@@ -127,6 +187,8 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
     form.setValue('customerEmail', '');
     form.setValue('customerPhone', '');
     form.setValue('customerNotes', '');
+    // Clear any validation errors
+    form.clearErrors(['customerName', 'customerEmail', 'customerPhone', 'customerNotes']);
   };
 
   const handleBackToSelect = () => {
@@ -137,6 +199,8 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
     form.setValue('customerEmail', '');
     form.setValue('customerPhone', '');
     form.setValue('customerNotes', '');
+    // Clear any validation errors
+    form.clearErrors(['customerName', 'customerEmail', 'customerPhone', 'customerNotes']);
   };
 
   const onSubmit = async (data: AppointmentCreateFormData) => {
@@ -158,11 +222,74 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
           setIsCreating(false);
           return;
         }
+        
+        // Additional validation for new customer
+        if (data.customerName.length < 2) {
+          toast.error('Le nom du client doit contenir au moins 2 caractères');
+          setIsCreating(false);
+          return;
+        }
+        
+        if (data.customerPhone.length < 10) {
+          toast.error('Le numéro de téléphone doit contenir au moins 10 chiffres');
+          setIsCreating(false);
+          return;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.customerEmail)) {
+          toast.error('Veuillez entrer une adresse email valide');
+          setIsCreating(false);
+          return;
+        }
       }
 
       // Validate required appointment fields
       if (!data.title || !data.appointmentDate || !data.appointmentTime || !data.duration) {
         toast.error('Veuillez remplir tous les champs obligatoires du rendez-vous');
+        setIsCreating(false);
+        return;
+      }
+
+      // Combine date and time into ISO string
+      const appointmentDateTime = new Date(`${data.appointmentDate}T${data.appointmentTime}`);
+      
+      // Validate business hours
+      const [hours, minutes] = data.appointmentTime.split(':').map(Number);
+      const dayOfWeek = appointmentDateTime.getDay();
+      
+      // Check if it's Sunday
+      if (dayOfWeek === 0) {
+        toast.error('Les rendez-vous ne sont pas disponibles le dimanche');
+        setIsCreating(false);
+        return;
+      }
+      
+      // Check business hours (9:00 AM to 7:00 PM)
+      if (hours < 9 || hours >= 19) {
+        toast.error('Les rendez-vous ne sont disponibles que de 9h00 à 19h00');
+        setIsCreating(false);
+        return;
+      }
+      
+      // Check if appointment is at least 30 minutes before closing
+      if (hours === 18 && minutes > 30) {
+        toast.error('Le dernier rendez-vous possible est à 18h30');
+        setIsCreating(false);
+        return;
+      }
+      
+      // Check if appointment is in the past
+      if (appointmentDateTime < new Date()) {
+        toast.error('La date de rendez-vous ne peut pas être dans le passé');
+        setIsCreating(false);
+        return;
+      }
+
+      // Check availability before submission
+      if (availabilityStatus && !availabilityStatus.isAvailable) {
+        toast.error('Ce créneau n\'est pas disponible. Veuillez choisir un autre horaire.');
         setIsCreating(false);
         return;
       }
@@ -176,23 +303,24 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
         customerEmail: data.customerEmail || selectedCustomer?.email || '',
         customerNotes: data.customerNotes || (selectedCustomer?.notes ? selectedCustomer.notes : undefined),
         
-        // Appointment data
-        appointmentDate: data.appointmentDate,
+        // Appointment data - combine date and time
+        appointmentDate: appointmentDateTime.toISOString(),
         appointmentTime: data.appointmentTime,
         duration: data.duration,
         reason: data.title,
         notes: data.notes,
+        ...(csrfToken && { csrf_token: csrfToken }), // Add CSRF token only if available
       };
 
       const result = await createAppointmentAction(createData);
       
       if (result.success) {
-        toast.success('Rendez-vous créé avec succès');
+        toast.success(result.message || 'Rendez-vous créé avec succès');
         // Call the parent's onCreate callback
         onCreate(createData);
         router.push('/admin/appointments');
       } else {
-        toast.error(result.error || 'Erreur lors de la création');
+        toast.error(result.error || 'Erreur lors de la création du rendez-vous');
         setIsCreating(false);
       }
     } catch (error) {
@@ -203,12 +331,20 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
   };
 
   return (
-    <form 
-      id="appointment-create-form" 
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-8"
-      autoComplete="off"
-    >
+    <Card>
+      <CardHeader>
+        <CardTitle>Informations du rendez-vous</CardTitle>
+        <CardDescription>
+          Remplissez les détails du rendez-vous et les informations du client
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form 
+          id="appointment-create-form" 
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8"
+          autoComplete="off"
+        >
       {/* Appointment Information */}
       <Card>
         <CardHeader>
@@ -319,6 +455,40 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
               </p>
             )}
           </div>
+
+          {/* Availability Status */}
+          {availabilityStatus && (
+            <div className="space-y-2">
+              {isCheckingAvailability ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Vérification de la disponibilité...
+                </div>
+              ) : availabilityStatus.isAvailable ? (
+                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  ✅ Ce créneau est disponible
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    ❌ Ce créneau n'est pas disponible
+                  </div>
+                  {availabilityStatus.conflicts && availabilityStatus.conflicts.length > 0 && (
+                    <div className="text-xs text-muted-foreground ml-4">
+                      <p className="font-medium mb-1">Conflits détectés :</p>
+                      {availabilityStatus.conflicts.map((conflict, index) => (
+                        <p key={index} className="mb-1">
+                          • {conflict.customerName} ({new Date(conflict.startTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - {new Date(conflict.endTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })})
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -457,6 +627,43 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
         </CardContent>
       </Card>
 
+      {/* Appointment Preview */}
+      {watchedDate && watchedTime && watchedDuration && (
+        <Card className="bg-green-50 border-green-200">
+          <CardHeader>
+            <CardTitle className="text-green-800 text-sm flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Aperçu du rendez-vous
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-green-700 text-sm space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">📅 Date & Heure</p>
+                <p>{new Date(`${watchedDate}T${watchedTime}`).toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })} à {watchedTime}</p>
+              </div>
+              <div>
+                <p className="font-medium">⏱️ Durée</p>
+                <p>{watchedDuration} minutes</p>
+              </div>
+              <div>
+                <p className="font-medium">👤 Client</p>
+                <p>{selectedCustomer ? selectedCustomer.name : (form.watch('customerName') || 'Nouveau client')}</p>
+              </div>
+              <div>
+                <p className="font-medium">📋 Motif</p>
+                <p>{form.watch('title') || 'Non spécifié'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Business Hours Info */}
       <Card className="bg-blue-50 border-blue-200">
         <CardHeader>
@@ -470,7 +677,31 @@ export default function AppointmentCreateForm({ onCreate, isCreating, setIsCreat
         </CardContent>
       </Card>
 
-
+      {/* Submit Button */}
+      <div className="flex justify-end gap-3 pt-6">
+        <Link href="/admin/appointments">
+          <Button
+            type="button"
+            variant="outline"
+            className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+          >
+            Annuler
+          </Button>
+        </Link>
+        <Button 
+          type="submit" 
+          disabled={isCreating || (availabilityStatus && !availabilityStatus.isAvailable) || isCheckingAvailability}
+          className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {isCreating ? 'Création...' : 
+           isCheckingAvailability ? 'Vérification...' :
+           (availabilityStatus && !availabilityStatus.isAvailable) ? 'Créneau indisponible' :
+           'Créer le rendez-vous'}
+        </Button>
+      </div>
     </form>
+      </CardContent>
+    </Card>
   );
 }

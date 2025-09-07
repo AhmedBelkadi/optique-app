@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { deleteProductAction } from '@/features/products/actions/deleteProduct';
 import { Product } from '@/features/products/schema/productSchema';
 import { useCSRF } from '@/components/common/CSRFProvider';
+import { Button } from '@/components/ui/button';
 
 interface DeleteProductModalProps {
   product: Product;
@@ -60,20 +61,20 @@ export default function DeleteProductModal({ product, onSuccess, onClose }: Dele
         </p>
 
         <div className="flex justify-end space-x-3">
-          <button
+          <Button
             onClick={onClose}
             disabled={isPending}
-            className="px-4 py-2 border border-border rounded-md text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+            className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
           >
-            Cancel
-          </button>
-          <button
+            Annuler
+          </Button>
+          <Button
             onClick={handleDelete}
             disabled={isPending}
             className="px-4 py-2 bg-destructive text-primary-foreground rounded-md hover:bg-destructive/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-destructive disabled:opacity-50"
           >
             {isPending ? 'Deleting...' : 'Delete'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

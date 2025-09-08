@@ -7,7 +7,7 @@ interface AuthContextType {
   user: UserWithRoles | null;
   token: string | null;
   isLoading: boolean;
-  login: (token: string, user: UserWithRoles) => void;
+  login: (user: UserWithRoles) => void;
   logout: () => void;
   updateUser: (user: UserWithRoles) => void;
 }

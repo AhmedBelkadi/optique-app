@@ -136,7 +136,6 @@ export default function ImageUploadField({
                     src={value}
                     alt={label}
                     className="w-full h-full object-cover"
-                    onError={() => setImageError(true)}
                   />
                 ) : (
                   // For regular URLs, use regular img tag
@@ -144,7 +143,6 @@ export default function ImageUploadField({
                     src={value}
                     alt={label}
                     className="w-full h-full object-cover"
-                    onError={() => setImageError(true)}
                   />
                 )}
               </>

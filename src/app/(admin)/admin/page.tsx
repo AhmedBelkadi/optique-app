@@ -5,10 +5,8 @@ import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import DashboardMetrics from '@/components/features/admin/DashboardMetrics';
 import RecentProducts from '@/components/features/admin/RecentProducts';
 import UpcomingAppointments from '@/components/features/admin/UpcomingAppointments';
-import AdminQuickActions from '@/components/features/admin/AdminQuickActions';
 import DataQualityDashboard from '@/components/features/admin/DataQualityDashboard';
 import { requirePermission } from '@/lib/auth/authorization';
-import { getCurrentUser } from '@/features/auth/services/session';
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -19,8 +17,7 @@ export default async function AdminDashboard() {
   // Dashboard is accessible to both admin and staff, but we need basic access
   await requirePermission('dashboard', 'read');
   
-  // Get current user for role-based filtering
-  const user = await getCurrentUser();
+
 
   return (
     <>
@@ -36,11 +33,6 @@ export default async function AdminDashboard() {
         <Suspense fallback={<DashboardMetricsSkeleton />}>
           <DashboardMetrics />
         </Suspense>
-
-        {/* Quick Actions Section */}
-        {/* <Suspense fallback={<QuickActionsSkeleton />}>
-          <AdminQuickActions user={user}  />
-        </Suspense> */}
 
         {/* Data Quality Dashboard */}
         <Suspense fallback={<DataQualitySkeleton />}>

@@ -69,10 +69,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                         src={product.images[currentImageIndex].path}
                         alt={product.images[currentImageIndex].alt || `${product.name} - Image ${currentImageIndex + 1}`}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error('Product image failed to load:', product.images[currentImageIndex].path);
-                          e.currentTarget.style.display = 'none';
-                        }}
+                     
                       />
                       
                       {/* Navigation Arrows */}

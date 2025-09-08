@@ -27,7 +27,7 @@ export async function createTestimonialAction(prevState: any, formData: FormData
     const name = formData.get('name') as string;
     const message = formData.get('message') as string;
     const rating = formData.get('rating') as string;
-    const source = formData.get('source') as string;
+    const source = formData.get('source') as 'internal' | 'facebook' | 'google' | 'trustpilot';
     const externalId = formData.get('externalId') as string;
     const externalUrl = formData.get('externalUrl') as string;
     const title = formData.get('title') as string;
@@ -54,7 +54,7 @@ export async function createTestimonialAction(prevState: any, formData: FormData
           name,
           message,
           rating: rating ? parseInt(rating, 10) : 5,
-          source: source || 'internal',
+          source: source || 'internal', 
           externalId: externalId || undefined,
           externalUrl: externalUrl || undefined,
           title: title || undefined,
@@ -134,7 +134,7 @@ export async function createTestimonialAction(prevState: any, formData: FormData
         success: false,
         error: 'Données invalides',
         fieldErrors: validationResult.error.flatten().fieldErrors,
-        values: { name, message, rating, source, externalId, externalUrl, title, image, isActive, isVerified }
+        values: { name, message, rating, source, externalId, externalUrl, title, image: '', isActive, isVerified }
       };
     }
 
@@ -169,7 +169,7 @@ export async function createTestimonialAction(prevState: any, formData: FormData
         success: false,
         error: result.error || 'Échec de la création du témoignage',
         fieldErrors: {},
-        values: { name, message, rating, source, externalId, externalUrl, title, image, isActive, isVerified }
+        values: { name, message, rating, source, externalId, externalUrl, title, image: '', isActive, isVerified }
       };
     }
   } catch (error) {

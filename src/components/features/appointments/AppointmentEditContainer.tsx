@@ -2,42 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, X } from 'lucide-react';
+import {  Save, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
 import AppointmentEditForm from './AppointmentEditForm';
+import { Appointment } from '@/features/appointments/types';
 
-interface AppointmentStatus {
-  id: string;
-  name: string;
-  displayName: string;
-  color: string;
-  description?: string | null;
-}
 
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  notes?: string;
-}
-
-interface Appointment {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string;
-  customer: Customer;
-  status: AppointmentStatus;
-}
 
 interface AppointmentEditContainerProps {
   appointment: Appointment;

@@ -101,10 +101,7 @@ export default async function RecentProducts() {
                         src={product.images[0].path}
                         alt={product.images[0].alt || product.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.error('Product image failed to load:', product.images[0].path);
-                          e.currentTarget.style.display = 'none';
-                        }}
+                     
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">

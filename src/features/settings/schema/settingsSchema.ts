@@ -52,8 +52,6 @@ export const combinedSettingsSchema = z.object({
   // Contact Settings
   ...contactSettingsSchema.shape,
   
-  // SEO Settings
-  ...seoSettingsSchema.shape,
   
   // Theme Settings
   ...themeSettingsSchema.shape,
@@ -75,10 +73,7 @@ export type ContactSettingsWithTimestamps = ContactSettings & {
   updatedAt: Date;
 };
 
-export type SEOSettingsWithTimestamps = SEOSettings & {
-  createdAt: Date;
-  updatedAt: Date;
-};
+
 
 export type ThemeSettingsWithTimestamps = ThemeSettings & {
   createdAt: Date;

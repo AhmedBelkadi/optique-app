@@ -44,10 +44,7 @@ export default function CategoryCard({
                   src={category.image}
                   alt={category.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.error('Image failed to load:', category.image);
-                    e.currentTarget.style.display = 'none';
-                  }}
+                
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
@@ -129,10 +126,7 @@ export default function CategoryCard({
             src={category.image}
             alt={category.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              console.error('Image failed to load:', category.image);
-              e.currentTarget.style.display = 'none';
-            }}
+           
           />
         ) : (
           <div className="flex items-center justify-center h-full">

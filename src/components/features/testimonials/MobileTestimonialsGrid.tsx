@@ -318,10 +318,7 @@ export function MobileTestimonialsGrid({
                             src={testimonial.image}
                             alt={testimonial.name}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                              console.error('Testimonial image failed to load:', testimonial.image);
-                              e.currentTarget.style.display = 'none';
-                            }}
+                           
                           />
                         </div>
                       ) : (

@@ -155,7 +155,7 @@ export function MobileProductInfo({ product }: MobileProductInfoProps) {
         </Button>
         
         {/* Secondary Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <Button 
             variant="default" 
             size="lg"

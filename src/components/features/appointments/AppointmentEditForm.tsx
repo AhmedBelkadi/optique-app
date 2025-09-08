@@ -15,7 +15,7 @@ import { toast } from 'react-hot-toast';
 import { updateAppointmentAction } from '@/features/appointments/actions/updateAppointmentAction';
 import { getAppointmentStatusesAction } from '@/features/appointments/actions/getAppointmentStatusesAction';
 import { useCSRF } from '@/components/common/CSRFProvider';
-import { AppointmentStatus, Customer, Appointment, AppointmentFormValidation } from '@/features/appointments/types';
+import { AppointmentStatus, Appointment } from '@/features/appointments/types';
 import { updateAppointmentSchema } from '@/features/appointments/utils/validation';
 
 // Types are now imported from shared types file
@@ -52,7 +52,7 @@ export default function AppointmentEditForm({ appointment, onSave, isSaving }: A
       duration: Math.round((new Date(appointment.endTime).getTime() - new Date(appointment.startTime).getTime()) / (1000 * 60)),
       notes: appointment.notes || '',
       customerName: appointment.customer.name,
-      customerPhone: appointment.customer.phone,
+      customerPhone: appointment.customer.phone || '',
       customerEmail: appointment.customer.email,
       customerNotes: appointment.customer.notes || '',
     }

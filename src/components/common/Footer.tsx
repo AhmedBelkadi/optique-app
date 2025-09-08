@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, ArrowUp } from 'lucide-react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 interface Service {
@@ -59,10 +58,6 @@ export default function Footer({ siteSettings, contactSettings, services = [] }:
                       width={100} 
                       height={100}
                       className="object-contain"
-                      onError={(e) => {
-                        console.error('Footer logo failed to load:', siteSettings?.logoUrl);
-                        e.currentTarget.style.display = 'none';
-                      }}
                     />
                   ) : (
                     <span className="text-xl md:text-2xl font-bold text-white">O</span>

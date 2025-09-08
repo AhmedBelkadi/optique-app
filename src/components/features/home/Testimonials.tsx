@@ -331,10 +331,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                             width={60}
                             height={60}
                             className="rounded-full object-cover"
-                            onError={(e) => {
-                              console.error('Testimonial image failed to load:', testimonial.image);
-                              e.currentTarget.style.display = 'none';
-                            }}
+                           
                           />
                         ) : (
                           <div 

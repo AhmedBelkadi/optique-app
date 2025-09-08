@@ -159,7 +159,7 @@ async function AboutContent() {
               <div className="relative">
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/placeholder.svg?height=500&width=600"
+                    src={siteSettings?.imageAboutSection || '/placeholder.svg?height=500&width=600'}
                     alt={`Façade du magasin ${siteSettings?.siteName || 'nous'}`}
                     width={600}
                     height={500}

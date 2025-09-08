@@ -46,7 +46,6 @@ async function main() {
     // Clear settings
     await prisma.siteSettings.deleteMany({});
     await prisma.contactSettings.deleteMany({});
-    await prisma.sEOSettings.deleteMany({});
     await prisma.themeSettings.deleteMany({});
     await prisma.operationalSettings.deleteMany({});
     

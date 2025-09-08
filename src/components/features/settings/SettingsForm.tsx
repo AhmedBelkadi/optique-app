@@ -128,12 +128,14 @@ export default function SettingsForm({
       slogan: siteSettings.slogan || '',
       logoUrl: siteSettings.logoUrl || '',
       heroBackgroundImg: siteSettings.heroBackgroundImg || '',
+      imageAboutSection: (siteSettings as any).imageAboutSection || '',
     },
   });
 
   // Store selected logo file for upload
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [selectedHeroBackgroundFile, setSelectedHeroBackgroundFile] = useState<File | null>(null);
+  const [selectedAboutImageFile, setSelectedAboutImageFile] = useState<File | null>(null);
 
   // Contact Settings Form
   const contactForm = useForm<ContactSettings>({
@@ -441,6 +443,14 @@ export default function SettingsForm({
       }
       if (finalHeroBackgroundUrl !== undefined && finalHeroBackgroundUrl !== null) {
         formData.append('heroBackgroundImg', finalHeroBackgroundUrl);
+      }
+
+      if (selectedAboutImageFile) {
+        formData.append('imageAboutSectionFile', selectedAboutImageFile);
+      }
+      const aboutImg = (siteForm.watch('imageAboutSection') as any);
+      if (aboutImg !== undefined && aboutImg !== null) {
+        formData.append('imageAboutSection', aboutImg as any);
       }
 
       // Use the action state action instead of direct call
@@ -780,6 +790,16 @@ export default function SettingsForm({
                         {siteForm.formState.errors.heroBackgroundImg.message}
                       </p>
                     )}
+                  </div>
+                  <div className="space-y-2">
+                    <ImageUpload
+                      label="About Section Image"
+                      value={(siteForm.watch('imageAboutSection') as any) || ''}
+                      onChange={(value) => siteForm.setValue('imageAboutSection' as any, value as any)}
+                      onFileChange={setSelectedAboutImageFile}
+                      maxSize={5}
+                      folder="about"
+                    />
                   </div>
                 </div>
 

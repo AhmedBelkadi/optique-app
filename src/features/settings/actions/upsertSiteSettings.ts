@@ -33,7 +33,7 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
 
     // Security validation and sanitization
     const requiredFields: string[] = [];
-    const optionalFields = ['siteName', 'slogan', 'logoUrl', 'heroBackgroundImg'];
+    const optionalFields = ['siteName', 'slogan', 'logoUrl', 'heroBackgroundImg', 'imageAboutSection'];
     
     const validation = validateAndSanitizePublicForm(formData, requiredFields, optionalFields);
     
@@ -48,12 +48,13 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
     // Handle image uploads
     let logoUrl = validation.sanitizedData.logoUrl || null;
     let heroBackgroundImg = validation.sanitizedData.heroBackgroundImg || null;
+    let imageAboutSection = validation.sanitizedData.imageAboutSection || null;
 
     // Get existing settings to check for old images
     const existingSettings = await prisma.siteSettings.findUnique({
       where: { id: 'singleton' },
-      select: { logoUrl: true, heroBackgroundImg: true }
-    });
+      select: { logoUrl: true, heroBackgroundImg: true } as any
+    }) as any;
 
     // Handle logo upload
     const logoFile = formData.get('logo') as File;
@@ -105,12 +106,37 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
       }
     }
 
+    // Handle about image upload
+    const aboutFile = formData.get('imageAboutSectionFile') as File;
+    if (aboutFile && aboutFile.size > 0) {
+      try {
+        const validation = validateImage(aboutFile);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
+        }
+
+        const imageResult = await saveSiteSettingsImage(aboutFile, 'about-section' as any);
+        imageAboutSection = imageResult.path;
+
+        if ((existingSettings as any)?.imageAboutSection) {
+          await deleteSiteSettingsImage((existingSettings as any).imageAboutSection);
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: 'Échec de l\'upload de l\'image de la section À propos',
+          error: error instanceof Error ? error.message : 'Failed to upload about image'
+        };
+      }
+    }
+
     // Extract and validate sanitized form data
     const siteData = {
       siteName: validation.sanitizedData.siteName || null,
       slogan: validation.sanitizedData.slogan || null,
       logoUrl,
       heroBackgroundImg,
+      imageAboutSection,
     };
 
     const result = await upsertSiteSettings(siteData);

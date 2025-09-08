@@ -26,7 +26,6 @@ export async function upsertAboutSectionAction(prevState: any, formData: FormDat
       id: formData.get('id') as string,
       title: formData.get('title') as string,
       content: formData.get('content') as string,
-      image: formData.get('image') as string,
     };
 
     // Validate form data (exclude id from validation)
@@ -42,7 +41,6 @@ export async function upsertAboutSectionAction(prevState: any, formData: FormDat
         data: {
           title: validatedData.title,
           content: validatedData.content,
-          image: validatedData.image,
         },
       });
     } else {
@@ -54,7 +52,8 @@ export async function upsertAboutSectionAction(prevState: any, formData: FormDat
 
       section = await prisma.aboutSection.create({
         data: {
-          ...validatedData,
+          title: validatedData.title,
+          content: validatedData.content,
           order: nextOrder,
         },
       });

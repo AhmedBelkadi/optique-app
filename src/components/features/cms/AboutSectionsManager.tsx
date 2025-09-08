@@ -9,7 +9,7 @@ import { deleteAboutSectionAction } from '@/features/about/actions/deleteAboutSe
 import { reorderAboutSectionsAction } from '@/features/about/actions/reorderAboutSections';
 import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import AboutSectionDialog from './AboutSectionDialog';
 import DeleteAboutSectionModal from './DeleteAboutSectionModal';
 import SortableList from './SortableList';
@@ -158,38 +158,6 @@ export default function AboutSectionsManager({ aboutSections }: AboutSectionsMan
               </p>
             </div>
           </div>
-
-          {/* Image Section */}
-          {section.image && (
-            <div className="lg:col-span-1">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
-                    Image
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={section.image}
-                      alt={section.title}
-                      className="h-16 w-16 object-cover rounded-lg border-2 border-white shadow-sm"
-                    />
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 truncate">
-                      {section.image.split('/').pop()}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Image uploaded
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Metadata */}
@@ -198,12 +166,6 @@ export default function AboutSectionsManager({ aboutSections }: AboutSectionsMan
             <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
             <span>Last updated: {formatDateShort(section.updatedAt)}</span>
           </div>
-          {section.image && (
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-              <span>Has image</span>
-            </div>
-          )}
         </div>
       </div>
 

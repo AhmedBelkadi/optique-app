@@ -600,11 +600,13 @@ async function seedSiteSettings() {
     update: {
       siteName: 'Arinass Optique',
       slogan: 'Votre vision, notre passion',
+      imageAboutSection: '/uploads/about-sections/history.jpg',
     },
     create: {
       id: 'singleton',
       siteName: 'Arinass Optique',
       slogan: 'Votre vision, notre passion',
+      imageAboutSection: '/uploads/about-sections/history.jpg',
     },
   });
 }

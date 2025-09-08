@@ -3,7 +3,7 @@ import { SiteSettings } from '../schema/settingsSchema';
 
 export async function getSiteSettings(): Promise<{
   success: boolean;
-  data?: SiteSettings;
+  data?: any;
   error?: string;
 }> {
   try {
@@ -39,19 +39,21 @@ export async function upsertSiteSettings(data: SiteSettings): Promise<{
   try {
     const settings = await prisma.siteSettings.upsert({
       where: { id: 'singleton' },
-      update: {
+      update: ({
         siteName: data.siteName || null,
         slogan: data.slogan || null,
         logoUrl: data.logoUrl || null,
         heroBackgroundImg: data.heroBackgroundImg || null,
-      },
-      create: {
+        imageAboutSection: (data as any).imageAboutSection || null,
+      } as any),
+      create: ({
         id: 'singleton',
         siteName: data.siteName || null,
         slogan: data.slogan || null,
         logoUrl: data.logoUrl || null,
         heroBackgroundImg: data.heroBackgroundImg || null,
-      },
+        imageAboutSection: (data as any).imageAboutSection || null,
+      } as any),
     });
 
     return {

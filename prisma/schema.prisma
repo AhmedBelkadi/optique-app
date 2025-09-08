@@ -291,6 +291,7 @@ model SiteSettings {
   slogan    String?
   logoUrl   String?
   heroBackgroundImg String?
+  imageAboutSection String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -363,7 +364,6 @@ model AboutSection {
   id        String   @id @default(cuid())
   title     String
   content   String
-  image     String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

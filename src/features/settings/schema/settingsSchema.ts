@@ -6,6 +6,7 @@ export const siteSettingsSchema = z.object({
   slogan: z.string().nullable(),
   logoUrl: z.string().nullable(),
   heroBackgroundImg: z.string().nullable(),
+  imageAboutSection: z.string().nullable(),
 });
 
 export type SiteSettings = z.infer<typeof siteSettingsSchema>;

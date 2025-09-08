@@ -172,23 +172,7 @@ export default function AboutSectionDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <ImageUploadField
-                      value={field.value}
-                      onChange={field.onChange}
-                      onRemove={() => field.onChange('')}
-                      label="Section Image (Optional)"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
 
             <FormField
               control={form.control}

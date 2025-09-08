@@ -320,24 +320,6 @@ model ContactSettings {
   @@map("contact_settings")
 }
 
-// SEO Settings - Search engine optimization and marketing
-model SEOSettings {
-  id                  String   @id @default("singleton")
-  metaTitle           String?
-  metaDescription     String?
-  productMetaTitle    String?
-  productMetaDescription String?
-  categoryMetaTitle   String?
-  categoryMetaDescription String?
-  ogImage             String?
-  googleAnalyticsId   String?
-  facebookPixelId     String?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("seo_settings")
-}
 
 // Theme Settings - All visual and styling configurations
 model ThemeSettings {

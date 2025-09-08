@@ -28,20 +28,6 @@ export const contactSettingsSchema = z.object({
 
 export type ContactSettings = z.infer<typeof contactSettingsSchema>;
 
-// SEO Settings Schema
-export const seoSettingsSchema = z.object({
-  metaTitle: z.string().nullable(),
-  metaDescription: z.string().nullable(),
-  productMetaTitle: z.string().nullable(),
-  productMetaDescription: z.string().nullable(),
-  categoryMetaTitle: z.string().nullable(),
-  categoryMetaDescription: z.string().nullable(),
-  ogImage: z.string().nullable(),
-  googleAnalyticsId: z.string().nullable(),
-  facebookPixelId: z.string().nullable(),
-});
-
-export type SEOSettings = z.infer<typeof seoSettingsSchema>;
 
 // Theme Settings Schema
 export const themeSettingsSchema = z.object({

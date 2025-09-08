@@ -53,7 +53,6 @@ const navigation: NavigationItem[] = [
       { name: 'About Page', href: '/admin/content/about', icon: User },
       { name: 'FAQ Management', href: '/admin/content/faq-page', icon: HelpCircle, badge: 'Popular' },
       { name: 'Site Settings', href: '/admin/content/settings', icon: Settings },
-      { name: 'SEO Settings', href: '/admin/content/seo', icon: Search },
     ],
   },
   {
@@ -83,7 +82,6 @@ const navigation: NavigationItem[] = [
     children: [
       { name: 'General Settings', href: '/admin/settings', icon: Settings },
       { name: 'Advanced Theme', href: '/admin/settings/advanced-theme', icon: Palette, badge: 'New' },
-      { name: 'SEO Settings', href: '/admin/settings/seo', icon: Search },
       { name: 'Operations', href: '/admin/settings/operations', icon: Zap },
     ],
   },

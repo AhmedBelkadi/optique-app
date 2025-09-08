@@ -28,17 +28,64 @@ export const contactSettingsSchema = z.object({
 
 export type ContactSettings = z.infer<typeof contactSettingsSchema>;
 
-// SEO Settings Schema
+// Enhanced SEO Settings Schema
 export const seoSettingsSchema = z.object({
+  // Global SEO
   metaTitle: z.string().nullable(),
   metaDescription: z.string().nullable(),
-  productMetaTitle: z.string().nullable(),
-  productMetaDescription: z.string().nullable(),
-  categoryMetaTitle: z.string().nullable(),
-  categoryMetaDescription: z.string().nullable(),
   ogImage: z.string().nullable(),
+  
+  // Page-specific SEO settings
+  homepage: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  about: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  contact: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  appointment: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  faq: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  testimonials: z.object({
+    title: z.string().nullable(),
+    description: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  products: z.object({
+    titleTemplate: z.string().nullable(),
+    descriptionTemplate: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  productDetails: z.object({
+    titleTemplate: z.string().nullable(),
+    descriptionTemplate: z.string().nullable(),
+    keywords: z.array(z.string()).nullable(),
+  }).nullable(),
+  
+  // Technical SEO
+  canonicalBaseUrl: z.string().url().nullable(),
+  robotsIndex: z.boolean().default(true),
+  robotsFollow: z.boolean().default(true),
+  
+  // Analytics
   googleAnalyticsId: z.string().nullable(),
   facebookPixelId: z.string().nullable(),
+  googleSearchConsole: z.string().nullable(),
 });
 
 export type SEOSettings = z.infer<typeof seoSettingsSchema>;

@@ -7,6 +7,9 @@ import CSRFProvider from '@/components/common/CSRFProvider';
 import ThemeProvider from '@/components/common/ThemeProvider';
 import { getSEOSettings } from '@/features/settings/services/seoSettings';
 import { getThemeSettings } from '@/features/settings/services/themeSettings';
+import { getSiteSettings } from '@/features/settings/services/siteSettings';
+import { getContactSettings } from '@/features/settings/services/contactSettings';
+import { MetaGenerator } from '@/lib/seo/metaGenerator';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,44 +19,29 @@ export const dynamic = 'force-dynamic';
 
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seoSettingsResult = await getSEOSettings();
+  // Fetch all required data for homepage meta generation
+  const [seoSettingsResult, siteSettingsResult, contactSettingsResult] = await Promise.all([
+    getSEOSettings(),
+    getSiteSettings(),
+    getContactSettings(),
+  ]);
+  
   const seoSettings = seoSettingsResult.data;
+  const siteSettings = siteSettingsResult.data;
+  const contactSettings = contactSettingsResult.data;
 
-  return {
-    title: seoSettings?.metaTitle || 'Optique - Your Vision, Our Expertise',
-    description: seoSettings?.metaDescription || 'Professional eyewear and optical services tailored to your unique needs. Experience the perfect blend of style, comfort, and precision.',
-    openGraph: {
-      title: seoSettings?.metaTitle || 'Optique - Your Vision, Our Expertise',
-      description: seoSettings?.metaDescription || 'Professional eyewear and optical services tailored to your unique needs. Experience the perfect blend of style, comfort, and precision.',
-      images: seoSettings?.ogImage ? [
-        {
-          url: seoSettings.ogImage,
-          width: 1200,
-          height: 630,
-          alt: seoSettings?.metaTitle || 'Optique',
-        }
-      ] : undefined,
-      type: 'website',
-      locale: 'en_US',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: seoSettings?.metaTitle || 'Optique - Your Vision, Our Expertise',
-      description: seoSettings?.metaDescription || 'Professional eyewear and optical services tailored to your unique needs. Experience the perfect blend of style, comfort, and precision.',
-      images: seoSettings?.ogImage ? [seoSettings.ogImage] : undefined,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-  };
+  if (!seoSettings) {
+    return {
+      title: 'Optique - Your Vision, Our Expertise',
+      description: 'Professional eyewear and optical services',
+    };
+  }
+
+  // Use the meta generator for homepage
+  return MetaGenerator.generatePageMeta('homepage', {
+    siteSettings,
+    contactSettings,
+  }, seoSettings);
 }
 
 export default async function RootLayout({

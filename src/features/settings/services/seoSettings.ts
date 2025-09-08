@@ -13,12 +13,52 @@ export async function getSEOSettings(): Promise<{
       update: {},
       create: {
         id: 'singleton',
+        homepage: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        about: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        contact: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        appointment: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        faq: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        testimonials: {
+          title: null,
+          description: null,
+          keywords: null,
+        },
+        products: {
+          titleTemplate: null,
+          descriptionTemplate: null,
+          keywords: null,
+        },
+        productDetails: {
+          titleTemplate: null,
+          descriptionTemplate: null,
+          keywords: null,
+        },
       },
     });
 
     return {
       success: true,
-      data: settings,
+      data: settings as SEOSettings,
     };
   } catch (error) {
     console.error('Error fetching SEO settings:', error);
@@ -40,25 +80,41 @@ export async function upsertSEOSettings(data: SEOSettings): Promise<{
       update: {
         metaTitle: data.metaTitle || null,
         metaDescription: data.metaDescription || null,
-        productMetaTitle: data.productMetaTitle || null,
-        productMetaDescription: data.productMetaDescription || null,
-        categoryMetaTitle: data.categoryMetaTitle || null,
-        categoryMetaDescription: data.categoryMetaDescription || null,
         ogImage: data.ogImage || null,
+        homepage: data.homepage || null,
+        about: data.about || null,
+        contact: data.contact || null,
+        appointment: data.appointment || null,
+        faq: data.faq || null,
+        testimonials: data.testimonials || null,
+        products: data.products || null,
+        productDetails: data.productDetails || null,
+        canonicalBaseUrl: data.canonicalBaseUrl || null,
+        robotsIndex: data.robotsIndex ?? true,
+        robotsFollow: data.robotsFollow ?? true,
         googleAnalyticsId: data.googleAnalyticsId || null,
         facebookPixelId: data.facebookPixelId || null,
+        googleSearchConsole: data.googleSearchConsole || null,
       },
       create: {
         id: 'singleton',
         metaTitle: data.metaTitle || null,
         metaDescription: data.metaDescription || null,
-        productMetaTitle: data.productMetaTitle || null,
-        productMetaDescription: data.productMetaDescription || null,
-        categoryMetaTitle: data.categoryMetaTitle || null,
-        categoryMetaDescription: data.categoryMetaDescription || null,
         ogImage: data.ogImage || null,
+        homepage: data.homepage || null,
+        about: data.about || null,
+        contact: data.contact || null,
+        appointment: data.appointment || null,
+        faq: data.faq || null,
+        testimonials: data.testimonials || null,
+        products: data.products || null,
+        productDetails: data.productDetails || null,
+        canonicalBaseUrl: data.canonicalBaseUrl || null,
+        robotsIndex: data.robotsIndex ?? true,
+        robotsFollow: data.robotsFollow ?? true,
         googleAnalyticsId: data.googleAnalyticsId || null,
         facebookPixelId: data.facebookPixelId || null,
+        googleSearchConsole: data.googleSearchConsole || null,
       },
     });
 

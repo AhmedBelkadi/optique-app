@@ -6,7 +6,7 @@ import { requirePermission } from '@/lib/auth/authorization';
 export async function getSEOSettingsAction() {
   try {
     // 🔐 AUTHENTICATION CHECK - Ensure user has permission
-    requirePermission('seo', 'read');
+    await requirePermission('seo', 'read');
 
     return await getSEOSettings();
   } catch (error) {

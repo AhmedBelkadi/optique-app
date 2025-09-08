@@ -320,18 +320,34 @@ model ContactSettings {
   @@map("contact_settings")
 }
 
-// SEO Settings - Search engine optimization and marketing
+// Enhanced SEO Settings - Comprehensive search engine optimization
 model SEOSettings {
   id                  String   @id @default("singleton")
+  
+  // Global SEO
   metaTitle           String?
   metaDescription     String?
-  productMetaTitle    String?
-  productMetaDescription String?
-  categoryMetaTitle   String?
-  categoryMetaDescription String?
   ogImage             String?
+  
+  // Page-specific SEO (stored as JSON)
+  homepage            Json?
+  about               Json?
+  contact             Json?
+  appointment         Json?
+  faq                 Json?
+  testimonials        Json?
+  products            Json?
+  productDetails      Json?
+  
+  // Technical SEO
+  canonicalBaseUrl    String?
+  robotsIndex         Boolean @default(true)
+  robotsFollow        Boolean @default(true)
+  
+  // Analytics
   googleAnalyticsId   String?
   facebookPixelId     String?
+  googleSearchConsole String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

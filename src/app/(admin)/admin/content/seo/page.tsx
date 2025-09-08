@@ -1,16 +1,15 @@
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
-import SEOSettingsForm from '@/components/features/settings/SEOSettingsForm';
+import SEOManagementForm from '@/components/features/seo/SEOManagementForm';
 import { getSEOSettingsAction } from '@/features/seo/actions/getSEOSettingsAction';
 import { requirePermission } from '@/lib/auth/authorization';
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store"; // optional, stricter
+export const fetchCache = "force-no-store";
 
 export default async function ContentSEOPage() {
-
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('seo', 'read');
 
@@ -32,11 +31,11 @@ export default async function ContentSEOPage() {
   return (
     <>
       <AdminPageConfig
-        title="SEO Settings"
-        subtitle="Manage your site's search engine optimization and marketing settings"
+        title="SEO Management"
+        subtitle="Comprehensive search engine optimization for all your public pages"
         breadcrumbs={[
           { label: 'Content Management', href: '/admin/content' },
-          { label: 'SEO Settings' }
+          { label: 'SEO Management' }
         ]}
         showSearch={false}
         showNotifications={true}
@@ -44,7 +43,7 @@ export default async function ContentSEOPage() {
 
       <div className="min-h-screen">
         <Suspense fallback={<SEOSettingsSkeleton />}>
-          <SEOSettingsForm settings={seoSettings as any} />
+          <SEOManagementForm settings={seoSettings as any} />
         </Suspense>
       </div>
     </>

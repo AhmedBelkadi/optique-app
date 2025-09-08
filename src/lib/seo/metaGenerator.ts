@@ -40,14 +40,14 @@ export class MetaGenerator {
     const siteSettings = data.siteSettings;
     const contactSettings = data.contactSettings;
 
-    const title = pageSettings?.title || seoSettings.metaTitle || `${siteSettings?.siteName || 'Optique'} - Your Vision, Our Expertise`;
+    const title = pageSettings?.title || seoSettings.metaTitle || `${siteSettings?.siteName || 'Optique'} - Votre Vision, Notre Expertise`;
     const description = pageSettings?.description || seoSettings.metaDescription || 
-      `Professional eyewear and optical services tailored to your unique needs. Experience the perfect blend of style, comfort, and precision${contactSettings?.city ? ` in ${contactSettings.city}` : ''}.`;
+      `Services optiques professionnels adaptés à vos besoins uniques. Découvrez le parfait équilibre entre style, confort et précision${contactSettings?.city ? ` à ${contactSettings.city}` : ''}.`;
 
     return {
       title,
       description,
-      keywords: pageSettings?.keywords || ['optique', 'lunettes', 'eyewear', 'optical', contactSettings?.city].filter(Boolean),
+      keywords: pageSettings?.keywords || ['optique', 'lunettes', 'montures', 'verres', 'opticien', contactSettings?.city].filter(Boolean),
       openGraph: {
         title,
         description,
@@ -318,7 +318,7 @@ export class MetaGenerator {
       ?.replace('{price}', product.price?.toString() || '')
       || product.description || seoSettings.metaDescription;
 
-    const productImages = product.images?.map(img => ({
+    const productImages = product.images?.map((img: any) => ({
       url: `${this.baseUrl}${img.path}`,
       width: 1200,
       height: 630,
@@ -333,7 +333,7 @@ export class MetaGenerator {
         title,
         description,
         images: productImages,
-        type: 'product',
+        type: 'website' as const,
         url: `${this.baseUrl}/products/${product.id}`,
         siteName: siteSettings?.siteName || 'Optique',
       },
@@ -341,7 +341,7 @@ export class MetaGenerator {
         card: 'summary_large_image',
         title,
         description,
-        images: productImages?.map(img => img.url),
+        images: productImages?.map((img: any) => img.url),
       },
       robots: {
         index: seoSettings.robotsIndex,

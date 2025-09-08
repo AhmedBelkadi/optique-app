@@ -22,14 +22,14 @@ import {
   MessageSquare,
   Home,
   Package,
-  FolderOpen,
   Settings,
-  Calendar,
-  HelpCircle,
+  Wrench,
   Users,
-  ExternalLink,
-  Copy,
-  RefreshCw
+  HelpCircle,
+  Info,
+  Lightbulb,
+  Target,
+  Zap
 } from 'lucide-react';
 import { upsertSEOSettingsAction } from '@/features/settings/actions/upsertSEOSettings';
 import { SEOSettings } from '@/features/settings/schema/settingsSchema';
@@ -51,6 +51,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const seoFormSchema = z.object({
   // Global SEO
@@ -101,9 +102,9 @@ const seoFormSchema = z.object({
   }).optional(),
   
   // Technical SEO
-  canonicalBaseUrl: z.string().url().optional(),
-  robotsIndex: z.boolean().default(true),
-  robotsFollow: z.boolean().default(true),
+  canonicalBaseUrl: z.string().optional(),
+  robotsIndex: z.boolean(),
+  robotsFollow: z.boolean(),
   
   // Analytics
   googleAnalyticsId: z.string().optional(),
@@ -122,6 +123,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState('overview');
   const [showPreview, setShowPreview] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const [state, formAction] = useActionState(upsertSEOSettingsAction, {
     success: false,
@@ -135,14 +137,46 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
       metaTitle: settings.metaTitle || '',
       metaDescription: settings.metaDescription || '',
       ogImage: settings.ogImage || '',
-      homepage: settings.homepage || { title: '', description: '', keywords: [] },
-      about: settings.about || { title: '', description: '', keywords: [] },
-      contact: settings.contact || { title: '', description: '', keywords: [] },
-      appointment: settings.appointment || { title: '', description: '', keywords: [] },
-      faq: settings.faq || { title: '', description: '', keywords: [] },
-      testimonials: settings.testimonials || { title: '', description: '', keywords: [] },
-      products: settings.products || { titleTemplate: '', descriptionTemplate: '', keywords: [] },
-      productDetails: settings.productDetails || { titleTemplate: '', descriptionTemplate: '', keywords: [] },
+      homepage: settings.homepage ? {
+        title: settings.homepage.title || '',
+        description: settings.homepage.description || '',
+        keywords: settings.homepage.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      about: settings.about ? {
+        title: settings.about.title || '',
+        description: settings.about.description || '',
+        keywords: settings.about.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      contact: settings.contact ? {
+        title: settings.contact.title || '',
+        description: settings.contact.description || '',
+        keywords: settings.contact.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      appointment: settings.appointment ? {
+        title: settings.appointment.title || '',
+        description: settings.appointment.description || '',
+        keywords: settings.appointment.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      faq: settings.faq ? {
+        title: settings.faq.title || '',
+        description: settings.faq.description || '',
+        keywords: settings.faq.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      testimonials: settings.testimonials ? {
+        title: settings.testimonials.title || '',
+        description: settings.testimonials.description || '',
+        keywords: settings.testimonials.keywords || []
+      } : { title: '', description: '', keywords: [] },
+      products: settings.products ? {
+        titleTemplate: settings.products.titleTemplate || '',
+        descriptionTemplate: settings.products.descriptionTemplate || '',
+        keywords: settings.products.keywords || []
+      } : { titleTemplate: '', descriptionTemplate: '', keywords: [] },
+      productDetails: settings.productDetails ? {
+        titleTemplate: settings.productDetails.titleTemplate || '',
+        descriptionTemplate: settings.productDetails.descriptionTemplate || '',
+        keywords: settings.productDetails.keywords || []
+      } : { titleTemplate: '', descriptionTemplate: '', keywords: [] },
       canonicalBaseUrl: settings.canonicalBaseUrl || '',
       robotsIndex: settings.robotsIndex ?? true,
       robotsFollow: settings.robotsFollow ?? true,
@@ -154,7 +188,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
 
   const handleSubmit = async (data: SEOFormData) => {
     if (csrfLoading || csrfError) {
-      toast.error('CSRF token not available');
+      toast.error('Token de sécurité non disponible');
       return;
     }
 
@@ -201,20 +235,29 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">SEO Management</h1>
+          <h1 className="text-3xl font-bold text-foreground">Optimisation SEO</h1>
           <p className="text-muted-foreground mt-2">
-            Optimize your site's search engine visibility across all public pages
+            Améliorez la visibilité de votre site dans les moteurs de recherche
           </p>
         </div>
         
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
+            onClick={() => setShowHelp(!showHelp)}
+            className="flex items-center gap-2"
+          >
+            <HelpCircle className="h-4 w-4" />
+            {showHelp ? 'Masquer l\'aide' : 'Aide'}
+          </Button>
+          
+          <Button
+            variant="outline"
             onClick={() => setShowPreview(!showPreview)}
             className="flex items-center gap-2"
           >
             {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            {showPreview ? 'Hide Preview' : 'Show Preview'}
+            {showPreview ? 'Masquer l\'aperçu' : 'Aperçu'}
           </Button>
           
           <Button 
@@ -226,23 +269,62 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                Enregistrement...
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save SEO Settings
+                Enregistrer
               </>
             )}
           </Button>
         </div>
       </div>
 
+      {/* Help Panel */}
+      {showHelp && (
+        <Alert className="border-blue-200 bg-blue-50">
+          <Info className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <div className="space-y-2">
+              <p className="font-medium">💡 Qu'est-ce que le SEO ?</p>
+              <p className="text-sm">
+                Le SEO (Search Engine Optimization) aide votre site à être mieux classé dans Google. 
+                Plus votre site est visible, plus vous attirerez de clients !
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="flex items-start gap-2">
+                  <Target className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">Titre de page</p>
+                    <p className="text-xs text-blue-700">Ce qui apparaît dans Google</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <MessageSquare className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">Description</p>
+                    <p className="text-xs text-blue-700">Le texte sous le titre dans Google</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <ImageIcon className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">Image sociale</p>
+                    <p className="text-xs text-blue-700">Image partagée sur Facebook/WhatsApp</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Success/Error Messages */}
       {state.success && (
         <div className="flex items-center gap-2 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
           <CheckCircle className="h-5 w-5 text-emerald-600" />
-          <span className="text-emerald-800 font-medium">SEO settings saved successfully!</span>
+          <span className="text-emerald-800 font-medium">Paramètres SEO enregistrés avec succès !</span>
         </div>
       )}
 
@@ -263,7 +345,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
               >
                 <Globe className="w-4 h-4" />
-                Overview
+                Général
               </TabsTrigger>
               <TabsTrigger 
                 value="pages" 
@@ -277,14 +359,14 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
               >
                 <Wrench className="w-4 h-4" />
-                Technical
+                Technique
               </TabsTrigger>
               <TabsTrigger 
                 value="analytics" 
                 className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
               >
                 <BarChart3 className="w-4 h-4" />
-                Analytics
+                Statistiques
               </TabsTrigger>
             </TabsList>
 
@@ -297,10 +379,10 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Globe className="h-5 w-5 text-primary" />
-                        Global SEO Settings
+                        Paramètres généraux
                       </CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        Configure default meta tags that apply to all pages
+                        Ces paramètres s'appliquent à toutes les pages de votre site
                       </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -309,15 +391,18 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                         name="metaTitle"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Default Meta Title</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              <Target className="h-4 w-4" />
+                              Titre de votre site
+                            </FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="Optique - Your Vision, Our Expertise" 
+                                placeholder="Optique - Votre Vision, Notre Expertise" 
                                 {...field} 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Recommended: 50-60 characters
+                              💡 Ce titre apparaît dans Google. Recommandé : 50-60 caractères
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -329,16 +414,19 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                         name="metaDescription"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Default Meta Description</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              <MessageSquare className="h-4 w-4" />
+                              Description de votre site
+                            </FormLabel>
                             <FormControl>
                               <Textarea 
-                                placeholder="Professional eyewear and optical services tailored to your unique needs..."
+                                placeholder="Services optiques professionnels adaptés à vos besoins uniques..."
                                 className="min-h-[80px]"
                                 {...field} 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Recommended: 150-160 characters
+                              💡 Cette description apparaît sous le titre dans Google. Recommandé : 150-160 caractères
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -350,17 +438,20 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                         name="ogImage"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Open Graph Image</FormLabel>
+                            <FormLabel className="flex items-center gap-2">
+                              <ImageIcon className="h-4 w-4" />
+                              Image pour les réseaux sociaux
+                            </FormLabel>
                             <FormControl>
                               <ImageUploadField
                                 label=""
                                 value={field.value}
                                 onChange={field.onChange}
-                                placeholder="Upload image for social media sharing"
+                                placeholder="Téléchargez une image pour le partage sur Facebook/WhatsApp"
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Recommended: 1200x630 pixels for social media sharing
+                              💡 Image qui apparaît quand vous partagez votre site sur Facebook ou WhatsApp. Recommandé : 1200x630 pixels
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -378,8 +469,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <Home className="h-5 w-5 text-primary" />
-                          Homepage SEO
+                          Page d'accueil
                         </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Personnalisez l'apparence de votre page d'accueil dans Google
+                        </p>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <FormField
@@ -387,9 +481,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="homepage.title"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Title</FormLabel>
+                              <FormLabel>Titre de la page d'accueil</FormLabel>
                               <FormControl>
-                                <Input placeholder="Homepage Title" {...field} />
+                                <Input placeholder="Titre de votre page d'accueil" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -400,9 +494,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="homepage.description"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Description</FormLabel>
+                              <FormLabel>Description de la page d'accueil</FormLabel>
                               <FormControl>
-                                <Textarea placeholder="Homepage description" {...field} />
+                                <Textarea placeholder="Description de votre page d'accueil" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -416,8 +510,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <Users className="h-5 w-5 text-primary" />
-                          About Page SEO
+                          Page À propos
                         </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Optimisez votre page "À propos" pour Google
+                        </p>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <FormField
@@ -425,9 +522,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="about.title"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Title</FormLabel>
+                              <FormLabel>Titre de la page À propos</FormLabel>
                               <FormControl>
-                                <Input placeholder="About Us - [Site Name]" {...field} />
+                                <Input placeholder="À propos de [Nom de votre site]" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -438,9 +535,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="about.description"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Description</FormLabel>
+                              <FormLabel>Description de la page À propos</FormLabel>
                               <FormControl>
-                                <Textarea placeholder="About page description" {...field} />
+                                <Textarea placeholder="Description de votre page À propos" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -454,8 +551,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <MessageSquare className="h-5 w-5 text-primary" />
-                          Contact Page SEO
+                          Page Contact
                         </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Améliorez la visibilité de votre page contact
+                        </p>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <FormField
@@ -463,9 +563,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="contact.title"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Title</FormLabel>
+                              <FormLabel>Titre de la page Contact</FormLabel>
                               <FormControl>
-                                <Input placeholder="Contact [Site Name] - [City] Optician" {...field} />
+                                <Input placeholder="Contact [Nom de votre site] - Opticien [Ville]" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -476,9 +576,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="contact.description"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Page Description</FormLabel>
+                              <FormLabel>Description de la page Contact</FormLabel>
                               <FormControl>
-                                <Textarea placeholder="Contact page description" {...field} />
+                                <Textarea placeholder="Description de votre page Contact" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -492,8 +592,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <Package className="h-5 w-5 text-primary" />
-                          Products Page SEO
+                          Page Produits
                         </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Optimisez votre page produits pour attirer plus de clients
+                        </p>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <FormField
@@ -501,9 +604,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="products.titleTemplate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Title Template</FormLabel>
+                              <FormLabel>Modèle de titre pour les produits</FormLabel>
                               <FormControl>
-                                <Input placeholder="[Site Name] - Premium Eyewear Collection" {...field} />
+                                <Input placeholder="[Nom de votre site] - Collection Lunettes Premium" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -514,9 +617,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           name="products.descriptionTemplate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Description Template</FormLabel>
+                              <FormLabel>Modèle de description pour les produits</FormLabel>
                               <FormControl>
-                                <Textarea placeholder="Discover our premium collection..." {...field} />
+                                <Textarea placeholder="Découvrez notre collection premium..." {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -533,8 +636,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Wrench className="h-5 w-5 text-primary" />
-                        Technical SEO
+                        Paramètres techniques
                       </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Configuration avancée pour les moteurs de recherche
+                      </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <FormField
@@ -542,15 +648,15 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                         name="canonicalBaseUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Canonical Base URL</FormLabel>
+                            <FormLabel>URL de base de votre site</FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="https://yourdomain.com" 
+                                placeholder="https://votresite.com" 
                                 {...field} 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Your website's base URL for canonical links
+                              💡 L'URL principale de votre site (ex: https://votre-optique.com)
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -564,9 +670,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                               <div className="space-y-0.5">
-                                <FormLabel className="text-base">Allow Indexing</FormLabel>
+                                <FormLabel className="text-base">Autoriser l'indexation</FormLabel>
                                 <p className="text-sm text-muted-foreground">
-                                  Allow search engines to index your pages
+                                  Permettre à Google d'indexer vos pages
                                 </p>
                               </div>
                               <FormControl>
@@ -585,9 +691,9 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                               <div className="space-y-0.5">
-                                <FormLabel className="text-base">Allow Following Links</FormLabel>
+                                <FormLabel className="text-base">Autoriser le suivi des liens</FormLabel>
                                 <p className="text-sm text-muted-foreground">
-                                  Allow search engines to follow links on your pages
+                                  Permettre à Google de suivre les liens de vos pages
                                 </p>
                               </div>
                               <FormControl>
@@ -610,8 +716,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-5 w-5 text-primary" />
-                        Analytics & Tracking
+                        Statistiques et suivi
                       </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Suivez les performances de votre site avec Google Analytics
+                      </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <FormField
@@ -621,7 +730,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           <FormItem>
                             <FormLabel className="flex items-center gap-2">
                               <TrendingUp className="h-4 w-4" />
-                              Google Analytics ID
+                              ID Google Analytics
                             </FormLabel>
                             <FormControl>
                               <Input 
@@ -630,7 +739,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Your Google Analytics 4 measurement ID
+                              💡 Votre identifiant Google Analytics pour suivre les visiteurs (ex: G-ABC123DEF4)
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -644,7 +753,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                           <FormItem>
                             <FormLabel className="flex items-center gap-2">
                               <MessageSquare className="h-4 w-4" />
-                              Facebook Pixel ID
+                              ID Facebook Pixel
                             </FormLabel>
                             <FormControl>
                               <Input 
@@ -653,7 +762,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Your Facebook Pixel ID for conversion tracking
+                              💡 Votre identifiant Facebook Pixel pour le suivi des conversions
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -671,12 +780,12 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                             </FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="Search Console verification code" 
+                                placeholder="Code de vérification Search Console" 
                                 {...field} 
                               />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
-                              Your Google Search Console verification code
+                              💡 Votre code de vérification Google Search Console
                             </p>
                             <FormMessage />
                           </FormItem>
@@ -698,44 +807,44 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-5 w-5 text-primary" />
-                  SEO Preview
+                  Aperçu SEO
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">Meta Title</Badge>
-                    <span className="text-sm font-medium">{watchedValues.metaTitle || 'Not set'}</span>
+                    <Badge variant="secondary">Titre</Badge>
+                    <span className="text-sm font-medium">{watchedValues.metaTitle || 'Non défini'}</span>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">Meta Description</Badge>
+                    <Badge variant="secondary">Description</Badge>
                     <span className="text-sm font-medium">
                       {watchedValues.metaDescription 
                         ? (watchedValues.metaDescription.length > 50 
                             ? watchedValues.metaDescription.substring(0, 50) + '...' 
                             : watchedValues.metaDescription)
-                        : 'Not set'
+                        : 'Non définie'
                       }
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">Google Analytics</Badge>
-                    <span className="text-sm font-medium">{watchedValues.googleAnalyticsId || 'Not set'}</span>
+                    <span className="text-sm font-medium">{watchedValues.googleAnalyticsId || 'Non configuré'}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">Facebook Pixel</Badge>
-                    <span className="text-sm font-medium">{watchedValues.facebookPixelId || 'Not set'}</span>
+                    <span className="text-sm font-medium">{watchedValues.facebookPixelId || 'Non configuré'}</span>
                   </div>
                 </div>
 
                 {/* Character Count */}
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Character Count</p>
+                  <p className="text-sm font-medium">Compteur de caractères</p>
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <div>Title: {watchedValues.metaTitle?.length || 0}/60</div>
+                    <div>Titre: {watchedValues.metaTitle?.length || 0}/60</div>
                     <div>Description: {watchedValues.metaDescription?.length || 0}/160</div>
                   </div>
                 </div>
@@ -743,11 +852,11 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 {/* OG Image Preview */}
                 {watchedValues.ogImage && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">Open Graph Image</p>
+                    <p className="text-sm font-medium">Image pour réseaux sociaux</p>
                     <div className="w-full h-32 border rounded-lg overflow-hidden">
                       <img 
                         src={watchedValues.ogImage} 
-                        alt="OG Preview" 
+                        alt="Aperçu image sociale" 
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
@@ -763,7 +872,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Actions rapides</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
@@ -773,7 +882,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 onClick={() => setActiveTab('overview')}
               >
                 <Globe className="h-4 w-4 mr-2" />
-                Global Settings
+                Paramètres généraux
               </Button>
               
               <Button 
@@ -783,7 +892,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 onClick={() => setActiveTab('pages')}
               >
                 <Settings className="h-4 w-4 mr-2" />
-                Page Settings
+                Pages individuelles
               </Button>
               
               <Button 
@@ -793,7 +902,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 onClick={() => setActiveTab('technical')}
               >
                 <Wrench className="h-4 w-4 mr-2" />
-                Technical SEO
+                Paramètres techniques
               </Button>
 
               <Button 
@@ -803,7 +912,7 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
                 onClick={() => setActiveTab('analytics')}
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Analytics
+                Statistiques
               </Button>
             </CardContent>
           </Card>
@@ -811,24 +920,24 @@ export default function SEOManagementForm({ settings }: SEOManagementFormProps) 
           {/* Save Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Save Status</CardTitle>
+              <CardTitle>État d'enregistrement</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
                 {isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                    <span className="text-sm text-muted-foreground">Saving changes...</span>
+                    <span className="text-sm text-muted-foreground">Enregistrement en cours...</span>
                   </>
                 ) : state.success ? (
                   <>
                     <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    <span className="text-sm text-emerald-600">All changes saved</span>
+                    <span className="text-sm text-emerald-600">Toutes les modifications sont sauvegardées</span>
                   </>
                 ) : (
                   <>
                     <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-                    <span className="text-sm text-muted-foreground">No unsaved changes</span>
+                    <span className="text-sm text-muted-foreground">Aucune modification non sauvegardée</span>
                   </>
                 )}
               </div>

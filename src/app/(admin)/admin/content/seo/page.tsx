@@ -19,7 +19,7 @@ export default async function ContentSEOPage() {
     return (
       <div className="min-h-screen bg-muted/50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Error Loading SEO Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Erreur lors du chargement des paramètres SEO</h1>
           <p className="text-muted-foreground">{seoResult.error}</p>
         </div>
       </div>
@@ -31,11 +31,11 @@ export default async function ContentSEOPage() {
   return (
     <>
       <AdminPageConfig
-        title="SEO Management"
-        subtitle="Comprehensive search engine optimization for all your public pages"
+        title="Optimisation SEO"
+        subtitle="Améliorez la visibilité de votre site dans les moteurs de recherche"
         breadcrumbs={[
-          { label: 'Content Management', href: '/admin/content' },
-          { label: 'SEO Management' }
+          { label: 'Gestion du contenu', href: '/admin/content' },
+          { label: 'Optimisation SEO' }
         ]}
         showSearch={false}
         showNotifications={true}

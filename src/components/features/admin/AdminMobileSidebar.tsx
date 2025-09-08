@@ -170,13 +170,13 @@ const navGroups: NavGroup[] = [
         description: 'Questions fréquentes',
         staffAccessible: true
       },
-      {
-        href: '/admin/content/seo',
-        label: 'SEO',
-        icon: Search,
-        description: 'Gérer le SEO du site',
-        staffAccessible: true
-      },
+      // {
+      //   href: '/admin/content/seo',
+      //   label: 'SEO',
+      //   icon: Search,
+      //   description: 'Gérer le SEO du site',
+      //   staffAccessible: true
+      // },
       {
         href: '/admin/content/operations',
         label: 'Opérations',

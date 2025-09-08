@@ -319,114 +319,9 @@ export default function SettingsForm({
     }
 
     try {
-      let finalLogoUrl = data.logoUrl;
-
-      // If there's a new logo file selected, upload it first
-      if (selectedLogoFile) {
-        try {
-          toast.loading('📤 Téléchargement du logo...', {
-            duration: 0,
-            style: {
-              background: '#f0f9ff',
-              color: '#0369a1',
-              border: '1px solid #bae6fd'
-            }
-          });
-
-          const uploadFormData = new FormData();
-          uploadFormData.append('file', selectedLogoFile);
-          uploadFormData.append('folder', 'site-settings');
-
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: uploadFormData,
-          });
-
-          if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Échec du téléchargement du logo');
-          }
-
-          const uploadResult = await uploadResponse.json();
-          finalLogoUrl = uploadResult.url;
-          
-          toast.dismiss();
-          toast.success('✅ Logo téléchargé avec succès !', {
-            duration: 3000,
-            style: {
-              background: '#f0fdf4',
-              color: '#16a34a',
-              border: '1px solid #bbf7d0'
-            }
-          });
-        } catch (uploadError) {
-          toast.dismiss();
-          console.error('Logo upload error:', uploadError);
-          toast.error(`❌ Échec du téléchargement du logo : ${uploadError instanceof Error ? uploadError.message : 'Erreur inconnue'}`, {
-            duration: 6000,
-            style: {
-              background: '#fef2f2',
-              color: '#dc2626',
-              border: '1px solid #fecaca'
-            }
-          });
-          return;
-        }
-      }
-
-      // Handle hero background image upload
-      let finalHeroBackgroundUrl = data.heroBackgroundImg;
-      if (selectedHeroBackgroundFile) {
-        try {
-          toast.loading('📤 Téléchargement de l\'image de fond du hero...', {
-            duration: 0,
-            style: {
-              background: '#f0f9ff',
-              color: '#0369a1',
-              border: '1px solid #bae6fd'
-            }
-          });
-
-          const uploadFormData = new FormData();
-          uploadFormData.append('file', selectedHeroBackgroundFile);
-          uploadFormData.append('folder', 'hero');
-
-          const uploadResponse = await fetch('/api/upload', {
-            method: 'POST',
-            body: uploadFormData,
-          });
-
-          if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Échec du téléchargement de l\'image de fond');
-          }
-
-          const uploadResult = await uploadResponse.json();
-          finalHeroBackgroundUrl = uploadResult.url;
-          
-          toast.dismiss();
-          toast.success('✅ Image de fond du hero téléchargée avec succès !', {
-            duration: 3000,
-            style: {
-              background: '#f0fdf4',
-              color: '#16a34a',
-              border: '1px solid #bbf7d0'
-            }
-          });
-        } catch (uploadError) {
-          toast.dismiss();
-          console.error('Hero background upload error:', uploadError);
-          toast.error(`❌ Échec du téléchargement de l'image de fond : ${uploadError instanceof Error ? uploadError.message : 'Erreur inconnue'}`, {
-            duration: 6000,
-            style: {
-              background: '#fef2f2',
-              color: '#dc2626',
-              border: '1px solid #fecaca'
-            }
-          });
-          return;
-        }
-      }
+      // Switch to server-side file handling in action
+      const finalLogoUrl = data.logoUrl;
+      const finalHeroBackgroundUrl = data.heroBackgroundImg;
 
       const formData = new FormData();
       formData.append('csrf_token', csrfToken);
@@ -443,6 +338,14 @@ export default function SettingsForm({
       }
       if (finalHeroBackgroundUrl !== undefined && finalHeroBackgroundUrl !== null) {
         formData.append('heroBackgroundImg', finalHeroBackgroundUrl);
+      }
+
+      // Append selected files for server-side upload
+      if (selectedLogoFile) {
+        formData.append('logo', selectedLogoFile);
+      }
+      if (selectedHeroBackgroundFile) {
+        formData.append('heroBackground', selectedHeroBackgroundFile);
       }
 
       if (selectedAboutImageFile) {

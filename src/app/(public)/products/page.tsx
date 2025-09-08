@@ -1,4 +1,5 @@
 import { getPublicProducts } from '@/features/products/services/getPublicProducts';
+import { PAGE_SIZE } from '@/features/products/config';
 import { getPublicCategories } from '@/features/categories/services/getPublicCategories';
 import { PageHeader } from '@/components/ui/page-header';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -8,9 +9,8 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { ProductsPageClient } from '@/components/features/products/ProductsPageClient';
 
-// Force dynamic rendering
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store"; // optional, stricter
+// Default (no-filter) listing can be revalidated to improve perf; filtered stays fresh
+export const revalidate = 300;
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -54,7 +54,7 @@ async function ProductsContent({ searchParams }: ProductsPageProps) {
       sortBy,
       sortOrder,
       page,
-      limit: 12,
+      limit: PAGE_SIZE,
     }),
     getPublicCategories(),
   ]);

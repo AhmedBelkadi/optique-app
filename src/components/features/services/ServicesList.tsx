@@ -153,14 +153,14 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
           <h2 className="text-2xl font-bold">Services</h2>
           <p className="text-muted-foreground">
             Gérez les services affichés dans le footer et sur la page de rendez-vous
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="w-full sm:w-auto flex gap-2">
           <ServiceForm onSuccess={onRefresh} onServiceCreated={onServiceCreated} />
         </div>
       </div>
@@ -177,10 +177,10 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
               onReorder={handleReorderServices}
               getId={(service) => service.id}
               renderItem={(service, index) => (
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     {/* Header with title and order */}
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 truncate">
                           {service.name}
@@ -224,7 +224,7 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex items-center gap-2 ml-0 sm:ml-4 self-stretch sm:self-auto">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">

@@ -199,7 +199,7 @@ export default function FAQModal({ faq, isOpen, onClose, onSuccess }: FAQModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {isEditing ? (
@@ -256,7 +256,7 @@ export default function FAQModal({ faq, isOpen, onClose, onSuccess }: FAQModalPr
 
 
           {/* Form Actions */}
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               type="button"
               onClick={handleClose}
@@ -269,6 +269,7 @@ export default function FAQModal({ faq, isOpen, onClose, onSuccess }: FAQModalPr
             <Button
               type="submit"
               disabled={!isValid || isCreatePending || isUpdatePending}
+              className="w-full sm:w-auto"
             >
               {isCreatePending || isUpdatePending ? (
                 <>

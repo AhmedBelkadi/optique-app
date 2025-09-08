@@ -117,14 +117,14 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
         {/* Main Filter Bar - Always Visible */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
           {/* Search and Category - Primary Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row gap-3 flex-1 min-w-0 w-full">
             <div className="relative flex-1 min-w-0">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60" />
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Rechercher des produits..."
-                className="h-10 pl-10 border-border focus:border-primary focus:ring-primary"
+                className="h-10 pl-10 border-border focus:border-primary focus:ring-primary w-full"
               />
             </div>
             
@@ -133,7 +133,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
                 value={categoryFilter || 'all'}
                 onValueChange={(val) => setCategoryFilter(val === 'all' ? '' : val)}
               >
-                <SelectTrigger className="h-10 border-border focus:border-primary focus:ring-primary">
+                <SelectTrigger className="h-10 border-border focus:border-primary focus:ring-primary w-full">
                   <SelectValue placeholder="Toutes les catégories" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,9 +149,9 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
           </div>
 
           {/* Sort Controls */}
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="h-10 w-40 border-border focus:border-primary focus:ring-primary">
+              <SelectTrigger className="h-10 w-full sm:w-40 border-border focus:border-primary focus:ring-primary">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -163,7 +163,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
             </Select>
 
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="h-10 w-32 border-border focus:border-primary focus:ring-primary">
+              <SelectTrigger className="h-10 w-full sm:w-32 border-border focus:border-primary focus:ring-primary">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -174,7 +174,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
           </div>
 
           {/* Filter Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full lg:w-auto">
             {hasActiveFilters && (
               <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20">
                 {activeFilterCount}
@@ -185,7 +185,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
               variant="default"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="h-10 px-3"
+              className="h-10 px-3 w-full sm:w-auto"
             >
               <SlidersHorizontal className="w-4 h-4 mr-2" />
               Filtres
@@ -197,7 +197,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="h-10 px-3 text-muted-foreground hover:text-foreground"
+                className="h-10 px-3 text-muted-foreground hover:text-foreground w-full sm:w-auto"
               >
                 <X className="w-4 h-4 mr-1" />
                 Effacer
@@ -209,7 +209,7 @@ const ProductFilters = React.memo(({ categories }: ProductFiltersProps) => {
         {/* Advanced Filters - Collapsible */}
         {isExpanded && (
           <div className="mt-4 pt-4 border-t border-border/50">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Brand Filter */}
               <div className="space-y-2">
                 <Label htmlFor="brand" className="text-xs font-medium text-muted-foreground">Marque</Label>

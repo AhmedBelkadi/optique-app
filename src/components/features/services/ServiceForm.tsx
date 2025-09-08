@@ -126,7 +126,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-xl w-[95vw] sm:w-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Modifier le Service' : 'Ajouter un Nouveau Service'}
@@ -145,7 +145,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
             )}
 
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -237,7 +237,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
               )}
             />
 
-            <div className="flex justify-end space-x-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 type="button"
                 className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
@@ -246,7 +246,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
               >
                 Annuler
               </Button>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
                 {isPending ? 'Enregistrement...' : (isEditing ? 'Mettre à jour' : 'Créer')}
               </Button>
             </div>

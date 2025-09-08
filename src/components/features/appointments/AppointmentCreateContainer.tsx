@@ -27,24 +27,7 @@ export default function AppointmentCreateContainer() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/appointments">
-            <Button variant="default" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour aux rendez-vous
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Nouveau rendez-vous</h1>
-            <p className="text-muted-foreground mt-1">
-              Créer un nouveau rendez-vous pour un client
-            </p>
-          </div>
-        </div>
-      </div>
-
+     
       {/* Create Form */}
       <AppointmentCreateForm 
         onCreate={handleCreate}

@@ -73,7 +73,7 @@ export default function DeleteHomeValueModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2 text-destructive">
             <Trash2 className="w-5 h-5" />
@@ -141,7 +141,7 @@ export default function DeleteHomeValueModal({
 
         <form action={handleSubmit}>
           <DialogFooter className="pt-4">
-            <div className="flex space-x-3 w-full">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button
                 type="button"
                 onClick={() => onOpenChange(false)}

@@ -67,7 +67,7 @@ export default function DeleteFAQModal({ faq, isOpen, onClose, onSuccess }: Dele
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-destructive">
             <Trash2 className="h-5 w-5" />
@@ -128,7 +128,7 @@ export default function DeleteFAQModal({ faq, isOpen, onClose, onSuccess }: Dele
 
         <form action={handleDelete}>
           <DialogFooter className="pt-4">
-            <div className="flex space-x-3 w-full">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button
                 type="button"
                 onClick={onClose}

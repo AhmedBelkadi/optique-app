@@ -147,12 +147,12 @@ export default function FAQPageManager({
   });
 
   const renderFAQItem = (faq: any, index: number) => (
-    <div className="flex items-start justify-between">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div className="flex-1 min-w-0">
         {/* Header with question and order */}
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">
+            <h3 className="text-lg font-semibold text-gray-900 break-words">
               {faq.question}
             </h3>
           </div>
@@ -171,7 +171,7 @@ export default function FAQPageManager({
               Réponse
             </span>
           </div>
-          <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed">
+          <p className="text-sm text-gray-700 leading-relaxed break-words">
             {faq.answer}
           </p>
         </div>
@@ -190,7 +190,7 @@ export default function FAQPageManager({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-1 ml-4">
+      <div className="flex items-center gap-1 ml-0 sm:ml-4">
         <Button
           size="sm"
           onClick={() => handleEditFAQ(faq)}
@@ -378,7 +378,7 @@ export default function FAQPageManager({
           
             <CardContent>
               {/* Results Counter and Bulk Actions */}
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="text-sm text-muted-foreground">
                   Affichage de {filteredFAQs.length} sur {faqList.length} FAQs
                   {searchTerm && (

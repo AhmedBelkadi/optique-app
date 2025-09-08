@@ -9,9 +9,11 @@ import Image from "next/image";
 interface ProductCardProps {
   product: Product;
   className?: string;
+  priorityImage?: boolean;
+  sizes?: string;
 }
 
-export function ProductCard({ product, className = "" }: ProductCardProps) {
+export function ProductCard({ product, className = "", priorityImage = false, sizes }: ProductCardProps) {
   return (
     <Card className={`group hover:shadow-xl transition-all duration-300 border-border hover:border-primary/30 h-full flex flex-col relative overflow-hidden ${className}`}>
       {/* Decorative gradient overlay on hover */}
@@ -20,11 +22,13 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
       <CardHeader className="p-0 flex-shrink-0 relative">
         <div className="aspect-square bg-muted rounded-t-lg overflow-hidden relative">
           {product.images && product.images.length > 0 && product.images[0].path ? (
-            <img
+            <Image
               src={product.images[0].path}
               alt={product.images[0].alt || product.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-             
+              fill
+              sizes={sizes || "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              priority={priorityImage}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -46,14 +50,14 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 flex-1 flex flex-col">
-        <div className="space-y-3 flex-1">
+      <CardContent className="p-3 md:p-4 flex-1 flex flex-col">
+        <div className="space-y-2 md:space-y-3 flex-1">
           <div className="flex-1">
-            <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors line-clamp-2">
               {product.name}
             </h3>
             {product.description && (
-              <p className="text-muted-foreground text-sm line-clamp-2 mt-1">
+              <p className="text-muted-foreground text-xs md:text-sm line-clamp-2 mt-1">
                 {product.description}
               </p>
             )}
@@ -61,14 +65,19 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
           
           <div className="flex items-center justify-between mt-auto">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-primary">
-                {product.price ? `${product.price} MAD` : 'Sur demande'}
-              </span>
+              {product.price ? (
+                <span className="text-primary flex items-baseline">
+                  <span className="text-lg md:text-2xl font-bold leading-none">{product.price}</span>
+                  <span className="ml-1 text-[11px] md:text-sm font-semibold text-primary/80 tracking-wide">MAD</span>
+                </span>
+              ) : (
+                <span className="text-sm md:text-base text-muted-foreground">Sur demande</span>
+              )}
             </div>
             
-            <Button asChild size="sm" variant="secondary" className="h-10 px-4 bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/20 hover:border-secondary/30 transition-all duration-300">
+            <Button asChild size="sm" variant="secondary" className="h-8 md:h-10 px-3 md:px-4 bg-secondary/10 hover:bg-secondary/20 text-secondary border border-secondary/20 hover:border-secondary/30 transition-all duration-300 rounded-full">
               <Link href={`/products/${product.id}`}>
-                <Eye className="w-4 h-4 mr-2" />
+                <Eye className="w-3.5 h-3.5 md:w-4 md:h-4 mr-2" />
                 Voir
               </Link>
             </Button>

@@ -3,6 +3,7 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { updateProduct } from '@/features/products/services/updateProduct';
+import { revalidatePath } from 'next/cache';
 import { requirePermission } from '@/lib/auth/authorization';
 import { UpdateProductState } from '@/types/api';
 
@@ -61,6 +62,16 @@ export async function updateProductAction(prevState: UpdateProductState, formDat
     });
 
     if (result.success) {
+      // Revalidate relevant pages so details reflect latest data
+      try {
+        revalidatePath('/admin/products');
+        revalidatePath(`/admin/products/${id}`);
+        revalidatePath(`/admin/products/${id}/edit`);
+        revalidatePath('/products');
+        revalidatePath(`/products/${id}`);
+      } catch (e) {
+        console.warn('Revalidation failed (non-fatal):', e);
+      }
       return {
         error: '',
         fieldErrors: {},

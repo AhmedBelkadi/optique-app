@@ -18,6 +18,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Customer } from '@/features/customers/schema/customerSchema';
 import { softDeleteCustomerAction } from '@/features/customers/actions/softDeleteCustomer';
 import { restoreCustomerAction } from '@/features/customers/actions/restoreCustomer';
@@ -34,6 +44,7 @@ interface CustomerTableProps {
 
 export default function CustomerTable({ customers, onDelete, onUpdate }: CustomerTableProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const { csrfToken } = useCSRF();
 
   const handleDelete = async (id: string) => {
@@ -78,6 +89,7 @@ export default function CustomerTable({ customers, onDelete, onUpdate }: Custome
       });
     } finally {
       setIsLoading(null);
+      setConfirmDeleteId(null);
     }
   };
 
@@ -216,7 +228,7 @@ export default function CustomerTable({ customers, onDelete, onUpdate }: Custome
                       </DropdownMenuItem>
                     ) : (
                       <DropdownMenuItem
-                        onClick={() => handleDelete(customer.id)}
+                        onClick={() => setConfirmDeleteId(customer.id)}
                         disabled={isLoading === customer.id}
                         className="text-destructive"
                       >
@@ -231,6 +243,32 @@ export default function CustomerTable({ customers, onDelete, onUpdate }: Custome
           ))}
         </TableBody>
       </Table>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!confirmDeleteId} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
+        <AlertDialogContent className="sm:max-w-md w-[95vw] sm:w-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer le client</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action va marquer ce client comme supprimé. Vous pourrez le restaurer plus tard.
+              Confirmez-vous la suppression ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+            >
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 } 

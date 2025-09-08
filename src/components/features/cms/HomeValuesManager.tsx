@@ -120,15 +120,15 @@ export function HomeValuesManager({ values }: HomeValuesManagerProps) {
   const activeValues = homeValues;
 
   const renderValueItem = (value: HomeValues, index: number) => (
-    <div className="flex items-start justify-between w-full">
-      <div className="flex-1 space-y-2">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
+      <div className="flex-1 space-y-2 min-w-0">
         <div className="flex items-center space-x-3">
           <Badge variant="secondary" className="text-xs">
             #{value.order + 1}
           </Badge>
           <span className="text-sm text-muted-foreground">#{index + 1}</span>
         </div>
-        <h3 className="font-medium text-foreground">{value.title}</h3>
+        <h3 className="font-medium text-foreground truncate">{value.title}</h3>
         <p className="text-sm text-muted-foreground line-clamp-2">
           {value.description}
         </p>
@@ -138,7 +138,7 @@ export function HomeValuesManager({ values }: HomeValuesManagerProps) {
           </Badge>
         )}
       </div>
-      <div className="flex space-x-2 ml-4">
+      <div className="flex space-x-2 ml-0 sm:ml-4">
         <Button
           variant="ghost"
           size="sm"

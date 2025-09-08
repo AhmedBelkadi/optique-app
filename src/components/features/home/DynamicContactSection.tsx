@@ -1,6 +1,7 @@
 "use client"
 
 import { MapPin, Phone, Mail, Clock, Navigation } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 interface ContactSettings {
@@ -143,10 +144,12 @@ export default function DynamicContactSection({ contactSettings }: DynamicContac
               </div>
 
               <div className="mt-8 pt-6 border-t border-border">
+                <Link href="/appointment">
                 <Button className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/80 hover:to-primary text-primary-foreground py-3 transition-all duration-300 hover:scale-105">
                   <Phone className="w-5 h-5 mr-2" />
                   Prendre Rendez-vous
                 </Button>
+                </Link>
               </div>
             </div>
           </div>

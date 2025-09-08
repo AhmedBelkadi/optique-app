@@ -74,7 +74,7 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
     // Update product with transaction to handle categories and images
     const product = await prisma.$transaction(async (tx) => {
       // Update basic product fields
-      const updatedProduct = await tx.product.update({
+      await tx.product.update({
         where: { id },
         data: updateData,
         include: {

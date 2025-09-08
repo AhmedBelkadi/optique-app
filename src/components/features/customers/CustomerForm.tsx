@@ -234,10 +234,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
                       </FormControl>
                       <FormMessage>
                         {fieldErrors.name && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.name}
-                          </div>
+                            <span>{fieldErrors.name}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -267,10 +267,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
                       </FormControl>
                       <FormMessage>
                         {fieldErrors.email && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.email}
-                          </div>
+                            <span>{fieldErrors.email}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -299,10 +299,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
                       </FormControl>
                       <FormMessage>
                         {fieldErrors.phone && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.phone}
-                          </div>
+                            <span>{fieldErrors.phone}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -331,10 +331,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
                       </FormControl>
                       <FormMessage>
                         {fieldErrors.address && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {fieldErrors.address}
-                          </div>
+                            <span>{fieldErrors.address}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -365,10 +365,10 @@ export default function CustomerForm({ mode, customer }: CustomerFormProps) {
                     </FormControl>
                     <FormMessage>
                       {fieldErrors.notes && (
-                        <div className="flex items-center text-destructive">
+                        <span className="inline-flex items-center text-destructive">
                           <X className="w-4 h-4 mr-1" />
-                          {fieldErrors.notes}
-                        </div>
+                          <span>{fieldErrors.notes}</span>
+                        </span>
                       )}
                     </FormMessage>
                   </FormItem>

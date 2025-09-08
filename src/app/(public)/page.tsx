@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getAllHomeValues } from '@/features/home/services/homeValuesService';
 import { getContactSettings } from '@/features/settings/services/contactSettings';
 import { getSiteSettings } from '@/features/settings/services/siteSettings';
-import { getAllProducts } from '@/features/products/queries/getAllProducts';
+import { getPublicProducts } from '@/features/products/services/getPublicProducts';
 import { getPublicTestimonials } from '@/features/testimonials/services/getPublicTestimonials';
 import DynamicValues from '@/components/features/home/DynamicValues';
 import FeaturedProducts from '@/components/features/home/FeaturedProducts';
@@ -16,9 +16,8 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 import Image from 'next/image';
 
-// Force dynamic rendering
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store"; // optional, stricter
+// Cache homepage for 15 minutes; content stays reasonably fresh
+export const revalidate = 900;
 
 async function HomeContent() {
   // Fetch all data in parallel
@@ -26,7 +25,7 @@ async function HomeContent() {
     getAllHomeValues(),
     getContactSettings(),
     getSiteSettings(),
-    getAllProducts(),
+    getPublicProducts({ limit: 6, sortBy: 'createdAt', sortOrder: 'desc' }),
     getPublicTestimonials()
   ]);
 
@@ -107,7 +106,9 @@ async function HomeContent() {
 
       {/* Featured Products */}
       {products.length > 0 && (
-        <FeaturedProducts products={products} />
+        <Suspense fallback={<FeaturedProductsSkeleton /> }>
+          <FeaturedProducts products={products} />
+        </Suspense>
       )}
 
       {/* Section Divider */}
@@ -179,5 +180,27 @@ function HomeSkeleton() {
         </div>
       </section>
     </div>
+  );
+}
+
+function FeaturedProductsSkeleton() {
+  return (
+    <section className="py-12 md:py-20">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <div className="h-8 bg-muted rounded mx-auto mb-4 w-48 animate-pulse" />
+          <div className="h-5 bg-muted/70 rounded mx-auto w-72 animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <div className="aspect-square bg-muted rounded" />
+              <div className="h-4 bg-muted rounded w-3/4" />
+              <div className="h-4 bg-muted rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

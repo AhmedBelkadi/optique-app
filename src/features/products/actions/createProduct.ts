@@ -9,6 +9,7 @@ import { logError } from '@/lib/errorHandling';
 import { getCurrentUser } from '@/features/auth/services/session';
 import { requirePermission } from '@/lib/auth/authorization';
 import { CreateProductState } from '@/types/api';
+import { revalidatePath } from 'next/cache';
 
 export async function createProductAction(prevState: CreateProductState, formData: FormData): Promise<CreateProductState> {
   try {
@@ -106,6 +107,7 @@ export async function createProductAction(prevState: CreateProductState, formDat
         }
       }
 
+      try { revalidatePath('/products'); } catch {}
       return {
         success: true,
         error: '',

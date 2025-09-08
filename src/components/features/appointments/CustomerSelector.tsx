@@ -292,23 +292,25 @@ export default function CustomerSelector({
       {selectedCustomer && (
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="h-5 w-5 text-primary" />
                 </div>
-                <div>
-                  <h4 className="font-medium text-foreground">{selectedCustomer.name}</h4>
-                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                     <span>{selectedCustomer.email}</span>
-                     {selectedCustomer.phone && <span>{selectedCustomer.phone}</span>}
-                   </div>
+                <div className="min-w-0">
+                  <h4 className="font-medium text-foreground truncate">{selectedCustomer.name}</h4>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
+                    <span className="truncate max-w-[14rem] sm:max-w-none">{selectedCustomer.email}</span>
+                    {selectedCustomer.phone && <span className="truncate">{selectedCustomer.phone}</span>}
+                  </div>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                <Check className="h-3 w-3 mr-1" />
-                Client sélectionné
-              </Badge>
+              <div className="sm:self-start">
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 w-full sm:w-auto justify-center">
+                  <Check className="h-3 w-3 mr-1" />
+                  Client sélectionné
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>

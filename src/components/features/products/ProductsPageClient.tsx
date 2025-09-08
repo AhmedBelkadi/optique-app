@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Package, 
+   
   Search, 
   X,
   ChevronLeft,
@@ -18,6 +18,7 @@ import { ProductCard } from '@/components/ui/product-card';
 import { MobileFilterSheet } from './MobileFilterSheet';
 import { QuickFilterChips } from './QuickFilterChips';
 import { Category } from '@/features/categories/schema/categorySchema';
+import { PAGE_SIZE } from '@/features/products/config';
 
 interface Product {
   id: string;
@@ -70,6 +71,8 @@ export function ProductsPageClient({
     currentFilters.priceRange !== 'all');
 
   const handleApplyFilters = (filters: any) => {
+    const loading = document.getElementById('products-grid-loading');
+    if (loading) loading.classList.remove('hidden');
     const params = new URLSearchParams();
     
     if (filters.search) params.set('search', filters.search);
@@ -83,10 +86,14 @@ export function ProductsPageClient({
   };
 
   const handleClearFilters = () => {
+    const loading = document.getElementById('products-grid-loading');
+    if (loading) loading.classList.remove('hidden');
     window.location.href = '/products';
   };
 
   const handleCategoryChange = (categoryId: string) => {
+    const loading = document.getElementById('products-grid-loading');
+    if (loading) loading.classList.remove('hidden');
     const params = new URLSearchParams(window.location.search);
     
     if (categoryId === 'all') {
@@ -288,7 +295,7 @@ export function ProductsPageClient({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <p className="text-muted-foreground text-sm sm:text-base">
-                Affichage de {((pagination.page - 1) * 12) + 1} à {Math.min(pagination.page * 12, pagination.total)} sur {pagination.total} produits
+                Affichage de {((pagination.page - 1) * PAGE_SIZE) + 1} à {Math.min(pagination.page * PAGE_SIZE, pagination.total)} sur {pagination.total} produits
               </p>
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" asChild>
@@ -303,9 +310,20 @@ export function ProductsPageClient({
         </section>
       )}
 
-      {/* Products Grid - Mobile Optimized */}
+      {/* Products Grid - Mobile Optimized with skeleton */}
       <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div id="products-grid-loading" className="hidden">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <div className="aspect-square bg-muted rounded animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-1/2 animate-pulse" />
+                </div>
+              ))}
+            </div>
+          </div>
           {products.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
               {products.map((product: any) => (
@@ -315,20 +333,14 @@ export function ProductsPageClient({
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <Package className="w-24 h-24 text-muted-foreground/60 mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold text-foreground mb-2">Aucun Produit Trouvé</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                {hasActiveFilters 
-                  ? 'Essayez d\'ajuster vos critères de recherche ou vos filtres.'
-                  : 'Nous travaillons à ajouter plus de produits à notre catalogue.'
-                }
-              </p>
-              {hasActiveFilters && (
-                <Button asChild>
-                  <a href="/products">Voir Tous les Produits</a>
-                </Button>
-              )}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <div className="aspect-square bg-muted rounded animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-1/2 animate-pulse" />
+                </div>
+              ))}
             </div>
           )}
         </div>

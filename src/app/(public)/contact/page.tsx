@@ -18,9 +18,8 @@ import ContactForm from '@/components/features/contact/ContactForm';
 import MobileContactForm from '@/components/features/contact/MobileContactForm';
 import { MobileContactMap } from '@/components/features/contact/MobileContactMap';
 
-// Force dynamic rendering
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store"; // optional, stricter
+// Cache contact page for 24 hours; content rarely changes
+export const revalidate = 86400;
 
 async function ContactContent() {
   const [contactResult, siteSettingsResult] = await Promise.all([
@@ -79,8 +78,8 @@ async function ContactContent() {
           <div className="space-y-4 md:space-y-6">
             {/* Address */}
             <div className="flex items-start space-x-3 md:space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-cyan-100/40 rounded-lg flex items-center justify-center">
+                <MapPin className="w-5 h-5 md:w-6 md:h-6 text-cyan-600" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Adresse</h3>
@@ -92,9 +91,9 @@ async function ContactContent() {
                     href={contactSettings.googleMapLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-primary hover:text-primary/80 text-sm mt-2 h-10 px-3 rounded-md border border-primary/20 hover:bg-primary/5 transition-colors"
+                    className="inline-flex items-center text-cyan-700 hover:text-cyan-800 text-sm mt-2 h-10 px-3 rounded-md border border-cyan-200 hover:bg-cyan-50 transition-colors"
                   >
-                    <MapPin className="w-4 h-4 mr-1" />
+                    <MapPin className="w-4 h-4 mr-1 text-cyan-600" />
                     Voir sur la carte
                   </Link>
                 )}
@@ -103,8 +102,8 @@ async function ContactContent() {
 
             {/* Phone */}
             <div className="flex items-start space-x-3 md:space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Phone className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-emerald-100/40 rounded-lg flex items-center justify-center">
+                <Phone className="w-5 h-5 md:w-6 md:h-6 text-emerald-600" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Téléphone</h3>
@@ -114,9 +113,9 @@ async function ContactContent() {
                     href={contactSettings.whatsappChatLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-primary hover:text-primary/80 text-sm mt-2 h-10 px-3 rounded-md border border-primary/20 hover:bg-primary/5 transition-colors"
+                    className="inline-flex items-center text-emerald-700 hover:text-emerald-800 text-sm mt-2 h-10 px-3 rounded-md border border-emerald-200 hover:bg-emerald-50 transition-colors"
                   >
-                    <Phone className="w-4 h-4 mr-1" />
+                    <Phone className="w-4 h-4 mr-1 text-emerald-600" />
                     Chat WhatsApp
                   </Link>
                 )}
@@ -125,14 +124,14 @@ async function ContactContent() {
 
             {/* Email */}
             <div className="flex items-start space-x-3 md:space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-sky-100/40 rounded-lg flex items-center justify-center">
+                <Mail className="w-5 h-5 md:w-6 md:h-6 text-sky-600" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Email</h3>
                 <a 
                   href={`mailto:${contactSettings.contactEmail}`}
-                  className="text-primary hover:text-primary/80 text-sm md:text-base break-all"
+                  className="text-sky-700 hover:text-sky-800 text-sm md:text-base break-all"
                 >
                   {contactSettings.contactEmail}
                 </a>
@@ -141,8 +140,8 @@ async function ContactContent() {
 
             {/* Opening Hours */}
             <div className="flex items-start space-x-3 md:space-x-4">
-              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-amber-100/40 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 md:w-6 md:h-6 text-amber-600" />
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Horaires d'ouverture</h3>
@@ -155,10 +154,10 @@ async function ContactContent() {
             {/* Social Media */}
             {(contactSettings.instagramLink || contactSettings.facebookLink) && (
               <div className="flex items-start space-x-3 md:space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 bg-pink-100/40 rounded-lg flex items-center justify-center">
                   <div className="flex space-x-1">
-                    {contactSettings.instagramLink && <Instagram className="w-4 h-4 md:w-5 md:h-5 text-primary" />}
-                    {contactSettings.facebookLink && <Facebook className="w-4 h-4 md:w-5 md:h-5 text-primary" />}
+                    {contactSettings.instagramLink && <Instagram className="w-4 h-4 md:w-5 md:h-5 text-pink-600" />}
+                    {contactSettings.facebookLink && <Facebook className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />}
                   </div>
                 </div>
                 <div className="min-w-0 flex-1">
@@ -169,9 +168,9 @@ async function ContactContent() {
                         href={contactSettings.instagramLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-primary hover:text-primary/80 text-sm h-10 px-3 rounded-md border border-primary/20 hover:bg-primary/5 transition-colors"
+                        className="inline-flex items-center text-pink-700 hover:text-pink-800 text-sm h-10 px-3 rounded-md border border-pink-200 hover:bg-pink-50 transition-colors"
                       >
-                        <Instagram className="w-4 h-4 mr-1" />
+                        <Instagram className="w-4 h-4 mr-1 text-pink-600" />
                         Instagram
                       </Link>
                     )}
@@ -180,9 +179,9 @@ async function ContactContent() {
                         href={contactSettings.facebookLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-primary hover:text-primary/80 text-sm h-10 px-3 rounded-md border border-primary/20 hover:bg-primary/5 transition-colors"
+                        className="inline-flex items-center text-blue-700 hover:text-blue-800 text-sm h-10 px-3 rounded-md border border-blue-200 hover:bg-blue-50 transition-colors"
                       >
-                        <Facebook className="w-4 h-4 mr-1" />
+                        <Facebook className="w-4 h-4 mr-1 text-blue-600" />
                         Facebook
                       </Link>
                     )}

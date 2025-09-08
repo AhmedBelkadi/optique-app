@@ -22,7 +22,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
     return null
   }
 
-  // Take only the first 6 products for featured display
+  // Cap to first 6 products to keep home light
   const featuredProducts = products.slice(0, 6)
 
   // Mobile swipe handlers

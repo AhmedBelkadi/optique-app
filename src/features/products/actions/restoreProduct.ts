@@ -37,6 +37,7 @@ export async function restoreProductAction(prevState: RestoreProductState, formD
       // Revalidate relevant paths and tags
       revalidatePath('/admin/products');
       revalidatePath('/admin/products/trash');
+      try { revalidatePath('/products'); } catch {}
       revalidateTag('products');
       revalidateTag('deleted-products');
       

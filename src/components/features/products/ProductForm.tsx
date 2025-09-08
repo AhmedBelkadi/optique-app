@@ -162,11 +162,14 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
     }
     
     // Use startTransition to properly handle the async action
-    startTransition(() => {
+    startTransition(async () => {
       if (mode === 'edit') {
-        // For edit mode, call update action directly
-        updateProductAction(state, formData);
-                 toast.success('Produit mis à jour avec succès !');
+        // For edit mode, call update action directly and refresh the current route
+        const res = await updateProductAction(state, formData);
+        if (res?.success) {
+          toast.success('Produit mis à jour avec succès !');
+          router.refresh();
+        }
       } else {
         // For create mode, use the form action
         formAction(formData);
@@ -288,10 +291,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.name && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {state.fieldErrors.name}
-                          </div>
+                            <span>{state.fieldErrors.name}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -323,10 +326,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.price && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {state.fieldErrors.price}
-                          </div>
+                            <span>{state.fieldErrors.price}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -351,10 +354,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.brand && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {state.fieldErrors.brand}
-                          </div>
+                            <span>{state.fieldErrors.brand}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -379,10 +382,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                       </FormControl>
                       <FormMessage>
                         {state.fieldErrors?.reference && (
-                          <div className="flex items-center text-destructive">
+                          <span className="inline-flex items-center text-destructive">
                             <X className="w-4 h-4 mr-1" />
-                            {state.fieldErrors.reference}
-                          </div>
+                            <span>{state.fieldErrors.reference}</span>
+                          </span>
                         )}
                       </FormMessage>
                     </FormItem>
@@ -413,10 +416,10 @@ export default function ProductForm({ mode, categories, product }: ProductFormPr
                     </FormControl>
                     <FormMessage>
                       {state.fieldErrors?.description && (
-                        <div className="flex items-center text-destructive">
+                        <span className="inline-flex items-center text-destructive">
                           <X className="w-4 h-4 mr-1" />
-                          {state.fieldErrors.description}
-                        </div>
+                          <span>{state.fieldErrors.description}</span>
+                        </span>
                       )}
                     </FormMessage>
                   </FormItem>

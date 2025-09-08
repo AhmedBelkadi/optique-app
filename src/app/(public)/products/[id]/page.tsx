@@ -11,6 +11,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { ProductDetailsSkeleton, ProductsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { MobileProductGallery } from '@/components/features/products/MobileProductGallery';
 import { MobileProductInfo } from '@/components/features/products/MobileProductInfo';
+import { MobileRelatedProducts } from '@/components/features/products/MobileRelatedProducts';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -88,22 +89,30 @@ async function ProductDetailsContent({ params }: ProductDetailsPageProps) {
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="py-16 bg-muted/30">
+        <section className="py-12 md:py-16 bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-foreground mb-4">
-                Related Products
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 md:mb-4">
+                Produits associés
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Discover more products in the same category that might interest you
+              <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
+                Découvrez d'autres produits de la même catégorie
               </p>
             </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {relatedProducts.map((relatedProduct) => (
-                <ProductCard key={relatedProduct.id} product={relatedProduct} />
-              ))}
-            </div>
+
+            <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-4 gap-4">{Array.from({length:4}).map((_,i)=>(<div key={i} className="h-64 bg-muted rounded-lg animate-pulse"/>))}</div>}>
+              {/* Desktop grid */}
+              <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                {relatedProducts.map((relatedProduct, idx) => (
+                  <div key={relatedProduct.id}>
+                    <ProductCard product={relatedProduct} priorityImage={idx === 0} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Mobile carousel like FeaturedProducts */}
+              <MobileRelatedProducts products={relatedProducts} />
+            </Suspense>
           </div>
         </section>
       )}

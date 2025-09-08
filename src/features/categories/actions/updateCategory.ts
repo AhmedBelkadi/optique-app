@@ -8,7 +8,7 @@ import { validateAndSanitizeCategory } from '@/lib/shared/utils/sanitize';
 import { saveImage, validateImage, deleteImage } from '@/lib/shared/utils/imageUploadUtils';
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
-import { revalidateTag } from 'next/cache';
+import { revalidateTag, revalidatePath } from 'next/cache';
 import { requirePermission } from '@/lib/auth/authorization';
 import { UpdateCategoryState } from '@/types/api';
 
@@ -119,6 +119,10 @@ export async function updateCategoryAction(prevState: UpdateCategoryState, formD
 
       // Invalidate cache to refresh the UI
       revalidateTag('categories');
+      try { revalidatePath('/products'); } catch {}
+      // Invalidate cache to refresh the UI
+      revalidateTag('categories');
+      try { revalidatePath('/products'); } catch {}
 
       return {
         success: true,

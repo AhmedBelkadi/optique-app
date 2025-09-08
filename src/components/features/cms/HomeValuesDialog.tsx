@@ -215,7 +215,7 @@ export default function HomeValuesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {mode === 'create' ? (
@@ -330,7 +330,7 @@ export default function HomeValuesDialog({
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               type="button"
               onClick={handleClose}
@@ -343,6 +343,7 @@ export default function HomeValuesDialog({
             <Button
               type="submit"
               disabled={isCreatePending || isUpdatePending}
+              className="w-full sm:w-auto"
             >
               {isCreatePending || isUpdatePending ? (
                 <>

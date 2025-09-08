@@ -5,6 +5,7 @@ import { validateCSRFToken } from '@/lib/csrf';
 import { softDeleteProduct } from '@/features/products/services/softDeleteProduct';
 import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
+import { revalidatePath } from 'next/cache';
 
 export async function softDeleteProductAction(prevState: any, formData: FormData): Promise<any> {
   try {
@@ -25,6 +26,7 @@ export async function softDeleteProductAction(prevState: any, formData: FormData
     const result = await softDeleteProduct(productId);
     
     if (result.success) {
+      try { revalidatePath('/products'); } catch {}
       return {
         error: '',
         success: true,

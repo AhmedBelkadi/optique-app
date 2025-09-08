@@ -136,10 +136,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           {/* Product Information */}
           <div className="space-y-6">
             {/* Header with Actions */}
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="space-y-2 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground break-words">{product.name}</h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
                   <span className="flex items-center space-x-1">
                     <Hash className="w-4 h-4" />
                     <span>ID: {product.id}</span>
@@ -151,10 +151,10 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 </div>
               </div>
               
-              <div className="flex space-x-3">
+              <div className="w-full sm:w-auto flex sm:space-x-3">
                 <Button
                   onClick={() => router.push(`/admin/products/${product.id}/edit`)}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto"
                 >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit

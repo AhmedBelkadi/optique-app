@@ -139,12 +139,11 @@ export default function ImageUploadField({
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  // For regular URLs, use Next.js Image component
-                  <Image
+                  // For regular URLs, use regular img tag
+                  <img
                     src={value}
                     alt={label}
-                    fill
-                    className="object-cover"
+                    className="w-full h-full object-cover"
                     onError={() => setImageError(true)}
                   />
                 )}

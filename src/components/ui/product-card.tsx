@@ -20,12 +20,14 @@ export function ProductCard({ product, className = "" }: ProductCardProps) {
       <CardHeader className="p-0 flex-shrink-0 relative">
         <div className="aspect-square bg-muted rounded-t-lg overflow-hidden relative">
           {product.images && product.images.length > 0 && product.images[0].path ? (
-            <Image
+            <img
               src={product.images[0].path}
               alt={product.images[0].alt || product.name}
-              width={400}
-              height={400}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => {
+                console.error('Product image failed to load:', product.images[0].path);
+                e.currentTarget.style.display = 'none';
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

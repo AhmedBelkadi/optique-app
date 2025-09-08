@@ -1,8 +1,19 @@
 import { prisma } from '@/lib/prisma';
 import { CategoryUpdateInput } from '@/features/categories/schema/categorySchema';
+import { deleteImage } from '@/lib/shared/utils/imageUploadUtils';
 
 export async function updateCategory(id: string, data: CategoryUpdateInput) {
   try {
+    // Get existing category to check for old image
+    const existingCategory = await prisma.category.findUnique({
+      where: { id },
+      select: { image: true }
+    });
+
+    if (!existingCategory) {
+      return { success: false, error: 'Catégorie non trouvée.' };
+    }
+
     const category = await prisma.category.update({
       where: { id },
       data: {
@@ -11,6 +22,11 @@ export async function updateCategory(id: string, data: CategoryUpdateInput) {
         image: data.image,
       },
     });
+
+    // Clean up old image if it was replaced
+    if (existingCategory.image && data.image && existingCategory.image !== data.image) {
+      await deleteImage(existingCategory.image);
+    }
 
     return { success: true, data: category };
   } catch (error: any) {

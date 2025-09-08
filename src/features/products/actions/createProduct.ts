@@ -3,7 +3,7 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { createProduct } from '@/features/products/services/createProduct';
-import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
+import { saveImage, generateImageAlt, validateImage, deleteImage } from '@/lib/shared/utils/imageUploadUtils';
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
 import { getCurrentUser } from '@/features/auth/services/session';
@@ -44,32 +44,65 @@ export async function createProductAction(prevState: CreateProductState, formDat
     if (result.success && result.data) {
       // Handle image uploads if any
       const imageFiles = formData.getAll('images') as File[];
+      const uploadedImages: string[] = []; // Track uploaded files for cleanup
       
       if (imageFiles.length > 0) {
         try {
-          for (let i = 0; i < imageFiles.length; i++) {
-            const file = imageFiles[i];
+          // Validate all images first
+          for (const file of imageFiles) {
             if (file && file.size > 0) {
-              const uploadResult = await saveImage(file, result.data.id, i);
-              
-              await prisma.productImage.create({
-                data: {
-                  productId: result.data.id,
-                  filename: uploadResult.filename,
-                  path: uploadResult.path,
-                  alt: generateImageAlt(result.data.name, i),
-                  order: i,
-                },
-              });
+              const validation = validateImage(file);
+              if (!validation.isValid) {
+                throw new Error(validation.error);
+              }
             }
           }
+
+          // Upload images and create database records in transaction
+          await prisma.$transaction(async (tx) => {
+            for (let i = 0; i < imageFiles.length; i++) {
+              const file = imageFiles[i];
+              if (file && file.size > 0) {
+                const uploadResult = await saveImage(file, 'products', result.data!.id, i);
+                uploadedImages.push(uploadResult.path);
+                
+                await tx.productImage.create({
+                  data: {
+                    productId: result.data!.id,
+                    filename: uploadResult.filename,
+                    path: uploadResult.path,
+                    alt: generateImageAlt(result.data!.name, i),
+                    order: i,
+                  },
+                });
+              }
+            }
+          });
         } catch (imageError) {
+          // Clean up uploaded files if transaction fails
+          for (const imagePath of uploadedImages) {
+            await deleteImage(imagePath);
+          }
+          
           logError(imageError as Error, { 
             action: 'createProduct', 
             productId: result.data.id,
             step: 'imageUpload' 
           });
-          // Continue even if image upload fails
+          
+          return {
+            success: false,
+            error: imageError instanceof Error ? imageError.message : 'Failed to upload images',
+            fieldErrors: {},
+            values: {
+              name,
+              description,
+              price,
+              brand,
+              reference,
+              categoryIds,
+            },
+          };
         }
       }
 

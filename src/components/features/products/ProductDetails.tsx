@@ -65,12 +65,14 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   <div className="space-y-4">
                     {/* Main Image Display */}
                     <div className="relative aspect-square bg-muted rounded-xl overflow-hidden shadow-lg">
-                      <Image
+                      <img
                         src={product.images[currentImageIndex].path}
                         alt={product.images[currentImageIndex].alt || `${product.name} - Image ${currentImageIndex + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Product image failed to load:', product.images[currentImageIndex].path);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                       
                       {/* Navigation Arrows */}

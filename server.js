@@ -10,7 +10,20 @@ app.prepare().then(() => {
   const server = express();
 
   // Serve uploads folder
-  server.use("/uploads", express.static(path.join(__dirname, "uploads")));
+  const uploadsPath = path.join(__dirname, "uploads");
+  console.log(`📁 Serving uploads from: ${uploadsPath}`);
+  
+  // Add debugging middleware for uploads
+  server.use("/uploads", (req, res, next) => {
+    console.log(`📤 Static file request: ${req.url}`);
+    console.log(`📁 Looking for file: ${path.join(uploadsPath, req.url)}`);
+    next();
+  }, express.static(uploadsPath, {
+    index: false,
+    dotfiles: 'ignore',
+    etag: true,
+    lastModified: true
+  }));
 
   // Handle everything else with Next.js
   server.all(/.*/, (req, res) => {

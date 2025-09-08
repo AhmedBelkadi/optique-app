@@ -5,7 +5,7 @@ import { validateCSRFToken } from '@/lib/csrf';
 import { updateCategory } from '@/features/categories/services/updateCategory';
 import { categorySchema } from '@/features/categories/schema/categorySchema';
 import { validateAndSanitizeCategory } from '@/lib/shared/utils/sanitize';
-import { saveCategoryImage } from '@/lib/shared/utils/serverCategoryImageUpload';
+import { saveImage, validateImage, deleteImage } from '@/lib/shared/utils/imageUploadUtils';
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
@@ -58,15 +58,39 @@ export async function updateCategoryAction(prevState: UpdateCategoryState, formD
       const imageFile = formData.get('image') as File;
       if (imageFile && imageFile.size > 0) {
         try {
-          const imageResult = await saveCategoryImage(imageFile, categoryId);
-          
-          // Update category with new image path
-          const updatedCategory = await prisma.category.update({
+          // Validate image first
+          const validation = validateImage(imageFile);
+          if (!validation.isValid) {
+            throw new Error(validation.error);
+          }
+
+          // Get existing category image before updating
+          const existingCategory = await prisma.category.findUnique({
             where: { id: categoryId },
-            data: { image: imageResult.path },
+            select: { image: true }
           });
 
-          // Return the fully updated category
+          // Upload image and update category in transaction
+          const updatedCategory = await prisma.$transaction(async (tx) => {
+            const imageResult = await saveImage(imageFile, 'categories', categoryId);
+            
+            // Update category with new image path
+            const updated = await tx.category.update({
+              where: { id: categoryId },
+              data: { image: imageResult.path },
+            });
+
+            return updated;
+          });
+
+          // Clean up old image after successful update
+          if (existingCategory?.image) {
+            await deleteImage(existingCategory.image);
+          }
+
+          // Invalidate cache to refresh the UI
+          revalidateTag('categories');
+
           return {
             success: true,
             error: '',
@@ -83,7 +107,13 @@ export async function updateCategoryAction(prevState: UpdateCategoryState, formD
             categoryId,
             step: 'imageUpload' 
           });
-          // Continue even if image upload fails, return original result
+          
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to upload image',
+            fieldErrors: {},
+            values: rawData,
+          };
         }
       }
 

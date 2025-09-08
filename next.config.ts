@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
     formats: ['image/webp','image/avif'],
+    domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/uploads/**',
+      },
+    ],
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],

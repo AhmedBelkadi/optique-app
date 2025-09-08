@@ -7,6 +7,9 @@ import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
 import { validateAndSanitizePublicForm } from '@/lib/security';
+import { validateImage } from '@/lib/shared/utils/imageUploadUtils';
+import { saveSiteSettingsImage, deleteSiteSettingsImage } from '@/lib/shared/utils/siteSettingsImageUpload';
+import { prisma } from '@/lib/prisma';
 
 export interface UpsertSiteSettingsState {
   success: boolean;
@@ -42,12 +45,72 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
       };
     }
 
+    // Handle image uploads
+    let logoUrl = validation.sanitizedData.logoUrl || null;
+    let heroBackgroundImg = validation.sanitizedData.heroBackgroundImg || null;
+
+    // Get existing settings to check for old images
+    const existingSettings = await prisma.siteSettings.findUnique({
+      where: { id: 'singleton' },
+      select: { logoUrl: true, heroBackgroundImg: true }
+    });
+
+    // Handle logo upload
+    const logoFile = formData.get('logo') as File;
+    if (logoFile && logoFile.size > 0) {
+      try {
+        const validation = validateImage(logoFile);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
+        }
+
+        const imageResult = await saveSiteSettingsImage(logoFile, 'logo');
+        logoUrl = imageResult.path;
+
+        // Clean up old logo if it exists
+        if (existingSettings?.logoUrl) {
+          await deleteSiteSettingsImage(existingSettings.logoUrl);
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: 'Échec de l\'upload du logo',
+          error: error instanceof Error ? error.message : 'Failed to upload logo'
+        };
+      }
+    }
+
+    // Handle hero background upload
+    const heroFile = formData.get('heroBackground') as File;
+    if (heroFile && heroFile.size > 0) {
+      try {
+        const validation = validateImage(heroFile);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
+        }
+
+        const imageResult = await saveSiteSettingsImage(heroFile, 'hero-background');
+        heroBackgroundImg = imageResult.path;
+
+        // Clean up old hero background if it exists
+        if (existingSettings?.heroBackgroundImg) {
+          await deleteSiteSettingsImage(existingSettings.heroBackgroundImg);
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: 'Échec de l\'upload de l\'image de fond',
+          error: error instanceof Error ? error.message : 'Failed to upload hero background'
+        };
+      }
+    }
+
     // Extract and validate sanitized form data
     const siteData = {
       siteName: validation.sanitizedData.siteName || null,
       slogan: validation.sanitizedData.slogan || null,
-      logoUrl: validation.sanitizedData.logoUrl || null,
-      heroBackgroundImg: validation.sanitizedData.heroBackgroundImg || null,
+      logoUrl,
+      heroBackgroundImg,
     };
 
     const result = await upsertSiteSettings(siteData);

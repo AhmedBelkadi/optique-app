@@ -5,7 +5,7 @@ import { validateCSRFToken } from '@/lib/csrf';
 import { createCategory } from '@/features/categories/services/createCategory';
 import { categorySchema } from '@/features/categories/schema/categorySchema';
 import { validateAndSanitizeCategory } from '@/lib/shared/utils/sanitize';
-import { saveCategoryImage } from '@/lib/shared/utils/serverCategoryImageUpload';
+import { saveImage, validateImage, deleteImage } from '@/lib/shared/utils/imageUploadUtils';
 import { prisma } from '@/lib/prisma';
 import { logError } from '@/lib/errorHandling';
 import { revalidateTag } from 'next/cache';
@@ -53,20 +53,28 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
     if (result.success && result.data) {
       let finalCategoryData = result.data;
 
-      // Handle image upload if provided BEFORE returning response
+      // Handle image upload if provided
       const imageFile = formData.get('image') as File;
       if (imageFile && imageFile.size > 0) {
         try {
-          const imageResult = await saveCategoryImage(imageFile, result.data.id);
-          
-          // Update category with image path
-          const updatedCategory = await prisma.category.update({
-            where: { id: result.data.id },
-            data: { image: imageResult.path },
-          });
+          // Validate image first
+          const validation = validateImage(imageFile);
+          if (!validation.isValid) {
+            throw new Error(validation.error);
+          }
 
-          // Use the updated category data with image path
-          finalCategoryData = updatedCategory;
+          // Upload image and update category in transaction
+          await prisma.$transaction(async (tx) => {
+            const imageResult = await saveImage(imageFile, 'categories', result.data.id);
+            
+            // Update category with image path
+            const updatedCategory = await tx.category.update({
+              where: { id: result.data.id },
+              data: { image: imageResult.path },
+            });
+
+            finalCategoryData = updatedCategory;
+          });
           
         } catch (error) {
           logError(error as Error, { 
@@ -74,7 +82,13 @@ export async function createCategoryAction(prevState: CreateCategoryState, formD
             categoryId: result.data.id,
             step: 'imageUpload' 
           });
-          // Continue even if image upload fails - keep original data
+          
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to upload image',
+            fieldErrors: {},
+            values: rawData,
+          };
         }
       }
 

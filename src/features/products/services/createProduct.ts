@@ -27,27 +27,29 @@ export async function createProduct(productData: CreateProductInput): Promise<Cr
 
     const { categoryIds, ...productFields } = validation.data;
 
-    const product = await prisma.product.create({
-      data: {
-        ...productFields,
-        categories: {
-          create: categoryIds.map(categoryId => ({
-            categoryId,
-          })),
-        },
-      },
-      include: {
-        categories: {
-          include: {
-            category: true,
+    const product = await prisma.$transaction(async (tx) => {
+      return await tx.product.create({
+        data: {
+          ...productFields,
+          categories: {
+            create: categoryIds.map(categoryId => ({
+              categoryId,
+            })),
           },
         },
-        images: {
-          orderBy: {
-            order: 'asc',
+        include: {
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+          images: {
+            orderBy: {
+              order: 'asc',
+            },
           },
         },
-      },
+      });
     });
 
     // Transform the data to match our schema

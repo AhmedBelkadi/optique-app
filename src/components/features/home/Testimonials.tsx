@@ -325,12 +325,16 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                     <div className="text-center mt-auto">
                       <div className="flex justify-center mb-3">
                         {testimonial.image && testimonial.image.trim() !== '' && testimonial.image !== 'null' ? (
-                          <Image
+                          <img
                             src={testimonial.image}
                             alt={testimonial.name}
                             width={60}
                             height={60}
                             className="rounded-full object-cover"
+                            onError={(e) => {
+                              console.error('Testimonial image failed to load:', testimonial.image);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         ) : (
                           <div 

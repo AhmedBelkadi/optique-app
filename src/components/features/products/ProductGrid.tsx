@@ -66,13 +66,14 @@ const ProductGrid = React.memo(({ products, onDelete }: ProductGridProps) => {
           {/* Image Section */}
                      <div className="relative aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
             {product.images?.[0] ? (
-              <Image
+              <img
                 src={product.images[0].path}
                 alt={product.images[0].alt || product.name}
-                fill
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                quality={85}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                onError={(e) => {
+                  console.error('Product image failed to load:', product.images[0].path);
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">

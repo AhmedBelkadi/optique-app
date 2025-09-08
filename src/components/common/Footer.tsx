@@ -53,7 +53,17 @@ export default function Footer({ siteSettings, contactSettings, services = [] }:
                   <h3 className="text-2xl md:text-3xl font-bold text-white">{siteSettings?.siteName || 'Notre Boutique'}</h3>
                   <p className="text-white/80 text-sm">{siteSettings?.slogan || 'Votre vision, notre passion'}</p>
                   {siteSettings?.logoUrl ? (
-                    <Image src={siteSettings?.logoUrl || '/logo.png'} alt={siteSettings?.siteName || 'Notre Boutique'} width={100} height={100} />
+                    <img 
+                      src={siteSettings?.logoUrl || '/logo.png'} 
+                      alt={siteSettings?.siteName || 'Notre Boutique'} 
+                      width={100} 
+                      height={100}
+                      className="object-contain"
+                      onError={(e) => {
+                        console.error('Footer logo failed to load:', siteSettings?.logoUrl);
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
                   ) : (
                     <span className="text-xl md:text-2xl font-bold text-white">O</span>
                   )}  

@@ -97,11 +97,14 @@ export default async function RecentProducts() {
                 <div key={product.id} className="flex items-center space-x-4 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
                   <div className="relative h-12 w-12 rounded-lg overflow-hidden bg-muted">
                     {product.images && product.images.length > 0 ? (
-                      <Image
+                      <img
                         src={product.images[0].path}
                         alt={product.images[0].alt || product.name}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Product image failed to load:', product.images[0].path);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">

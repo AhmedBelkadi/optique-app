@@ -3,10 +3,11 @@
 import { apiRateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
 import { createTestimonial } from '@/features/testimonials/services/createTestimonial';
-import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
-import { testimonialSchema, CreateTestimonialInput } from '../schema/testimonialSchema';
+import { testimonialSchema } from '../schema/testimonialSchema';
+import { saveImage, validateImage } from '@/lib/shared/utils/imageUploadUtils';
+import { prisma } from '@/lib/prisma';
 
 export async function createTestimonialAction(prevState: any, formData: FormData): Promise<any> {
   try {
@@ -30,9 +31,89 @@ export async function createTestimonialAction(prevState: any, formData: FormData
     const externalId = formData.get('externalId') as string;
     const externalUrl = formData.get('externalUrl') as string;
     const title = formData.get('title') as string;
-    const image = formData.get('image') as string;
+    const imageFile = formData.get('image') as File;
     const isActive = formData.get('isActive') === 'true';
     const isVerified = formData.get('isVerified') === 'true';
+
+    // Handle image upload first if provided
+    let imagePath: string | undefined = undefined;
+    if (imageFile && imageFile.size > 0) {
+      try {
+        const validation = validateImage(imageFile);
+        if (!validation.isValid) {
+          return {
+            success: false,
+            error: validation.error,
+            fieldErrors: { image: [validation.error] },
+            values: { name, message, rating, source, externalId, externalUrl, title, image: '', isActive, isVerified }
+          };
+        }
+
+        // Create testimonial first to get ID
+        const tempResult = await createTestimonial({
+          name,
+          message,
+          rating: rating ? parseInt(rating, 10) : 5,
+          source: source || 'internal',
+          externalId: externalId || undefined,
+          externalUrl: externalUrl || undefined,
+          title: title || undefined,
+          image: undefined,
+          isActive,
+          isVerified,
+        });
+
+        if (!tempResult.success || !tempResult.data) {
+          return {
+            success: false,
+            error: tempResult.error || 'Failed to create testimonial',
+            fieldErrors: {},
+            values: { name, message, rating, source, externalId, externalUrl, title, image: '', isActive, isVerified }
+          };
+        }
+
+        // Upload image and update testimonial
+        await prisma.$transaction(async (tx) => {
+          const imageResult = await saveImage(imageFile, 'testimonials', tempResult.data.id);
+          imagePath = imageResult.path;
+          
+          await tx.testimonial.update({
+            where: { id: tempResult.data.id },
+            data: { image: imagePath },
+          });
+        });
+
+        // Revalidate relevant paths
+        revalidatePath('/admin/testimonials');
+        revalidatePath('/testimonials');
+        
+        return {
+          success: true,
+          message: 'Témoignage créé avec succès !',
+          data: { ...tempResult.data, image: imagePath },
+          fieldErrors: {},
+          values: {
+            name: '',
+            message: '',
+            rating: '',
+            source: 'internal',
+            externalId: '',
+            externalUrl: '',
+            title: '',
+            image: '',
+            isActive: true,
+            isVerified: false
+          }
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to upload image',
+          fieldErrors: {},
+          values: { name, message, rating, source, externalId, externalUrl, title, image: '', isActive, isVerified }
+        };
+      }
+    }
 
     // Validate input data using Zod schema
     const validationResult = testimonialSchema.create.safeParse({
@@ -43,7 +124,7 @@ export async function createTestimonialAction(prevState: any, formData: FormData
       externalId: externalId || undefined,
       externalUrl: externalUrl || undefined,
       title: title || undefined,
-      image: image || undefined,
+      image: imagePath || undefined,
       isActive,
       isVerified,
     });

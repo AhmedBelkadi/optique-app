@@ -314,11 +314,14 @@ export function MobileTestimonialsGrid({
                     <div className="flex items-center min-w-0 flex-1">
                       {testimonial.image ? (
                         <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden mr-3 bg-muted flex-shrink-0">
-                          <Image
+                          <img
                             src={testimonial.image}
                             alt={testimonial.name}
-                            fill
-                            className="object-cover"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Testimonial image failed to load:', testimonial.image);
+                              e.currentTarget.style.display = 'none';
+                            }}
                           />
                         </div>
                       ) : (

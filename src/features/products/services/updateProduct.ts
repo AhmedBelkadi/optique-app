@@ -123,10 +123,11 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
         // Delete image files from disk
         for (const image of imagesToDelete) {
           try {
-            const filePath = join(process.cwd(), 'public', image.path);
+            const filePath = join(process.cwd(), image.path);
             await unlink(filePath);
+            console.log(`[Product Update] Successfully deleted image file: ${image.path}`);
           } catch (error) {
-            console.error(`Failed to delete image file: ${image.path}`, error);
+            console.error(`[Product Update] Failed to delete image file: ${image.path}`, error);
             // Continue with deletion even if file removal fails
           }
         }

@@ -53,81 +53,103 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
     // Get existing settings to check for old images
     const existingSettings = await prisma.siteSettings.findUnique({
       where: { id: 'singleton' },
-      select: { logoUrl: true, heroBackgroundImg: true } as any
-    }) as any;
+      select: { logoUrl: true, heroBackgroundImg: true, imageAboutSection: true }
+    });
 
-    // Handle logo upload
+    // Process all file uploads in parallel to avoid race conditions
+    const uploadPromises: Promise<{ type: string; url: string }>[] = [];
+    const filesToProcess: { file: File; type: string; field: string }[] = [];
+
+    // Collect all files to upload
     const logoFile = formData.get('logo') as File;
     if (logoFile && logoFile.size > 0) {
-      try {
-        const validation = validateImage(logoFile);
-        if (!validation.isValid) {
-          throw new Error(validation.error);
-        }
-
-        const imageResult = await saveSiteSettingsImage(logoFile, 'logo');
-        logoUrl = imageResult.path;
-
-        // Clean up old logo if it exists
-        if (existingSettings?.logoUrl) {
-          await deleteSiteSettingsImage(existingSettings.logoUrl);
-        }
-      } catch (error) {
-        return {
-          success: false,
-          message: 'Échec de l\'upload du logo',
-          error: error instanceof Error ? error.message : 'Failed to upload logo'
-        };
-      }
+      filesToProcess.push({ file: logoFile, type: 'logo', field: 'logoUrl' });
     }
 
-    // Handle hero background upload
     const heroFile = formData.get('heroBackground') as File;
     if (heroFile && heroFile.size > 0) {
-      try {
-        const validation = validateImage(heroFile);
-        if (!validation.isValid) {
-          throw new Error(validation.error);
+      filesToProcess.push({ file: heroFile, type: 'hero-background', field: 'heroBackgroundImg' });
+    }
+
+    const aboutFile = formData.get('imageAboutSectionFile') as File;
+    if (aboutFile && aboutFile.size > 0) {
+      filesToProcess.push({ file: aboutFile, type: 'about-section', field: 'imageAboutSection' });
+    }
+
+    // Process uploads with small delays to reduce VPS file system pressure
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const { file, type, field } = filesToProcess[i];
+      
+      const uploadPromise = (async () => {
+        try {
+          // Add small delay between uploads to reduce file system pressure on VPS
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100 * i));
+          }
+          
+          const validation = validateImage(file);
+          if (!validation.isValid) {
+            throw new Error(validation.error);
+          }
+
+          const imageResult = await saveSiteSettingsImage(file, type as any);
+          return { type: field, url: imageResult.path };
+        } catch (error) {
+          throw new Error(`Failed to upload ${type}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+      })();
+      
+      uploadPromises.push(uploadPromise);
+    }
 
-        const imageResult = await saveSiteSettingsImage(heroFile, 'hero-background');
-        heroBackgroundImg = imageResult.path;
-
-        // Clean up old hero background if it exists
-        if (existingSettings?.heroBackgroundImg) {
-          await deleteSiteSettingsImage(existingSettings.heroBackgroundImg);
+    // Wait for all uploads to complete
+    if (uploadPromises.length > 0) {
+      try {
+        const results = await Promise.all(uploadPromises);
+        
+        // Update URLs based on upload results
+        for (const result of results) {
+          switch (result.type) {
+            case 'logoUrl':
+              logoUrl = result.url;
+              break;
+            case 'heroBackgroundImg':
+              heroBackgroundImg = result.url;
+              break;
+            case 'imageAboutSection':
+              imageAboutSection = result.url;
+              break;
+          }
         }
       } catch (error) {
         return {
           success: false,
-          message: 'Échec de l\'upload de l\'image de fond',
-          error: error instanceof Error ? error.message : 'Failed to upload hero background'
+          message: 'Échec de l\'upload des images',
+          error: error instanceof Error ? error.message : 'Failed to upload images'
         };
       }
     }
 
-    // Handle about image upload
-    const aboutFile = formData.get('imageAboutSectionFile') as File;
-    if (aboutFile && aboutFile.size > 0) {
-      try {
-        const validation = validateImage(aboutFile);
-        if (!validation.isValid) {
-          throw new Error(validation.error);
-        }
+    // Clean up old images after successful uploads
+    const cleanupPromises: Promise<void>[] = [];
+    
+    if (logoUrl && existingSettings?.logoUrl && logoUrl !== existingSettings.logoUrl) {
+      cleanupPromises.push(deleteSiteSettingsImage(existingSettings.logoUrl));
+    }
+    
+    if (heroBackgroundImg && existingSettings?.heroBackgroundImg && heroBackgroundImg !== existingSettings.heroBackgroundImg) {
+      cleanupPromises.push(deleteSiteSettingsImage(existingSettings.heroBackgroundImg));
+    }
+    
+    if (imageAboutSection && existingSettings?.imageAboutSection && imageAboutSection !== existingSettings.imageAboutSection) {
+      cleanupPromises.push(deleteSiteSettingsImage(existingSettings.imageAboutSection));
+    }
 
-        const imageResult = await saveSiteSettingsImage(aboutFile, 'about-section' as any);
-        imageAboutSection = imageResult.path;
-
-        if ((existingSettings as any)?.imageAboutSection) {
-          await deleteSiteSettingsImage((existingSettings as any).imageAboutSection);
-        }
-      } catch (error) {
-        return {
-          success: false,
-          message: 'Échec de l\'upload de l\'image de la section À propos',
-          error: error instanceof Error ? error.message : 'Failed to upload about image'
-        };
-      }
+    // Clean up old images in background (don't wait for completion)
+    if (cleanupPromises.length > 0) {
+      Promise.all(cleanupPromises).catch(error => {
+        console.error('Failed to cleanup old images:', error);
+      });
     }
 
     // Extract and validate sanitized form data

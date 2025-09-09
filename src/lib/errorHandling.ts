@@ -96,6 +96,14 @@ function getDefaultStatusCode(code: ErrorCode): number {
 }
 
 export function logError(error: Error | AppError, context?: Record<string, any>): void {
+  // Ignore framework redirect errors which are control-flow, not application errors
+  if (
+    error &&
+    (error as any).message === 'NEXT_REDIRECT' ||
+    (error as any).digest === 'NEXT_REDIRECT'
+  ) {
+    return;
+  }
   const isAppError = error instanceof AppError;
   const logData = {
     name: error.name,

@@ -1,6 +1,5 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { rateLimit, getClientIdentifier } from '@/lib/rateLimit';
 import { validateCSRFToken } from '@/lib/csrf';
@@ -24,6 +23,14 @@ export async function logoutAction(prevState: any, formData: FormData) {
     // Redirect to login page
     redirect('/auth/login');
   } catch (error) {
+    // Let framework redirect errors pass through without logging
+    if (
+      error &&
+      ((error as any).digest === 'NEXT_REDIRECT' ||
+        (error as Error).message === 'NEXT_REDIRECT')
+    ) {
+      throw error;
+    }
     // Handle rate limiting errors
     if (error instanceof Error && error.name === 'RateLimitError') {
       logError(error, { action: 'logout', error: 'rate_limit_exceeded' });

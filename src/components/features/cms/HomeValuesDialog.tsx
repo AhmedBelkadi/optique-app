@@ -215,8 +215,8 @@ export default function HomeValuesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-lg sm:h-auto sm:max-h-[95vh] sm:mx-0">
+        <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
           <DialogTitle className="flex items-center gap-2">
             {mode === 'create' ? (
               <>
@@ -232,7 +232,7 @@ export default function HomeValuesDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
           {/* Title Field */}
           <div className="space-y-2">
             <Label htmlFor="title">Titre *</Label>
@@ -330,7 +330,7 @@ export default function HomeValuesDialog({
             </div>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
+          <DialogFooter className="sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6 flex-col sm:flex-row gap-2">
             <Button
               type="button"
               onClick={handleClose}

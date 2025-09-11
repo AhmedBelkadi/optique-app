@@ -35,7 +35,7 @@ export default async function ContentAboutPage() {
 
       />
 
-      <div className="space-y-6">
+      <div className="px-4 sm:px-6 py-4 space-y-6">
         <Suspense fallback={<AboutPageSkeleton />}>
           <AboutPageManager
             aboutSections={aboutSections}

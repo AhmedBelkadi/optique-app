@@ -549,7 +549,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
             {activeBanners.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-sm font-medium text-foreground">Active Banners</h4>
+                  <h4 className="text-sm font-medium text-foreground">Bannieres Activées</h4>
                   <Badge variant="default" className="text-xs">{activeBanners.length}</Badge>
                 </div>
                 <div className="space-y-3">
@@ -561,7 +561,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div className="flex-1 space-y-3 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Badge variant={status.variant} className={`${status.color} transition-colors text-xs`}>
+                              <Badge variant={status.variant} className={`transition-colors text-xs`}>
                                 {status.label}
                               </Badge>
                               <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
@@ -595,7 +595,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Edit Banner</TooltipContent>
+                              <TooltipContent>Modifier Banniere</TooltipContent>
                             </Tooltip>
                             
                             <Tooltip>
@@ -609,7 +609,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Deactivate Banner</TooltipContent>
+                              <TooltipContent>Désactiver Banniere</TooltipContent>
                             </Tooltip>
                             
                             <AlertDialog>
@@ -629,9 +629,9 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+                                  <AlertDialogTitle>Supprimer Banniere</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete this banner? This action cannot be undone.
+                                    Êtes-vous sûr de vouloir supprimer cette banniere ? Cette action est irréversible.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -640,7 +640,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                     onClick={() => handleDelete(banner.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
-                                    Delete Banner
+                                    Supprimer Banniere
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -658,7 +658,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
             {inactiveBanners.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-sm font-medium text-foreground">Inactive Banners</h4>
+                  <h4 className="text-sm font-medium text-foreground">Bannieres Désactivées</h4>
                   <Badge variant="secondary" className="text-xs">{inactiveBanners.length}</Badge>
                 </div>
                 <div className="space-y-3">
@@ -695,10 +695,10 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   onClick={() => handleEdit(banner)}
                                   className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 sm:h-8 sm:w-8"
                                 >
-                                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                                  <Edit className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Edit Banner</TooltipContent>
+                              <TooltipContent>Modifier Banniere</TooltipContent>
                             </Tooltip>
                             
                             <Tooltip>
@@ -712,7 +712,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Activate Banner</TooltipContent>
+                              <TooltipContent>Activer Banniere</TooltipContent>
                             </Tooltip>
                             
                             <AlertDialog>
@@ -732,9 +732,9 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Banner</AlertDialogTitle>
+                                  <AlertDialogTitle>Supprimer Banniere</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete this banner? This action cannot be undone.
+                                    Êtes-vous sûr de vouloir supprimer cette banniere ? Cette action est irréversible.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -743,7 +743,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                     onClick={() => handleDelete(banner.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
-                                    Delete Banner
+                                    Supprimer Banniere
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -761,14 +761,14 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
             {banners.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 <Megaphone className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                <h3 className="text-lg font-semibold mb-2">No banners yet</h3>
-                <p className="text-sm mb-4">Create your first promotional banner to start engaging your visitors</p>
+                <h3 className="text-lg font-semibold mb-2">Aucune banniere trouvée</h3>
+                <p className="text-sm mb-4">Créez votre première banniere pour commencer à engager vos visiteurs</p>
                 <Button 
                   onClick={() => setShowForm(true)}
                   className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Your First Banner
+                  Créer Votre Première Banniere
                 </Button>
               </div>
             )}

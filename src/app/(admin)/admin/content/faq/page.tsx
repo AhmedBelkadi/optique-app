@@ -31,7 +31,7 @@ export default async function ContentFAQPage() {
         showNotifications={true}
       />
 
-      <div className="space-y-6">
+      <div className="px-4 sm:px-6 py-4 space-y-6">
         <Suspense fallback={<FAQPageSkeleton />}>
           <FAQPageManager
             faqs={faqs}

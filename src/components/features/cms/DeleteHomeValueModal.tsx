@@ -73,7 +73,7 @@ export default function DeleteHomeValueModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md w-[95vw] sm:w-auto max-h-[85vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2 text-destructive">
             <Trash2 className="w-5 h-5" />

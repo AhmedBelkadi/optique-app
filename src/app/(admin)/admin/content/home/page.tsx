@@ -49,7 +49,7 @@ async function HomeValuesContainer() {
   const homeValues = result.data || [];
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 py-4 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Valeurs de la Page d'Accueil</h2>

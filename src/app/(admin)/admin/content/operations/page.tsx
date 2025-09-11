@@ -69,7 +69,7 @@ export default async function ContentOperationsPage() {
         showNotifications={true}
       />
 
-      <div className="min-h-screen space-y-6">
+      <div className="px-4 sm:px-6 py-4 min-h-screen space-y-6">
         <Tabs defaultValue="operations" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="operations">Paramètres opérationnels</TabsTrigger>

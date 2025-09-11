@@ -54,18 +54,18 @@ export default function AboutBenefitsManager({ benefits }: AboutBenefitsManagerP
       const result = await reorderAboutBenefitsAction({}, formData);
       
       if (result.success) {
-        toast.success('Benefits reordered successfully!');
+        toast.success('Avantages reordonnés avec succès !');
         if (result.data) {
           setBenefitsList(result.data);
         }
       } else {
-        toast.error(result.error || 'Failed to reorder benefits');
+        toast.error(result.error || 'Échec du reordonnement des avantages');
         // Revert the optimistic update
         setBenefitsList(benefits);
       }
     } catch (error) {
       console.error('Error reordering benefits:', error);
-      toast.error('Failed to reorder benefits');
+      toast.error('Échec du reordonnement des avantages');
       // Revert the optimistic update
       setBenefitsList(benefits);
     }
@@ -123,17 +123,17 @@ export default function AboutBenefitsManager({ benefits }: AboutBenefitsManagerP
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Benefits</h3>
+        <h3 className="text-lg font-medium">Avantages</h3>
         <Button onClick={handleAddBenefit} size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          Add Benefit
+          Ajouter un avantage
         </Button>
       </div>
 
       {(!benefitsList || benefitsList.length === 0) ? (
         <div className="text-center py-8 text-muted-foreground">
-          <p>No benefits added yet.</p>
-          <p className="text-sm">Click "Add Benefit" to get started.</p>
+            <p>Aucun avantage ajouté.</p>
+          <p className="text-sm">Cliquez sur "Ajouter un avantage" pour commencer.</p>
         </div>
       ) : (
         <SortableList

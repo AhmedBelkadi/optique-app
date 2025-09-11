@@ -192,20 +192,21 @@ export default function FAQPageManager({
       {/* Action Buttons */}
       <div className="flex items-center gap-1 ml-0 sm:ml-4">
         <Button
+          variant="outline"
           size="sm"
           onClick={() => handleEditFAQ(faq)}
-          className="h-8 w-8 p-0 bg-emerald-500 hover:bg-emerald-500/90"
+          className="h-8 w-8 p-0 text-emerald-500 "
         >
-          <Edit className="h-4 w-4" />
+          <Edit className="h-4 w-4 text-emerald-500" />
         </Button>
         <Button
-          variant="destructive"
+          variant="outline"
           size="sm"
           onClick={() => handleDeleteFAQ(faq)}
           disabled={isReorderPending}
-          className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+          className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600"
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-4 w-4 text-red-500" />
         </Button>
       </div>
     </div>
@@ -213,64 +214,7 @@ export default function FAQPageManager({
 
   return (
     <div className="space-y-6">
-      {/* Page Completion Progress */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-primary" />
-            Complétion de la page FAQ
-          </CardTitle>
-          <CardDescription>
-            Suivez votre progression dans la configuration de la page FAQ
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">
-              {completedSections} sur {totalSections} sections complètes
-            </span>
-            <Badge variant={completionPercentage === 100 ? 'default' : 'secondary'}>
-              {Math.round(completionPercentage)}%
-            </Badge>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${completionPercentage}%` }}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Actions rapides
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button 
-              onClick={handleAddFAQ}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Ajouter une nouvelle FAQ
-            </Button>
-            <Button 
-              variant="default"
-              onClick={() => setActiveTab('faqs')}
-              className="flex items-center gap-2"
-            >
-              <HelpCircle className="h-4 w-4" />
-              Gérer les FAQs
-            </Button>
-         
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Content Overview */}
       <Card>

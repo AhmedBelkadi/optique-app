@@ -215,23 +215,23 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Edit Benefit' : 'Add New Benefit'}
+            {isEditing ? 'Modifier l\'avantage' : 'Ajouter un nouvel avantage'}
           </DialogTitle>
           <DialogDescription>
             {isEditing 
-              ? 'Update the benefit information below.'
-              : 'Add a new benefit to showcase your services.'
+              ? 'Mettre à jour les informations de l\'avantage ci-dessous.'
+              : 'Ajouter un nouvel avantage pour mettre en valeur vos services.'
             }
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Titre</Label>
             <Input
               id="title"
               {...form.register('title')}
-              placeholder="e.g., Expert Care"
+              placeholder="e.g., Expertise"
               disabled={isCreatePending || isUpdatePending}
             />
             {form.formState.errors.title && (
@@ -242,11 +242,11 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
               {...form.register('description')}
-              placeholder="Describe the benefit..."
+              placeholder="Décrivez l'avantage..."
               rows={3}
               disabled={isCreatePending || isUpdatePending}
             />
@@ -258,11 +258,11 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="highlight">Highlight</Label>
+            <Label htmlFor="highlight">Mise en avant</Label>
             <Input
               id="highlight"
               {...form.register('highlight')}
-              placeholder="e.g., 15 years of experience"
+              placeholder="e.g., 15 ans d'expérience"
               disabled={isCreatePending || isUpdatePending}
             />
             {form.formState.errors.highlight && (
@@ -274,14 +274,14 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="icon">Icon</Label>
+              <Label htmlFor="icon">Icône</Label>
               <Select
                 value={form.watch('icon')}
                 onValueChange={(value) => form.setValue('icon', value)}
                 disabled={isCreatePending || isUpdatePending}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select icon" />
+                  <SelectValue placeholder="Sélectionner une icône" />
                 </SelectTrigger>
                 <SelectContent>
                   {iconOptions.map((icon) => (
@@ -299,14 +299,14 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="color">Icon Color</Label>
+              <Label htmlFor="color">Couleur de l'icône</Label>
               <Select
                 value={form.watch('color')}
                 onValueChange={(value) => form.setValue('color', value)}
                 disabled={isCreatePending || isUpdatePending}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select color" />
+                    <SelectValue placeholder="Sélectionner une couleur" />
                 </SelectTrigger>
                 <SelectContent>
                   {colorOptions.map((color) => (
@@ -324,14 +324,14 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bgColor">Background Color</Label>
+              <Label htmlFor="bgColor">Couleur de fond</Label>
               <Select
                 value={form.watch('bgColor')}
                 onValueChange={(value) => form.setValue('bgColor', value)}
                 disabled={isCreatePending || isUpdatePending}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select background" />
+                  <SelectValue placeholder="Sélectionner une couleur de fond" />
                 </SelectTrigger>
                 <SelectContent>
                   {bgColorOptions.map((bgColor) => (
@@ -360,7 +360,7 @@ export default function AboutBenefitForm({ benefit, isOpen, onClose, onSuccess }
               Annuler
             </Button>
             <Button type="submit" disabled={isCreatePending || isUpdatePending || csrfLoading}>
-              {isCreatePending || isUpdatePending ? 'Saving...' : (isEditing ? 'Update Benefit' : 'Add Benefit')}
+              {isCreatePending || isUpdatePending ? 'Enregistrement...' : (isEditing ? 'Mettre à jour l\'avantage' : 'Ajouter un avantage')}
             </Button>
           </DialogFooter>
         </form>

@@ -59,21 +59,22 @@ export default async function ContentOperationsPage() {
   return (
     <>
       <AdminPageConfig
-        title="Operations Settings"
-        subtitle="Manage your site's operational configuration and external API integrations"
+        title="Paramètres opérationnels"
+        subtitle="Gérez la configuration opérationnelle de votre site et les intégrations API externes"
         breadcrumbs={[
-          { label: 'Content Management', href: '/admin/content' },
-          { label: 'Operations Settings' }
+          { label: 'Gestion du contenu', href: '/admin/content' },
+          { label: 'Paramètres opérationnels' }
         ]}
         showSearch={false}
         showNotifications={true}
       />
 
       <div className="px-4 sm:px-6 py-4 min-h-screen space-y-6">
+
         <Tabs defaultValue="operations" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="operations">Paramètres opérationnels</TabsTrigger>
-            <TabsTrigger value="external-apis">API externes</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50 border border-border ">
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200" value="operations">Paramètres opérationnels</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200" value="external-apis">API externes</TabsTrigger>
           </TabsList>
           
           <TabsContent value="operations" className="space-y-6">

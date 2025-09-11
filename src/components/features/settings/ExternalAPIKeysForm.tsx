@@ -165,11 +165,11 @@ export default function ExternalAPIKeysForm({ initialSettings }: ExternalAPIKeys
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'configured':
-        return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Configuré</Badge>;
+        return <Badge variant="success" className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Configuré</Badge>;
       case 'disabled':
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Désactivé</Badge>;
       case 'not-configured':
-        return <Badge variant="default" className="text-muted-foreground"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
+        return <Badge variant="outline" className="text-muted-foreground"><AlertCircle className="w-3 h-3 mr-1" />Non configuré</Badge>;
       default:
         return null;
     }

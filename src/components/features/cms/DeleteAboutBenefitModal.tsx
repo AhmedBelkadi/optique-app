@@ -41,17 +41,17 @@ export default function DeleteAboutBenefitModal({ benefit, isOpen, onClose, onSu
       const result = await deleteAboutBenefitAction({}, formData);
 
       if (result.success) {
-        toast.success('Benefit deleted successfully');
+        toast.success('Avantage supprimé avec succès');
         if (result.data) {
           onSuccess?.(result.data);
         }
         onClose();
       } else {
-        toast.error(result.error || 'Failed to delete benefit');
+        toast.error(result.error || 'Échec de la suppression de l\'avantage');
       }
     } catch (error) {
       console.error('Error deleting benefit:', error);
-      toast.error('Failed to delete benefit');
+      toast.error('Échec de la suppression de l\'avantage');
     } finally {
       setIsDeleting(false);
     }
@@ -69,9 +69,9 @@ export default function DeleteAboutBenefitModal({ benefit, isOpen, onClose, onSu
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Benefit</DialogTitle>
+          <DialogTitle>Supprimer l'avantage</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete the benefit "{benefit.title}"? This action cannot be undone.
+            Êtes-vous sûr de vouloir supprimer l'avantage "{benefit.title}"? Cette action est irréversible.
           </DialogDescription>
         </DialogHeader>
 
@@ -91,7 +91,7 @@ export default function DeleteAboutBenefitModal({ benefit, isOpen, onClose, onSu
             onClick={handleDelete}
             disabled={isDeleting || csrfLoading}
           >
-            {isDeleting ? 'Deleting...' : 'Delete Benefit'}
+            {isDeleting ? 'Suppression...' : 'Supprimer l\'avantage'}
           </Button>
         </DialogFooter>
       </DialogContent>

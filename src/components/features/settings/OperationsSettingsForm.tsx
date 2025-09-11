@@ -62,7 +62,7 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
 
   const handleSubmit = async (data: OperationsFormData) => {
     if (csrfLoading || csrfError) {
-      toast.error('CSRF token not available');
+      toast.error('CSRF token non disponible');
       return;
     }
 
@@ -101,10 +101,10 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Settings className="h-5 w-5 text-primary" />
-          Maintenance Mode
+          Mode de maintenance
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Control site availability and display maintenance messages
+          Contrôle la disponibilité du site et affiche les messages de maintenance
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -118,10 +118,10 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
                   <div className="space-y-0.5">
                     <FormLabel className="text-base flex items-center gap-2">
                       <Shield className="h-4 w-4" />
-                      Enable Maintenance Mode
+                      Activer le mode de maintenance
                     </FormLabel>
                     <p className="text-sm text-muted-foreground">
-                      When enabled, visitors will see a maintenance message instead of the normal site
+                      Lorsqu'il est activé, les visiteurs verront un message de maintenance au lieu du site normal
                     </p>
                   </div>
                   <FormControl>
@@ -140,8 +140,8 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
               <Alert className="border-orange-200 bg-orange-50">
                 <AlertTriangle className="h-4 w-4 text-orange-600" />
                 <AlertDescription className="text-orange-800">
-                  <strong>Maintenance Mode Active:</strong> Your website is currently in maintenance mode. 
-                  Visitors will see a maintenance message instead of the normal site content.
+                  <strong>Mode de maintenance actif:</strong> Votre site est actuellement en mode de maintenance. 
+                  Les visiteurs verront un message de maintenance au lieu du contenu normal du site.
                 </AlertDescription>
               </Alert>
             )}
@@ -173,12 +173,12 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  Enregistrement...
                 </>
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Save Maintenance Settings
+                  Enregistrer les paramètres de maintenance
                 </>
               )}
             </Button>
@@ -187,10 +187,10 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
 
         {/* Status Information */}
         <div className="space-y-3 pt-4 border-t">
-          <h4 className="text-sm font-medium text-foreground">Current Status</h4>
+          <h4 className="text-sm font-medium text-foreground">Statut actuel</h4>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Maintenance Mode</span>
+              <span className="text-sm text-muted-foreground">Mode de maintenance</span>
               <Badge variant={watchedValues.maintenanceMode ? "destructive" : "secondary"}>
                 {watchedValues.maintenanceMode ? "Active" : "Inactive"}
               </Badge>
@@ -198,12 +198,12 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
             
             {watchedValues.maintenanceMode && (
               <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
-                <strong>What happens when maintenance mode is active:</strong>
+                <strong>Ce qui se passe lorsque le mode de maintenance est actif:</strong>
                 <ul className="list-disc list-inside mt-1 space-y-1">
-                  <li>Visitors see a "Site Under Maintenance" message</li>
-                  <li>Normal site content is hidden</li>
-                  <li>Admin panel remains accessible</li>
-                  <li>Perfect for updates, maintenance, or temporary closures</li>
+                  <li>Les visiteurs voient un message "Site en maintenance"</li>
+                  <li>Le contenu du site normal est masqué</li>
+                  <li>Le panneau d'administration reste accessible</li>
+                  <li>Parfait pour les mises à jour, la maintenance, ou les fermetures temporaires</li>
                 </ul>
               </div>
             )}

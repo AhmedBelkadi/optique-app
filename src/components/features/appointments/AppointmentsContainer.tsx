@@ -204,7 +204,7 @@ export default function AppointmentsContainer({
 
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 py-4 space-y-6">
       {/* Filters and Search */}
       <Card>
         <CardHeader>

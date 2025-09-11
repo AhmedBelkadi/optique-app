@@ -138,7 +138,7 @@ export default function TestimonialsContainer({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 py-4 space-y-6">
       {/* Testimonials Table */}
       {testimonials.length === 0 ? (
         <div className="bg-background rounded-lg border p-8 shadow-sm text-center">

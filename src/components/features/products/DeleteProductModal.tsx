@@ -7,6 +7,7 @@ import { deleteProductAction } from '@/features/products/actions/deleteProduct';
 import { Product } from '@/features/products/schema/productSchema';
 import { useCSRF } from '@/components/common/CSRFProvider';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface DeleteProductModalProps {
   product: Product;
@@ -27,11 +28,11 @@ export default function DeleteProductModal({ product, onSuccess, onClose }: Dele
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        toast.success('Product deleted successfully!');
+        toast.success('Produit supprimé avec succès!');
         onSuccess?.();
         onClose();
       } else if (state.error) {
-        toast.error(state.error || 'Failed to delete product');
+        toast.error(state.error || 'Échec de la suppression du produit');
       }
     }
     previousIsPending.current = isPending;
@@ -39,7 +40,7 @@ export default function DeleteProductModal({ product, onSuccess, onClose }: Dele
 
   const handleDelete = () => {
     if (!csrfToken) {
-      toast.error('Security token not available. Please refresh the page.');
+      toast.error('Token de sécurité non disponible. Veuillez rafraîchir la page.');
       return;
     }
 
@@ -53,30 +54,33 @@ export default function DeleteProductModal({ product, onSuccess, onClose }: Dele
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold text-foreground mb-4">Delete Product</h2>
-        <p className="text-muted-foreground mb-6">
-          Are you sure you want to delete "{product.name}"? This action cannot be undone.
-        </p>
-
-        <div className="flex justify-end space-x-3">
-          <Button
-            onClick={onClose}
-            disabled={isPending}
-            className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
-          >
-            Annuler
-          </Button>
-          <Button
-            onClick={handleDelete}
-            disabled={isPending}
-            className="px-4 py-2 bg-destructive text-primary-foreground rounded-md hover:bg-destructive/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-destructive disabled:opacity-50"
-          >
-            {isPending ? 'Deleting...' : 'Delete'}
-          </Button>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="w-[95vw] sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Supprimer le produit</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Êtes-vous sûr de vouloir supprimer "{product.name}"? Cette action ne peut pas être annulée.
+          </p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              onClick={onClose}
+              disabled={isPending}
+              className="bg-gray-300 text-black"
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleDelete}
+              disabled={isPending}
+              className="bg-destructive text-primary-foreground"
+            >
+              {isPending ? 'Suppression...' : 'Supprimer'}
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

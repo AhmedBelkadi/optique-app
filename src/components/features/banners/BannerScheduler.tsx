@@ -370,15 +370,15 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                 Create New Banner
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
+            <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-[600px] sm:h-auto sm:max-h-[95vh] sm:mx-0">
+              <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
                 <DialogTitle className="flex items-center gap-2">
                   <Megaphone className="h-5 w-5 text-primary" />
                   {editingBanner ? 'Edit Banner' : 'Create New Banner'}
                 </DialogTitle>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
                   <FormField
                     control={form.control}
                     name="text"
@@ -503,38 +503,43 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     </Alert>
                   )}
 
-                                    <div className="flex gap-2">
-                    <Button 
-                      type="submit" 
-                      disabled={isPending || csrfLoading}
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-                    >
-                      {isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {editingBanner ? 'Updating...' : 'Creating...'}
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          {editingBanner ? 'Update Banner' : 'Create Banner'}
-                        </>
-                      )}
-                    </Button>
-                    <Button 
-                      type="button" 
-                      className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
-                      onClick={() => {
-                        setShowForm(false);
-                        setEditingBanner(null);
-                        form.reset();
-                      }}
-                    >
-                      Annuler
-                    </Button>
-                  </div>
+                  {/* spacer before footer */}
+                  <div className="h-4" />
                 </form>
               </Form>
+              <div className="sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full">
+                  <Button 
+                    type="button" 
+                    className="w-full sm:w-auto bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingBanner(null);
+                      form.reset();
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    type="button" 
+                    disabled={isPending || csrfLoading}
+                    className="w-full sm:flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                    onClick={() => form.handleSubmit(handleSubmit)()}
+                  >
+                    {isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {editingBanner ? 'Updating...' : 'Creating...'}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="mr-2 h-4 w-4" />
+                        {editingBanner ? 'Update Banner' : 'Create Banner'}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
 

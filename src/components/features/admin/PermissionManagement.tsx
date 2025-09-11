@@ -290,7 +290,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 py-4 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <Button onClick={handleCreatePermission} className="bg-gradient-to-r from-primary to-primary/80">
@@ -472,8 +472,8 @@ export default function PermissionManagement({ permissions: initialPermissions }
 
       {/* Create Permission Modal */}
       <Dialog open={createModalOpen} onOpenChange={handleCloseCreate}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-[500px] sm:h-auto sm:max-h-[95vh] sm:mx-0">
+          <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6 space-y-3">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
                 <Plus className="w-5 h-5 text-primary-foreground" />
@@ -489,7 +489,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
             </div>
           </DialogHeader>
 
-          <form action={handleCreateSubmit} className="space-y-6">
+          <form action={handleCreateSubmit} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
             <div className="space-y-4">
               {/* Permission Name */}
               <div className="space-y-2">
@@ -652,8 +652,8 @@ export default function PermissionManagement({ permissions: initialPermissions }
 
       {/* Edit Permission Modal */}
       <Dialog open={editModalOpen} onOpenChange={handleCloseEdit}>
-        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-[500px] sm:h-auto sm:max-h-[95vh] sm:mx-0">
+          <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6 space-y-3">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
                 <Edit className="w-5 h-5 text-primary-foreground" />
@@ -669,7 +669,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
             </div>
           </DialogHeader>
 
-          <form action={handleUpdateSubmit} className="space-y-6">
+          <form action={handleUpdateSubmit} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
             <div className="space-y-4">
               {/* Permission Name */}
               <div className="space-y-2">
@@ -832,7 +832,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
 
       {/* Delete Permission Modal */}
       <Dialog open={deleteModalOpen} onOpenChange={handleCloseDelete}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] sm:max-w-md">
           <DialogHeader className="space-y-3">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">

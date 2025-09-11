@@ -108,8 +108,8 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="space-y-3">
+      <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-md sm:h-auto sm:max-h-[95vh] sm:mx-0">
+        <DialogHeader className="space-y-3 sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
               <Plus className="w-5 h-5 text-primary-foreground" />
@@ -125,7 +125,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
           </div>
         </DialogHeader>
 
-        <form action={formAction} className="space-y-4">
+        <form action={formAction} className="space-y-4 px-4 py-4 sm:px-6 sm:py-6">
           {/* Hidden CSRF token */}
           <input type="hidden" name="csrf_token" value={csrfToken || ''} />
           
@@ -177,13 +177,13 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
             </div>
           </div>
 
-          <DialogFooter className="pt-4">
-            <div className="flex space-x-3 w-full">
+          <DialogFooter className="pt-4 sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full">
               <Button
                 type="button"
                 onClick={handleClose}
                 disabled={isPending}
-                className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+                className="w-full sm:w-auto bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
 
               >
                 Annuler
@@ -191,7 +191,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
               <Button
                 type="submit"
                 disabled={isPending}
-                className="flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full sm:flex-1 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {isPending ? (
                   <>

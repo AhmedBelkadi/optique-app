@@ -36,7 +36,7 @@ export default function UsersContainer({ users: initialUsers, roles }: UsersCont
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="px-4 sm:px-6 py-4 space-y-6">
       {/* Create User Button */}
       <div className="flex justify-end">
         <Button onClick={() => setCreateModalOpen(true)}>

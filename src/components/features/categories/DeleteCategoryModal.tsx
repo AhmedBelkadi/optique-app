@@ -45,7 +45,7 @@ export default function DeleteCategoryModal({
     
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        toast.success('Category deleted successfully!', {
+        toast.success('Catégorie supprimée avec succès!', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -55,7 +55,7 @@ export default function DeleteCategoryModal({
         onSuccess?.();
         onClose();
       } else if (state.error) {
-        toast.error(state.error || 'Failed to delete category', {
+        toast.error(state.error || 'Échec de la suppression de la catégorie', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -73,7 +73,7 @@ export default function DeleteCategoryModal({
 
   const handleDelete = () => {
     if (!csrfToken) {
-      toast.error('Security token not available. Please refresh the page.');
+      toast.error('Token de sécurité non disponible. Veuillez rafraîchir la page.');
       return;
     }
 
@@ -89,7 +89,7 @@ export default function DeleteCategoryModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-[95vw] sm:max-w-md">
         <DialogHeader className="space-y-3">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
@@ -97,10 +97,10 @@ export default function DeleteCategoryModal({
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold text-foreground">
-                Delete Category
+                Supprimer la catégorie
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                This action cannot be undone
+                Cette action ne peut pas être annulée
               </p>
             </div>
           </div>
@@ -113,11 +113,11 @@ export default function DeleteCategoryModal({
                 <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-orange-800">
-                    Are you sure you want to delete "{categoryName}"?
+                    Êtes-vous sûr de vouloir supprimer "{categoryName}"?
                   </p>
                   <p className="text-sm text-orange-700">
-                    This will permanently remove the category from your system. 
-                    If the category is used by any products, the deletion will be prevented.
+                    Cette action supprimera la catégorie de votre système. 
+                      Si la catégorie est utilisée par un produit, la suppression sera prévenue.
                   </p>
                 </div>
               </div>
@@ -137,7 +137,7 @@ export default function DeleteCategoryModal({
         </div>
 
         <div className="pt-4">
-          <div className="flex space-x-3 w-full">
+          <div className="flex justify-end gap-2 w-full">
             <Button
               type="button"
               onClick={onClose}
@@ -152,17 +152,17 @@ export default function DeleteCategoryModal({
               variant="destructive"
               disabled={isPending}
               onClick={handleDelete}
-              className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
             >
               {isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Deleting...
+                  Suppression...
                 </>
               ) : (
                 <>
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Category
+                  Supprimer la catégorie
                 </>
               )}
             </Button>

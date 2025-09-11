@@ -18,18 +18,17 @@ export default async function ContentBannersPage() {
   return (
     <>
       <AdminPageConfig
-        title="Banners & Promotions"
-        subtitle="Manage marketing materials, promotional banners, and announcements"
+        title="Bannières & Promotions"
+        subtitle="Gérez les bannières et les promotions"
         breadcrumbs={[
-          { label: 'Content Management', href: '/admin/content' },
-          { label: 'Banners & Promotions' }
+          { label: 'Bannières & Promotions' }
         ]}
         showSearch={false}
         showNotifications={true}
       />
 
       <div className="space-y-6">
-        <div className="px-3 sm:px-4 md:px-6 lg:px-0">
+        <div className="md:px-6 lg:px-0">
           <Suspense fallback={<BannersSkeleton />}>
             <BannerScheduler banners={banners} />
           </Suspense>

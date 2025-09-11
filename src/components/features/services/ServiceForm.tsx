@@ -112,7 +112,7 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant={isEditing ? "outline" : "default"} size="sm">
+        <Button variant={isEditing ? "outline" : "default"}>
           {isEditing ? (
             <>
               <Edit className="h-4 w-4 mr-2" />
@@ -126,15 +126,15 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl w-[95vw] sm:w-auto">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-xl sm:h-auto sm:max-h-[95vh] sm:mx-0">
+        <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
+          <DialogTitle className="text-lg sm:text-xl">
             {isEditing ? 'Modifier le Service' : 'Ajouter un Nouveau Service'}
           </DialogTitle>
         </DialogHeader>
         
         <Form {...form}>
-          <form action={handleSubmit} className="space-y-6">
+          <form action={handleSubmit} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
             {/* Hidden inputs for form data */}
             <input type="hidden" name="name" value={form.watch('name')} />
             <input type="hidden" name="description" value={form.watch('description') || ''} />
@@ -237,10 +237,10 @@ export function ServiceForm({ service, onSuccess, onServiceCreated, onServiceUpd
               )}
             />
 
-            <div className="flex flex-col sm:flex-row justify-end gap-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
               <Button
                 type="button"
-                className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+                className="w-full sm:w-auto bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
                 onClick={() => setIsOpen(false)}
                 disabled={isPending}
               >

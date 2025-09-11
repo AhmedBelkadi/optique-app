@@ -606,24 +606,24 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
       {/* Create Role Modal */}
       <Dialog open={createModalOpen} onOpenChange={handleCloseCreate}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-[800px] sm:h-auto sm:max-h-[95vh] sm:mx-0">
+          <DialogHeader className="space-y-3 sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                <Plus className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <div>
-                <DialogTitle className="text-xl font-semibold text-foreground">
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-lg sm:text-xl font-semibold text-foreground">
                   Create New Role
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Define a new role with specific permissions
                 </p>
               </div>
             </div>
           </DialogHeader>
 
-          <form action={handleCreateSubmit} className="space-y-6">
+          <form action={handleCreateSubmit} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
             <div className="space-y-4">
               {/* Role Name */}
               <div className="space-y-2">
@@ -690,38 +690,40 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 </div>
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="templates" className="flex items-center space-x-2">
-                      <Zap className="w-4 h-4" />
-                      <span>Templates</span>
+                  <TabsList className="grid w-full grid-cols-2 h-auto">
+                    <TabsTrigger value="templates" className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+                      <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Templates</span>
+                      <span className="sm:hidden">Templates</span>
                     </TabsTrigger>
-                    <TabsTrigger value="manual" className="flex items-center space-x-2">
-                      <Settings className="w-4 h-4" />
-                      <span>Manual Selection</span>
+                    <TabsTrigger value="manual" className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+                      <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Manual Selection</span>
+                      <span className="sm:hidden">Manual</span>
                     </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="templates" className="space-y-4 mt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       {Object.entries(PERMISSION_TEMPLATES).map(([key, template]) => (
                         <Card key={key} className="hover:shadow-md transition-shadow cursor-pointer border-border/50">
-                          <CardContent className="p-4">
-                            <div className="flex items-start space-x-3">
-                              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Star className="w-4 h-4 text-primary" />
+                          <CardContent className="p-3 sm:p-4">
+                            <div className="flex items-start space-x-2 sm:space-x-3">
+                              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <Star className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-medium text-sm">{template.name}</h4>
-                                <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-xs sm:text-sm">{template.name}</h4>
+                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{template.description}</p>
                                 <div className="flex flex-wrap gap-1 mt-2">
-                                  {template.permissions.slice(0, 3).map((perm, idx) => (
-                                    <Badge key={idx} variant="default" className="text-xs">
+                                  {template.permissions.slice(0, 2).map((perm, idx) => (
+                                    <Badge key={idx} variant="default" className="text-xs px-1 py-0">
                                       {perm}
                                     </Badge>
                                   ))}
-                                  {template.permissions.length > 3 && (
-                                    <Badge variant="default" className="text-xs">
-                                      +{template.permissions.length - 3} more
+                                  {template.permissions.length > 2 && (
+                                    <Badge variant="default" className="text-xs px-1 py-0">
+                                      +{template.permissions.length - 2}
                                     </Badge>
                                   )}
                                 </div>
@@ -731,7 +733,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                               type="button"
                               variant="default"
                               size="sm"
-                              className="w-full mt-3"
+                              className="w-full mt-3 text-xs sm:text-sm"
                               onClick={() => handleTemplateSelect(key)}
                             >
                               Use Template
@@ -761,7 +763,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         {/* Action Filters */}
                         <div>
                           <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Action</Label>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
                             {Object.entries(actionLabels).map(([action, label]) => (
                               <Button
                                 key={action}
@@ -769,7 +771,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                 variant={selectedActions.includes(action) ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => toggleActionFilter(action)}
-                                className="text-xs"
+                                className="text-xs px-2 py-1 h-auto"
                               >
                                 {label}
                               </Button>
@@ -780,7 +782,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         {/* Resource Filters */}
                         <div>
                           <Label className="text-xs font-medium text-muted-foreground mb-2 block">Filter by Resource</Label>
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
                             {Object.entries(resourceLabels).map(([resource, label]) => (
                               <Button
                                 key={resource}
@@ -788,10 +790,10 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                 variant={selectedResources.includes(resource) ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => toggleResourceFilter(resource)}
-                                className="text-xs"
+                                className="text-xs px-2 py-1 h-auto"
                               >
-                                {getResourceIcon(resource)}
-                                <span className="ml-1">{label}</span>
+                                <span className="hidden sm:inline">{getResourceIcon(resource)}</span>
+                                <span className="ml-0 sm:ml-1">{label}</span>
                               </Button>
                             ))}
                           </div>
@@ -814,12 +816,13 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                     </div>
 
                     {/* Quick Selection Buttons */}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
                       <Button
                         type="button"
                         variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions(filteredPermissions.map((p: Permission) => p.id))}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         Select All
                       </Button>
@@ -828,6 +831,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions([])}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         Clear All
                       </Button>
@@ -836,6 +840,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         variant="default"
                         size="sm"
                         onClick={() => setSelectedPermissions(filteredPermissions.filter((p: Permission) => p.action === 'read').map((p: Permission) => p.id))}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         Read Only
                       </Button>
@@ -844,6 +849,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         variant="outline"
                         size="sm"
                         onClick={() => selectByAction('create')}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         All Create
                       </Button>
@@ -852,6 +858,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         variant="outline"
                         size="sm"
                         onClick={() => selectByAction('update')}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         All Update
                       </Button>
@@ -860,6 +867,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                         variant="outline"
                         size="sm"
                         onClick={() => selectByAction('delete')}
+                        className="text-xs px-2 py-1 h-auto"
                       >
                         All Delete
                       </Button>
@@ -873,7 +881,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                     )}
 
                     {/* Permissions by Resource */}
-                    <div className="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+                    <div className="space-y-4 max-h-64 sm:max-h-96 overflow-y-auto border rounded-lg p-2 sm:p-4">
                       {Object.keys(groupedPermissions).length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">
                           <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -886,15 +894,15 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                           return (
                           <AccordionItem key={resource} value={resource} className="border-none">
                             <AccordionTrigger className="p-2 hover:bg-muted/50 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                  {getResourceIcon(resource)}
-                                  <h4 className="font-medium text-sm capitalize">{getResourceLabel(resource)}</h4>
-                                <Badge variant="default" className="text-xs">
-                                    {typedPerms.length} permission{typedPerms.length !== 1 ? 's' : ''}
+                              <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
+                                  <span className="hidden sm:inline">{getResourceIcon(resource)}</span>
+                                  <h4 className="font-medium text-xs sm:text-sm capitalize truncate">{getResourceLabel(resource)}</h4>
+                                <Badge variant="default" className="text-xs flex-shrink-0">
+                                    {typedPerms.length}
                                 </Badge>
                                   {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) && (
-                                    <Badge variant="secondary" className="text-xs">
-                                      All Selected
+                                    <Badge variant="secondary" className="text-xs flex-shrink-0">
+                                      All
                                     </Badge>
                                   )}
                               </div>
@@ -908,12 +916,12 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                   const allSelected = typedPerms.every((p: Permission) => selectedPermissions.includes(p.id));
                                   handleSelectAllResource(resource, !allSelected);
                                 }}
-                                className="text-xs"
+                                className="text-xs px-2 py-1 h-auto"
                               >
                                 {typedPerms.every((p: Permission) => selectedPermissions.includes(p.id)) ? 'Deselect All' : 'Select All'}
                               </Button>
                             </div>
-                            <AccordionContent className="space-y-2 ml-6">
+                            <AccordionContent className="space-y-2 ml-2 sm:ml-6">
                               <div className="grid grid-cols-1 gap-2">
                                 {typedPerms.map((permission: Permission) => {
                                   const isCritical = ['delete', 'manage'].includes(permission.action);
@@ -922,7 +930,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                   return (
                                     <div 
                                       key={permission.id} 
-                                      className={`flex items-start space-x-3 p-3 hover:bg-muted/30 rounded-lg transition-colors ${
+                                      className={`flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 hover:bg-muted/30 rounded-lg transition-colors ${
                                         isSelected ? 'bg-primary/5 border border-primary/20' : ''
                                       } ${isCritical ? 'border-l-2 border-l-orange-400' : ''}`}
                                     >
@@ -931,32 +939,30 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                         checked={isSelected}
                                       onCheckedChange={(checked) => handlePermissionToggle(permission.id, checked as boolean)}
                                       disabled={createIsPending}
-                                        className="mt-0.5 w-5 h-5"
+                                        className="mt-0.5 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
                                     />
-                                    <Label htmlFor={`create-${permission.id}`} className="flex-1 cursor-pointer">
-                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-sm font-medium">{permission.name}</span>
+                                    <Label htmlFor={`create-${permission.id}`} className="flex-1 cursor-pointer min-w-0">
+                                        <div className="flex flex-col gap-1">
+                                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+                                            <span className="text-xs sm:text-sm font-medium truncate">{permission.name}</span>
                                             {isCritical && (
-                                              <Badge variant="destructive" className="text-xs">
+                                              <Badge variant="destructive" className="text-xs flex-shrink-0">
                                                 Critical
                                               </Badge>
                                             )}
-                                          </div>
-                                          <div className="flex items-center gap-2">
                                             <Badge 
                                               variant={permission.action === 'create' ? 'default' : 
                                                       permission.action === 'read' ? 'secondary' :
                                                       permission.action === 'update' ? 'outline' : 'destructive'}
-                                              className="text-xs"
+                                              className="text-xs flex-shrink-0"
                                             >
                                           {actionLabels[permission.action]}
                                         </Badge>
                                           </div>
-                                      </div>
                                       {permission.description && (
-                                        <p className="text-xs text-muted-foreground mt-1">{permission.description}</p>
+                                        <p className="text-xs text-muted-foreground line-clamp-2">{permission.description}</p>
                                       )}
+                                      </div>
                                     </Label>
                                   </div>
                                   );
@@ -985,30 +991,32 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               </Card>
             )}
 
-            <DialogFooter className="pt-4">
-              <div className="flex space-x-3 w-full">
+            <DialogFooter className="pt-4 sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full">
                 <Button
                   type="button"
                   onClick={handleCloseCreate}
                   disabled={createIsPending}
-                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
+                  className="bg-gray-300 text-black font-medium py-2 px-4 sm:px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base"
                 >
                   Annuler
                 </Button>
                 <Button
                   type="submit"
                   disabled={createIsPending || selectedPermissions.length === 0}
-                  className="flex-1 bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                 >
                   {createIsPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating...
+                      <span className="hidden sm:inline">Creating...</span>
+                      <span className="sm:hidden">Creating...</span>
                     </>
                   ) : (
                     <>
                       <Plus className="w-4 h-4 mr-2" />
-                      Create Role ({selectedPermissions.length} permissions)
+                      <span className="hidden sm:inline">Create Role ({selectedPermissions.length} permissions)</span>
+                      <span className="sm:hidden">Create ({selectedPermissions.length})</span>
                     </>
                   )}
                 </Button>
@@ -1020,24 +1028,24 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
       {/* Edit Role Modal */}
       <Dialog open={editModalOpen} onOpenChange={handleCloseEdit}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-[800px] sm:h-auto sm:max-h-[95vh] sm:mx-0">
+          <DialogHeader className="space-y-3 sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                <Edit className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                <Edit className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <div>
-                <DialogTitle className="text-xl font-semibold text-foreground">
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-lg sm:text-xl font-semibold text-foreground">
                   Edit Role: {editingRole.name}
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Update role details and permissions
                 </p>
               </div>
             </div>
           </DialogHeader>
 
-          <form action={handleUpdateSubmit} className="space-y-6">
+          <form action={handleUpdateSubmit} className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
             <div className="space-y-4">
               {/* Role Name */}
               <div className="space-y-2">
@@ -1233,7 +1241,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                 )}
 
                 {/* Permissions by Resource */}
-                <div className="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+                <div className="space-y-4 max-h-64 sm:max-h-96 overflow-y-auto border rounded-lg p-2 sm:p-4">
                   {Object.keys(groupedPermissions).length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -1343,31 +1351,32 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
               </Card>
             )}
 
-            <DialogFooter className="pt-4">
-              <div className="flex space-x-3 w-full">
+            <DialogFooter className="pt-4 sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full">
                 <Button
                   type="button"
                   onClick={handleCloseEdit}
                   disabled={updateIsPending}
-                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
-
+                  className="bg-gray-300 text-black font-medium py-2 px-4 sm:px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base"
                 >
                   Annuler
                 </Button>
                 <Button
                   type="submit"
                   disabled={updateIsPending || selectedPermissions.length === 0}
-                  className="flex-1 bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 bg-[linear-gradient(to_right,hsl(var(--primary)),hsl(var(--primary)/0.8))] hover:bg-[linear-gradient(to_right,hsl(var(--primary)/0.9),hsl(var(--primary)/0.7))] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                 >
                   {updateIsPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Updating...
+                      <span className="hidden sm:inline">Updating...</span>
+                      <span className="sm:hidden">Updating...</span>
                     </>
                   ) : (
                     <>
                       <Edit className="w-4 h-4 mr-2" />
-                      Update Role ({selectedPermissions.length} permissions)
+                      <span className="hidden sm:inline">Update Role ({selectedPermissions.length} permissions)</span>
+                      <span className="sm:hidden">Update ({selectedPermissions.length})</span>
                     </>
                   )}
                 </Button>
@@ -1379,17 +1388,17 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
       {/* Delete Role Modal */}
       <Dialog open={deleteModalOpen} onOpenChange={handleCloseDelete}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="p-0 w-screen h-[100dvh] max-w-none mx-0 overflow-y-auto sm:w-[95vw] sm:max-w-md sm:h-auto sm:max-h-[95vh] sm:mx-0">
+          <DialogHeader className="space-y-3 sticky top-0 z-20 bg-background border-b px-4 py-3 sm:px-6">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
-              <div>
-                <DialogTitle className="text-xl font-semibold text-foreground">
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-lg sm:text-xl font-semibold text-foreground">
                   Delete Role
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   This action cannot be undone
                 </p>
               </div>
@@ -1398,14 +1407,14 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
           <div className="space-y-4">
             <Card className="border-orange-200 bg-orange-50">
-              <CardContent className="p-4">
-                <div className="flex items-start space-x-3">
-                  <Trash2 className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-orange-800">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-start space-x-2 sm:space-x-3">
+                  <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-orange-800">
                       Are you sure you want to delete <strong>&quot;{selectedRole?.name}&quot;</strong>?
                     </p>
-                    <p className="text-sm text-orange-700 mt-1">
+                    <p className="text-xs sm:text-sm text-orange-700 mt-1">
                       This will permanently remove the role from your system. 
                       If the role is assigned to any users, the deletion will be prevented.
                     </p>
@@ -1416,10 +1425,10 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
 
             {deleteState.error && (
               <Card className="border-destructive/20 bg-destructive/5">
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center text-destructive">
-                    <X className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">{deleteState.error}</span>
+                    <X className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-medium">{deleteState.error}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -1427,14 +1436,13 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
           </div>
 
           <form action={handleDeleteSubmit}>
-            <DialogFooter className="pt-4">
-              <div className="flex space-x-3 w-full">
+            <DialogFooter className="pt-4 sticky bottom-0 z-20 bg-background border-t px-4 py-3 sm:px-6">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full">
                 <Button
                   type="button"
                   onClick={handleCloseDelete}
                   disabled={deleteIsPending}
-                  className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
-
+                  className="bg-gray-300 text-black font-medium py-2 px-4 sm:px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base"
                 >
                   Annuler
                 </Button>
@@ -1442,17 +1450,19 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   type="submit"
                   variant="destructive"
                   disabled={deleteIsPending}
-                  className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
                 >
                   {deleteIsPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Deleting...
+                      <span className="hidden sm:inline">Deleting...</span>
+                      <span className="sm:hidden">Deleting...</span>
                     </>
                   ) : (
                     <>
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Delete Role
+                      <span className="hidden sm:inline">Delete Role</span>
+                      <span className="sm:hidden">Delete</span>
                     </>
                   )}
                 </Button>

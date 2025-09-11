@@ -1,198 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Package,
-  FolderOpen,
-  Settings,
-  MessageSquare,
-  Users,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  User,
-  Image,
-  ChevronDown,
-  ChevronUp,
-  Shield,
-  UserCheck,
-  Info,
-  Wrench,
-  Search,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, ChevronDown, ChevronUp } from 'lucide-react';
 import AdminNavItem from './AdminNavItem';
 import Link from 'next/link';
-
-interface NavItem {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: {
-    count: number;
-    variant?: 'secondary' | 'destructive';
-  };
-  description?: string;
-  adminOnly?: boolean; // Only admins can see this
-  staffAccessible?: boolean; // Staff can access this
-}
-
-interface NavGroup {
-  title: string;
-  items: NavItem[];
-  defaultCollapsed?: boolean;
-  adminOnly?: boolean; // Only admins can see this group
-}
-
-const navGroups: NavGroup[] = [
-  {
-    title: 'Mon Compte',
-    items: [
-      {
-        href: '/admin/profile',
-        label: 'Mon Profil',
-        icon: User,
-        description: 'Gérer mon profil et mot de passe',
-        staffAccessible: true
-      }
-    ],
-    defaultCollapsed: false
-  },
-  {
-    title: 'Activité Principale',
-    items: [
-      {
-        href: '/admin',
-        label: 'Tableau de Bord',
-        icon: LayoutDashboard,
-        description: 'Aperçu et analyses',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/products',
-        label: 'Produits',
-        icon: Package,
-        description: 'Gérer le catalogue de produits',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/categories',
-        label: 'Catégories',
-        icon: FolderOpen,
-        description: 'Organiser les produits',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/customers',
-        label: 'Clients',
-        icon: Users,
-        description: 'Base de données clients',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/appointments',
-        label: 'Rendez-vous',
-        icon: Calendar,
-        description: 'Gestion des rendez-vous',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/testimonials',
-        label: 'Témoignages',
-        icon: MessageSquare,
-        description: 'Avis clients',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/banners',
-        label: 'Bannières',
-        icon: Image,
-        description: 'Gérer les bannières du site',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/services',
-        label: 'Services',
-        icon: Wrench,
-        description: 'Gérer les services affichés',
-        staffAccessible: true
-      }
-    ],
-    defaultCollapsed: false
-  },
-  {
-    title: 'Administration',
-    items: [
-      {
-        href: '/admin/users',
-        label: 'Utilisateurs',
-        icon: UserCheck,
-        description: 'Gérer les comptes utilisateurs',
-        adminOnly: true
-      },
-      {
-        href: '/admin/roles',
-        label: 'Rôles & Permissions',
-        icon: Shield,
-        description: 'Gérer les rôles et permissions',
-        adminOnly: true
-      },
-      {
-        href: '/admin/settings',
-        label: 'Paramètres',
-        icon: Settings,
-        description: 'Configuration du système',
-        adminOnly: true
-      }
-    ],
-    adminOnly: true,
-    defaultCollapsed: true
-  },
-  {
-    title: 'Contenu & CMS',
-    items: [
-      {
-        href: '/admin/content/home',
-        label: 'Accueil',
-        icon: Home,
-        description: 'Page d\'accueil',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/content/about',
-        label: 'A propos',
-        icon: Info,
-        description: 'A propos de nous',
-        staffAccessible: true
-      },
-      {
-        href: '/admin/content/faq',
-        label: 'FAQ',
-        icon: Info,
-        description: 'Questions fréquentes',
-        staffAccessible: true
-      },
-      // {
-      //   href: '/admin/content/seo',
-      //   label: 'SEO',
-      //   icon: Search,
-      //   description: 'Gérer le SEO du site',
-      //   staffAccessible: true
-      // }
-      // ,
-      {
-        href: '/admin/content/operations',
-        label: 'Opérations',
-        icon: Settings,
-        description: 'Gérer les opérations du site',
-        staffAccessible: true
-      }
-    ],
-    defaultCollapsed: true
-  }
-];
+import { filterNavigationByRole } from './navigationConfig';
 
 interface AdminSidebarProps {
   user?: any;
@@ -201,95 +14,104 @@ interface AdminSidebarProps {
 }
 
 export default function AdminSidebar({ user, className = "", onSidebarCollapse }: AdminSidebarProps) {
-  // Sidebar collapse state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  
-  // Initialize collapsed state based on defaultCollapsed property
+  const [showTopIndicator, setShowTopIndicator] = useState(false);
+  const [showBottomIndicator, setShowBottomIndicator] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
+
+  // measure header height (updates on resize)
+  useEffect(() => {
+    const update = () => {
+      setHeaderHeight(headerRef.current?.getBoundingClientRect().height ?? 0);
+    };
+    update();
+    window.addEventListener('resize', update);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && headerRef.current) {
+      ro = new ResizeObserver(update);
+      ro.observe(headerRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', update);
+      if (ro) ro.disconnect();
+    };
+  }, []);
+
+  // collapsed groups init
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>();
-    navGroups.forEach(group => {
-      if (group.defaultCollapsed) {
-        initial.add(group.title);
-      }
+    filterNavigationByRole(user).forEach(group => {
+      if (group.defaultCollapsed) initial.add(group.title);
     });
     return initial;
   });
-  
-  const pathname = usePathname();
 
-  // Notify parent of initial state
+  const pathname = usePathname();
+  const navGroups = filterNavigationByRole(user);
+
   useEffect(() => {
-    onSidebarCollapse?.(isSidebarCollapsed);
-  }, [isSidebarCollapsed, onSidebarCollapse]); // Run when state changes
+    if (onSidebarCollapse) onSidebarCollapse(isSidebarCollapsed);
+  }, [isSidebarCollapsed, onSidebarCollapse]);
 
   const toggleGroup = (groupTitle: string) => {
     setCollapsedGroups(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(groupTitle)) {
-        newSet.delete(groupTitle);
-      } else {
-        newSet.add(groupTitle);
+      const n = new Set(prev);
+      if (n.has(groupTitle)) n.delete(groupTitle);
+      else n.add(groupTitle);
+      return n;
+    });
+  };
+
+  const toggleSidebar = () => setIsSidebarCollapsed(s => !s);
+
+  const handleScroll = () => {
+    if (!navRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = navRef.current;
+    const pct = scrollTop / (scrollHeight - clientHeight || 1);
+    setShowTopIndicator(scrollTop > 10);
+    setShowBottomIndicator(pct < 0.95);
+  };
+
+  useEffect(() => {
+    handleScroll();
+  }, [navGroups, isSidebarCollapsed]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key.toLowerCase() === 'b') {
+          e.preventDefault();
+          toggleSidebar();
+        }
       }
-      return newSet;
-    });
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(prev => {
-      const newState = !prev;
-      onSidebarCollapse?.(newState);
-      return newState;
-    });
-  };
-
-  // Simple role-based filtering
-  const isAdmin = user?.isAdmin || false;
-  const isStaff = user?.isStaff || false;
-
-  const filteredNavGroups = navGroups.filter(group => {
-    // If group is admin-only, only show to admins
-    if (group.adminOnly && !isAdmin) return false;
-    
-    // Filter items within each group
-    const filteredItems = group.items.filter(item => {
-      // If item is admin-only, only show to admins
-      if (item.adminOnly && !isAdmin) return false;
-      
-      // If item is staff-accessible, show to both admin and staff
-      if (item.staffAccessible) return true;
-      
-      // Default: only show to admins
-      return isAdmin;
-    });
-
-    // Only show groups that have visible items
-    return filteredItems.length > 0;
-  });
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
-    <aside className={`fixed left-0 top-0 h-screen z-50 bg-background/80 backdrop-blur-xl border-r border-border/60 flex flex-col transition-all duration-300 ${
-      isSidebarCollapsed ? 'w-16' : 'w-64'
-    } ${className}`}>
-      {/* Header */}
-      <div className="p-4 border-b border-border/60">
+    <aside
+      className={`fixed left-0 top-0 h-screen z-50 bg-background/80 backdrop-blur-xl border-r border-border/60 flex flex-col min-h-0 ${
+        isSidebarCollapsed ? 'w-16' : 'w-64'
+      } ${className}`}
+    >
+      {/* Header (we measure this) */}
+      <div ref={headerRef} className="p-4 border-b border-border/60">
         <div className="flex items-center justify-between">
-          {!isSidebarCollapsed && (
-            <h2 className="text-lg font-semibold text-foreground">Administration</h2>
-          )}
+          {!isSidebarCollapsed && <h2 className="text-lg font-semibold text-foreground">Administration</h2>}
           <div className="flex items-center gap-2">
             <button
               onClick={toggleSidebar}
               className="p-1 rounded-md hover:bg-muted/50 transition-colors"
-              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={isSidebarCollapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
+              aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {isSidebarCollapsed ? (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-              )}
+              {isSidebarCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronLeft className="h-4 w-4 text-muted-foreground" />}
             </button>
             {!isSidebarCollapsed && (
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Go to homepage">
                 <Home className="h-4 w-4" />
               </Link>
             )}
@@ -297,33 +119,40 @@ export default function AdminSidebar({ user, className = "", onSidebarCollapse }
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-4">
-        {filteredNavGroups.map((group) => (
-          <div key={group.title} className="space-y-2">
-            {!isSidebarCollapsed && (
-              <button
-                onClick={() => toggleGroup(group.title)}
-                className="flex items-center justify-between w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded-md hover:bg-muted/50"
-              >
-                <span>{group.title}</span>
-                {collapsedGroups.has(group.title) ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronUp className="h-4 w-4" />
-                )}
-              </button>
-            )}
-            
-            {(!isSidebarCollapsed && !collapsedGroups.has(group.title)) && (
-              <div className="space-y-1 ml-2">
-                {group.items
-                  .filter(item => {
-                    if (item.adminOnly && !isAdmin) return false;
-                    if (item.staffAccessible) return true;
-                    return isAdmin;
-                  })
-                  .map((item) => (
+      {/* Nav: force height = viewport - headerHeight so it MUST scroll */}
+      <div className="relative flex-1 min-h-0">
+        {showTopIndicator && !isSidebarCollapsed && (
+          <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-background/80 to-transparent z-10 pointer-events-none" />
+        )}
+
+        {showBottomIndicator && !isSidebarCollapsed && (
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-background/80 to-transparent z-10 pointer-events-none" />
+        )}
+
+        <nav
+          ref={navRef}
+          onScroll={handleScroll}
+          // IMPORTANT: fixed-height calc ensures scroll works even if flex styles elsewhere are wrong.
+          style={{ height: `calc(100vh - ${headerHeight}px)` }}
+          className="overflow-y-auto overflow-x-hidden p-4 space-y-4 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent hover:scrollbar-thumb-muted-foreground/50"
+        >
+          {navGroups.map(group => (
+            <div key={group.title} className="space-y-2">
+              {!isSidebarCollapsed && (
+                <button
+                  onClick={() => toggleGroup(group.title)}
+                  className="flex items-center justify-between w-full text-left text-sm font-semibold text-muted-foreground py-2 px-2 rounded-md hover:text-foreground hover:bg-muted/50 transition-colors"
+                  aria-label={`Toggle ${group.title} section`}
+                  aria-expanded={!collapsedGroups.has(group.title)}
+                >
+                  <span className="uppercase tracking-wide">{group.title}</span>
+                  {collapsedGroups.has(group.title) ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+              )}
+
+              {(!isSidebarCollapsed && !collapsedGroups.has(group.title)) && (
+                <div className="space-y-1 ml-2">
+                  {group.items.map(item => (
                     <AdminNavItem
                       key={item.href}
                       href={item.href}
@@ -335,19 +164,12 @@ export default function AdminSidebar({ user, className = "", onSidebarCollapse }
                       isCollapsed={isSidebarCollapsed}
                     />
                   ))}
-              </div>
-            )}
+                </div>
+              )}
 
-            {/* Show only icons when sidebar is collapsed */}
-            {isSidebarCollapsed && (
-              <div className="space-y-1">
-                {group.items
-                  .filter(item => {
-                    if (item.adminOnly && !isAdmin) return false;
-                    if (item.staffAccessible) return true;
-                    return isAdmin;
-                  })
-                  .map((item) => (
+              {isSidebarCollapsed && (
+                <div className="space-y-1">
+                  {group.items.map(item => (
                     <AdminNavItem
                       key={item.href}
                       href={item.href}
@@ -356,14 +178,15 @@ export default function AdminSidebar({ user, className = "", onSidebarCollapse }
                       description={item.description}
                       badge={item.badge}
                       isActive={pathname === item.href}
-                      isCollapsed={true}
+                      isCollapsed
                     />
                   ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </nav>
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
     </aside>
   );
 }

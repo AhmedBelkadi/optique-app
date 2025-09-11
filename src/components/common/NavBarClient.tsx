@@ -26,33 +26,26 @@ export default function NavBarClient() {
 
     return (
         <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {navigationItems.map((item, index) => {
-                const isSecondary = index % 2 === 1; // Alternate between primary and secondary styling
+            {navigationItems.map((item) => {
                 return (
                     <Link 
                         key={item.href}
                         href={item.href} 
                         className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative group ${
-                            isActive(item.href) 
-                                ? isSecondary
-                                    ? 'text-secondary bg-secondary/10 border border-secondary/20'
-                                    : 'text-primary bg-primary/10 border border-primary/20'
-                                : isSecondary
-                                    ? 'text-foreground hover:text-secondary hover:bg-secondary/5'
-                                    : 'text-foreground hover:text-primary hover:bg-primary/5'
+                            isActive(item.href) ? 'text-primary' : 'text-gray-700 hover:text-primary'
                         }`}
                     >
                         <item.icon className={`w-4 h-4 mr-2 transition-colors duration-300 ${
                             isActive(item.href) 
-                                ? isSecondary ? 'text-secondary' : 'text-primary'
-                                : isSecondary ? 'group-hover:text-secondary' : 'group-hover:text-primary'
+                                ? 'text-primary'
+                                : 'text-gray-700 group-hover:text-primary'
                         }`} />
                         {item.label}
                         {/* Hover underline effect */}
                         <div className={`absolute -bottom-1 left-3 right-3 h-0.5 transition-all duration-300 ${
                             isActive(item.href)
-                                ? isSecondary ? 'bg-secondary' : 'bg-primary'
-                                : isSecondary ? 'bg-secondary scale-x-0 group-hover:scale-x-100' : 'bg-primary scale-x-0 group-hover:scale-x-100'
+                                ? 'bg-primary'
+                                : 'bg-primary scale-x-0 group-hover:scale-x-100'
                         }`}></div>
                     </Link>
                 );

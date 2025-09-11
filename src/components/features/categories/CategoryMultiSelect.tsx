@@ -49,10 +49,10 @@ export default function CategoryMultiSelect({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
+            variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-10 px-3 py-2 text-sm border-border hover:border-slate-300 focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+            className="w-full justify-between h-10 px-3 py-2 text-sm border-border focus:border-primary focus:ring-1 focus:ring-primary hover:bg-background hover:text-foreground hover:border-border hover:shadow-sm hover:scale-100"
           >
             <span className="truncate text-left">
               {selectedCategories.length === 0
@@ -81,7 +81,7 @@ export default function CategoryMultiSelect({
                   <CommandItem
                     key={category.id}
                     onSelect={() => handleSelect(category.id)}
-                    className="flex items-center space-x-2 px-3 py-2 cursor-pointer hover:bg-muted/50 data-[selected=true]:bg-muted"
+                    className="flex items-center space-x-2 px-3 py-2 cursor-pointer data-[selected=true]:bg-muted"
                   >
                     <Check
                       className={cn(
@@ -107,15 +107,15 @@ export default function CategoryMultiSelect({
             <Badge
               key={category.id}
               variant="secondary"
-              className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs bg-primary/10 text-primary border border-primary/20"
             >
               <span className="truncate max-w-[120px]">{category.name}</span>
               <button
                 type="button"
                 onClick={() => handleRemove(category.id)}
-                className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                className="ml-1 rounded-full p-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
               >
-                <X className="h-3 w-3 text-primary hover:text-primary" />
+                <X className="h-3 w-3 text-primary" />
               </button>
             </Badge>
           ))}

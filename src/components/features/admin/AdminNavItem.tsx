@@ -33,43 +33,37 @@ export default function AdminNavItem({
   description,
   className = ""
 }: AdminNavItemProps) {
-  const getHoverStyles = () => {
-    if (href.includes('trash')) {
-      return 'text-foreground hover:bg-gradient-to-r hover:from-destructive/10 hover:to-destructive/10 hover:text-destructive hover:shadow-sm hover:shadow-destructive/20 active:from-destructive/20 active:to-destructive/15';
-    }
-    if (href.includes('settings')) {
-      return 'text-foreground hover:bg-gradient-to-r hover:from-muted/60 hover:to-muted/40 hover:text-muted-foreground hover:shadow-sm active:from-muted/80 active:to-muted/60';
-    }
-    return 'text-foreground hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:text-primary hover:shadow-sm hover:shadow-primary/20 active:from-primary/20 active:to-primary/15';
-  };
-
   const getActiveStyles = () => {
-    if (!isActive) return '';
+    if (!isActive) {
+      return 'text-muted-foreground hover:text-primary hover:bg-primary/10 hover:border-l-3 hover:border-l-primary hover:shadow-sm';
+    }
     
     if (href.includes('trash')) {
-      return 'bg-gradient-to-r from-destructive/20 via-destructive/15 to-destructive/10 text-destructive border-l-2 border-l-destructive shadow-sm shadow-destructive/30';
+      return 'bg-destructive/10 text-destructive border-l-3 border-l-destructive shadow-sm hover:bg-destructive/15';
     }
     if (href.includes('settings')) {
-      return 'bg-gradient-to-r from-muted/30 via-muted/20 to-muted/10 text-muted-foreground border-l-2 border-l-muted-foreground shadow-sm shadow-muted/30';
+      return 'bg-muted/20 text-muted-foreground border-l-3 border-l-muted-foreground shadow-sm hover:bg-muted/30';
     }
-    return 'bg-gradient-to-r from-primary/20 via-primary/15 to-primary/10 text-primary border-l-2 border-primary shadow-sm shadow-primary/30';
+    return 'bg-primary/10 text-primary border-l-3 border-primary shadow-sm hover:bg-primary/15';
   };
 
   const navItem = (
     <Link
       href={href}
-      className={`flex items-center rounded-xl transition-all duration-200 group relative min-h-[44px] ${
+      className={`flex items-center rounded-xl min-h-[44px] transition-colors duration-200 ${
         isCollapsed ? 'justify-center w-12 h-11 mx-auto' : 'justify-start px-3 py-2.5 w-full'
-      } ${getActiveStyles()} ${getHoverStyles()} ${className}`}
+      } ${getActiveStyles()} ${className}`}
+      aria-label={isCollapsed ? `${label}${description ? ` - ${description}` : ''}` : undefined}
+      tabIndex={0}
     >
-      <Icon className={`transition-all duration-200 group-hover:scale-110 ${
-        isCollapsed ? 'w-4 w-4' : 'w-4 w-4 mr-3'
-      }`} />
+      <Icon className={`${
+        isCollapsed ? 'w-4 h-4' : 'w-4 h-4 mr-3'
+      } ${isActive ? 'text-primary' : ''}`} />
       
       {!isCollapsed && (
         <>
           <div className="flex-1 min-w-0">
-            <span className="font-semibold block text-sm">{label}</span>
+            <span className={`font-semibold block text-sm ${isActive ? 'text-primary' : ''}`}>{label}</span>
             {description && (
               <span className="text-xs text-muted-foreground/70 block truncate mt-0.5 leading-tight">
                 {description}
@@ -79,7 +73,7 @@ export default function AdminNavItem({
           {badge && (
             <Badge 
               variant={badge.variant} 
-              className="ml-auto text-xs flex-shrink-0 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+              className="ml-auto text-xs flex-shrink-0 bg-primary/10 text-primary border-primary/20"
             >
               {badge.count}
             </Badge>
@@ -89,11 +83,8 @@ export default function AdminNavItem({
 
       {/* Active indicator for collapsed state */}
       {isCollapsed && isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-sm shadow-primary/50" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-sm" />
       )}
-
-      {/* Touch feedback overlay for mobile */}
-      <div className="absolute inset-0 rounded-xl bg-transparent transition-colors duration-150 group-active:bg-primary/5" />
     </Link>
   );
 
@@ -104,7 +95,7 @@ export default function AdminNavItem({
           <TooltipTrigger asChild>
             {navItem}
           </TooltipTrigger>
-          <TooltipContent side="right" className="bg-primary border border-border max-w-xs shadow-lg">
+          <TooltipContent side="right" className="bg-primary border border-border max-w-xs">
             <div className="space-y-1.5">
               <p className="font-semibold text-primary-foreground">{label}</p>
               {description && (

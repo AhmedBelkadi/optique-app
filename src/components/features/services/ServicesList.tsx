@@ -153,13 +153,7 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Services</h2>
-          <p className="text-muted-foreground">
-            Gérez les services affichés dans le footer et sur la page de rendez-vous
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-3">
         <div className="w-full sm:w-auto flex gap-2">
           <ServiceForm onSuccess={onRefresh} onServiceCreated={onServiceCreated} />
         </div>
@@ -167,8 +161,8 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
 
       {/* Services List */}
       <Card>
-        <CardHeader>
-          <CardTitle>Liste des Services</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">Liste des Services</CardTitle>
         </CardHeader>
         <CardContent>
           {sortedServices.length > 0 ? (
@@ -177,17 +171,17 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
               onReorder={handleReorderServices}
               getId={(service) => service.id}
               renderItem={(service, index) => (
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-lg border hover:bg-muted/30 transition-colors">
                   <div className="flex-1 min-w-0">
                     {/* Header with title and order */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2 sm:mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                           {service.name}
                         </h3>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] sm:text-xs font-medium bg-blue-100 text-blue-800">
                           #{index + 1}
                         </span>
                         <Badge variant={service.isActive ? "default" : "secondary"}>
@@ -224,10 +218,10 @@ export function ServicesList({ services, onRefresh, onServiceCreated, onServiceU
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 ml-0 sm:ml-4 self-stretch sm:self-auto">
+                  <div className="flex items-center gap-2 ml-0 sm:ml-4 self-stretch sm:self-auto w-full sm:w-auto justify-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="w-full sm:w-auto justify-between">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>

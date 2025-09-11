@@ -228,7 +228,7 @@ export function PasswordChangeForm() {
               <Button 
                 type="submit" 
                 disabled={isPending}
-                className="min-w-[140px] h-11 bg-gradient-to-r from-primary to-green-600 hover:from-primary/90 hover:to-green-600/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full h-11 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 {isPending ? (
                   <>

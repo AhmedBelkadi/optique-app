@@ -557,42 +557,42 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     const status = getBannerStatus(banner);
                     const timeRemaining = getTimeRemaining(banner);
                     return (
-                      <Card key={banner.id} className="p-4 border-l-4 border-l-green-500 hover:shadow-md transition-all duration-200 group">
-                        <div className="flex items-start justify-between gap-3">
+                      <Card key={banner.id} className="p-3 sm:p-4 border-l-4 border-l-green-500 hover:shadow-md transition-all duration-200 group">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div className="flex-1 space-y-3 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Badge variant={status.variant} className={`${status.color} transition-colors`}>
+                              <Badge variant={status.variant} className={`${status.color} transition-colors text-xs`}>
                                 {status.label}
                               </Badge>
-                              <Eye className="h-4 w-4 text-green-600" />
+                              <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                               {timeRemaining && (
                                 <span className="text-xs text-muted-foreground bg-green-50 px-2 py-1 rounded-full">
                                   {timeRemaining}
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                            <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
-                                <Calendar className="h-3 w-3" />
-                                Starts: {formatDate(banner.startDate)}
+                                <Calendar className="h-3 w-3 flex-shrink-0" />
+                                <span className="truncate">Starts: {formatDate(banner.startDate)}</span>
                               </span>
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
-                                <Clock className="h-3 w-3" />
-                                Ends: {formatDate(banner.endDate)}
+                                <Clock className="h-3 w-3 flex-shrink-0" />
+                                <span className="truncate">Ends: {formatDate(banner.endDate)}</span>
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center justify-end sm:justify-start gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleEdit(banner)}
-                                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 sm:h-8 sm:w-8"
                                 >
-                                  <Edit className="h-4 w-4" />
+                                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>Edit Banner</TooltipContent>
@@ -604,9 +604,9 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleToggle(banner.id, banner.isActive)}
-                                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 sm:h-8 sm:w-8"
                                 >
-                                  <EyeOff className="h-4 w-4" />
+                                  <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>Deactivate Banner</TooltipContent>
@@ -618,12 +618,12 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   variant="ghost"
                                   size="sm"
                                   disabled={isDeletePending && deletingBannerId === banner.id}
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 sm:h-8 sm:w-8"
                                 >
                                   {isDeletePending && deletingBannerId === banner.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                                   ) : (
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                   )}
                                 </Button>
                               </AlertDialogTrigger>
@@ -665,37 +665,37 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                   {inactiveBanners.map((banner) => {
                     const status = getBannerStatus(banner);
                     return (
-                      <Card key={banner.id} className="p-4 border-l-4 border-l-gray-300 opacity-75 hover:opacity-100 hover:shadow-md transition-all duration-200 group">
-                        <div className="flex items-start justify-between gap-3">
+                      <Card key={banner.id} className="p-3 sm:p-4 border-l-4 border-l-gray-300 opacity-75 hover:opacity-100 hover:shadow-md transition-all duration-200 group">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div className="flex-1 space-y-3 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Badge variant={status.variant} className={`${status.color} transition-colors`}>
+                              <Badge variant={status.variant} className={`${status.color} transition-colors text-xs`}>
                                 {status.label}
                               </Badge>
-                              <EyeOff className="h-4 w-4 text-gray-400" />
+                              <EyeOff className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
                             </div>
-                            <p className="text-sm font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
+                            <p className="text-sm sm:text-base font-medium leading-relaxed text-foreground break-words">{banner.text}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
-                                <Calendar className="h-3 w-3" />
-                                Started: {formatDate(banner.startDate)}
+                                <Calendar className="h-3 w-3 flex-shrink-0" />
+                                <span className="truncate">Started: {formatDate(banner.startDate)}</span>
                               </span>
                               <span className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-md">
-                                <Clock className="h-3 w-3" />
-                                Ended: {formatDate(banner.endDate)}
+                                <Clock className="h-3 w-3 flex-shrink-0" />
+                                <span className="truncate">Ended: {formatDate(banner.endDate)}</span>
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center justify-end sm:justify-start gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleEdit(banner)}
-                                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 sm:h-8 sm:w-8"
                                 >
-                                  <Edit className="h-4 w-4" />
+                                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>Edit Banner</TooltipContent>
@@ -707,9 +707,9 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleToggle(banner.id, banner.isActive)}
-                                  className="text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  className="text-muted-foreground hover:text-foreground hover:bg-muted h-8 w-8 sm:h-8 sm:w-8"
                                 >
-                                  <Eye className="h-4 w-4" />
+                                  <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>Activate Banner</TooltipContent>
@@ -721,12 +721,12 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                                   variant="ghost"
                                   size="sm"
                                   disabled={isDeletePending && deletingBannerId === banner.id}
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 sm:h-8 sm:w-8"
                                 >
                                   {isDeletePending && deletingBannerId === banner.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                                   ) : (
-                                    <Trash2 className="h-4 w-4" />
+                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                   )}
                                 </Button>
                               </AlertDialogTrigger>

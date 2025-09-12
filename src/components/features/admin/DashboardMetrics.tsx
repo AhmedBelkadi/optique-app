@@ -81,13 +81,13 @@ export default async function DashboardMetrics() {
   const getStatusStyles = (status: 'normal' | 'warning' | 'danger' | 'info') => {
     switch (status) {
       case 'warning':
-        return 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition-colors';
+        return 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:border-amber-300 hover:shadow-amber-200/50 hover:shadow-lg transition-all duration-300 ease-out';
       case 'danger':
-        return 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100 transition-colors';
+        return 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100 hover:border-red-300 hover:shadow-red-200/50 hover:shadow-lg transition-all duration-300 ease-out';
       case 'info':
-        return 'border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 transition-colors';
+        return 'border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 hover:border-blue-300 hover:shadow-blue-200/50 hover:shadow-lg transition-all duration-300 ease-out';
       default:
-        return 'border-green-200 bg-green-50 text-green-800 hover:bg-green-100 transition-colors';
+        return 'border-green-200 bg-green-50 text-green-800 hover:bg-green-100 hover:border-green-300 hover:shadow-green-200/50 hover:shadow-lg transition-all duration-300 ease-out';
     }
   };
 
@@ -99,14 +99,14 @@ export default async function DashboardMetrics() {
           return (
             <Card 
               key={metric.title} 
-              className={`border-2 cursor-pointer transform hover:scale-105 transition-all duration-200 ${getStatusStyles(metric.status)}`}
+              className={`border-2 cursor-pointer transform hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 ease-out hover:shadow-xl group ${getStatusStyles(metric.status)}`}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
-                <IconComponent className="h-4 w-4 text-muted-foreground" />
+                <IconComponent className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metric.value.toLocaleString()}</div>
+                <div className="text-2xl font-bold group-hover:text-primary transition-colors duration-300">{metric.value.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">{metric.description}</p>
                 
                 {metric.alert && (
@@ -122,7 +122,7 @@ export default async function DashboardMetrics() {
       </div>
 
       {(productsWithoutImages > 0 || productsWithoutCategories > 0) && (
-        <Card className="border-amber-200 bg-amber-50 hover:bg-amber-100 transition-colors">
+        <Card className="border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 hover:shadow-amber-200/50 hover:shadow-lg transition-all duration-300 ease-out">
           <CardHeader>
             <CardTitle className="text-amber-800 flex items-center">
               <AlertTriangle className="h-5 w-5 mr-2" />
@@ -153,7 +153,7 @@ export default async function DashboardMetrics() {
       )}
 
       {todaysAppointments.length > 0 && (
-        <Card className="hover:shadow-md transition-shadow">
+        <Card className="hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 ease-out border-border/50 hover:border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Calendar className="h-5 w-5 mr-2" />
@@ -163,7 +163,7 @@ export default async function DashboardMetrics() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {Object.entries(appointmentStatusCounts).map(([status, count]) => (
-                <div key={status} className="text-center p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                <div key={status} className="text-center p-3 bg-muted/30 rounded-lg hover:bg-muted/50 hover:scale-105 hover:shadow-md transition-all duration-200 ease-out">
                   <div className="text-2xl font-bold text-primary">{count}</div>
                   <div className="text-xs text-muted-foreground capitalize">{status.toLowerCase().replace('_', ' ')}</div>
                 </div>

@@ -81,7 +81,7 @@ export default function CategoryImageUpload({
           <div className="w-32 h-32 relative rounded-lg overflow-hidden border">
             <Image
               src={preview}
-              alt="Category preview"
+              alt="Aperçu de la catégorie"
               fill
               className="object-cover"
             />

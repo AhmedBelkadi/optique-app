@@ -21,12 +21,12 @@ export default async function RolesPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <AdminPageConfig
-        title="Role Management"
-        subtitle="Manage user roles and their associated permissions"
+        title="Gestion des Rôles"
+        subtitle="Gérer les rôles utilisateur et leurs permissions associées"
       />
       
       {/* Role Management Component */}
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Chargement...</div>}>
         <RoleManagement roles={rolesWithDetails} permissions={permissions} />
       </Suspense>
     </div>

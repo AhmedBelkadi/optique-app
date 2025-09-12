@@ -50,19 +50,19 @@ export const authSchema = {
       )
       .refine(
         (password) => /[A-Z]/.test(password),
-        "Password must contain at least one uppercase letter"
+        "Le mot de passe doit contenir au moins une lettre majuscule"
       )
       .refine(
         (password) => /[a-z]/.test(password),
-        "Password must contain at least one lowercase letter"
+        "Le mot de passe doit contenir au moins une lettre minuscule"
       )
       .refine(
         (password) => /[0-9]/.test(password),
-        "Password must contain at least one number"
+        "Le mot de passe doit contenir au moins un chiffre"
       )
       .refine(
         (password) => /[^A-Za-z0-9]/.test(password),
-        "Password must contain at least one special character"
+        "Le mot de passe doit contenir au moins un caractère spécial"
       ),
     confirmPassword: z.string(),
   }).refine(

@@ -8,16 +8,16 @@ import { toast } from 'react-hot-toast';
 interface TestimonialImageUploadProps {
   value?: string;
   onChange: (value: string) => void;
+  onFileChange: (file: File | null) => void;
   onRemove: () => void;
   disabled?: boolean;
 }
 
-export default function TestimonialImageUpload({ value, onChange, onRemove, disabled }: TestimonialImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
+export default function TestimonialImageUpload({ value, onChange, onFileChange, onRemove, disabled }: TestimonialImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileSelect = (file: File) => {
     if (!file) return;
 
     // Validate file type
@@ -32,36 +32,14 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
       return;
     }
 
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', 'testimonials');
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Upload failed: ${response.status}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        onChange(result.url);
-        toast.success('Image téléchargée avec succès !');
-      } else {
-        throw new Error(result.error || 'Upload failed');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error(`Échec du téléchargement: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-    } finally {
-      setIsUploading(false);
-    }
+    // Create preview URL for immediate display
+    const previewUrl = URL.createObjectURL(file);
+    onChange(previewUrl);
+    onFileChange(file);
+    
+    toast.success('Image sélectionnée ! Cliquez sur "Enregistrer" pour télécharger.', {
+      duration: 4000,
+    });
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -70,7 +48,7 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
 
     const files = e.dataTransfer.files;
     if (files && files[0]) {
-      handleFileUpload(files[0]);
+      handleFileSelect(files[0]);
     }
   };
 
@@ -84,15 +62,20 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
     setDragActive(false);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
-      handleFileUpload(files[0]);
+      handleFileSelect(files[0]);
     }
   };
 
   const handleRemove = () => {
+    // Clean up preview URL if it's a blob URL
+    if (value && value.startsWith('blob:')) {
+      URL.revokeObjectURL(value);
+    }
     onRemove();
+    onFileChange(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -105,7 +88,7 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
         <div className="relative">
           <img
             src={value}
-            alt="Testimonial"
+            alt="Témoignage"
             className="w-32 h-32 object-cover rounded-lg border"
           />
           <Button
@@ -113,7 +96,7 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
             variant="destructive"
             size="sm"
             onClick={handleRemove}
-            disabled={disabled || isUploading}
+            disabled={disabled}
             className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
           >
             <X className="h-3 w-3" />
@@ -134,33 +117,23 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
           onDragLeave={handleDragLeave}
         >
           <div className="flex flex-col items-center gap-2">
-            {isUploading ? (
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            ) : (
-              <Upload className="h-8 w-8 text-muted-foreground" />
-            )}
+            <Upload className="h-8 w-8 text-muted-foreground" />
             
             <div className="text-sm">
-              {isUploading ? (
-                <p className="text-muted-foreground">Téléchargement en cours...</p>
-              ) : (
-                <>
-                  <p className="text-muted-foreground">
-                    Glissez-déposez une image ici ou{' '}
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={disabled}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      cliquez pour sélectionner
-                    </button>
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    PNG, JPG jusqu'à 5MB
-                  </p>
-                </>
-              )}
+              <p className="text-muted-foreground">
+                Glissez-déposez une image ici ou{' '}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={disabled}
+                  className="text-primary hover:underline font-medium"
+                >
+                  cliquez pour sélectionner
+                </button>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                PNG, JPG jusqu'à 5MB
+              </p>
             </div>
           </div>
         </div>
@@ -171,9 +144,9 @@ export default function TestimonialImageUpload({ value, onChange, onRemove, disa
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleFileSelect}
+        onChange={handleInputChange}
         className="hidden"
-        disabled={disabled || isUploading}
+        disabled={disabled}
       />
     </div>
   );

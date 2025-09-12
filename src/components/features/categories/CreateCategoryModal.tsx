@@ -7,7 +7,6 @@ import { useActionState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Plus, Loader2 } from 'lucide-react';
 import { createCategoryAction } from '@/features/categories/actions/createCategory';
-import { CreateCategoryState } from '@/types/api';
 import {
   Dialog,
   DialogContent,
@@ -71,7 +70,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
     if (previousIsPending.current && !isPending) {
       if (state.success) {
         // Show success toast
-        toast.success('Category created successfully!', {
+        toast.success('Catégorie créée avec succès !', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -88,7 +87,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
         onClose();
       } else if (state.error) {
         // Show error toast
-        toast.error(state.error || 'Failed to create category', {
+        toast.error(state.error || 'Échec de la création de la catégorie', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -116,10 +115,10 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold text-foreground">
-                Create New Category
+                Créer une Nouvelle Catégorie
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Add a new category to organize your products
+                Ajouter une nouvelle catégorie pour organiser vos produits
               </p>
             </div>
           </div>
@@ -143,7 +142,7 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
               <Input
                 id="name"
                 name="name"
-                placeholder="Enter category name"
+                placeholder="Entrez le nom de la catégorie"
                 disabled={isPending}
                 required
                 className={state.fieldErrors?.name ? 'border-destructive' : ''}
@@ -196,12 +195,12 @@ export default function CreateCategoryModal({ open, onClose, onSuccess }: Create
                 {isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    Création...
                   </>
                 ) : (
                   <>
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Category
+                    Créer la Catégorie
                   </>
                 )}
               </Button>

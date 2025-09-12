@@ -540,7 +540,7 @@ export default function SettingsForm({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading CSRF token...</p>
+            <p className="text-muted-foreground">Chargement du jeton de sécurité...</p>
         </div>
       </div>
     );
@@ -551,11 +551,11 @@ export default function SettingsForm({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="text-destructive mb-4">
-            <p className="text-lg font-semibold">Failed to load security token</p>
+            <p className="text-lg font-semibold">Erreur lors du chargement du jeton de sécurité</p>
             <p className="text-sm text-muted-foreground mt-2">{csrfError}</p>
         </div>
           <Button onClick={retry} variant="default">
-            Retry
+            Réessayer
           </Button>
         </div>
       </div>
@@ -567,9 +567,9 @@ export default function SettingsForm({
       {/* Header Info */}
       <div className="bg-muted/50 border border-border rounded-lg p-4">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">Live Preview</Badge>
+          <Badge variant="secondary">Aperçu en Direct</Badge>
           <span className="text-sm text-muted-foreground">
-            Theme changes are applied in real-time. Save your changes to persist them.
+            Les modifications du thème sont appliquées en temps réel. Enregistrez vos modifications pour les conserver.
           </span>
         </div>
       </div>
@@ -580,19 +580,19 @@ export default function SettingsForm({
             value="site" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Site
+            Site *
           </TabsTrigger>
           <TabsTrigger 
             value="contact" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Contact
+            Contact *
           </TabsTrigger>
           <TabsTrigger 
             value="theme" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Theme
+            Thème *
           </TabsTrigger>
          
         </TabsList>
@@ -601,19 +601,19 @@ export default function SettingsForm({
         <TabsContent value="site" className="space-y-6">
                   <Card>
                     <CardHeader>
-              <CardTitle>Site Information</CardTitle>
+              <CardTitle>Informations du Site *</CardTitle>
               <CardDescription>
-                Basic information about your website
+                Informations de base sur votre site web
               </CardDescription>
                     </CardHeader>
             <CardContent>
               <form onSubmit={siteForm.handleSubmit(onSiteSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="siteName">Site Name *</Label>
+                  <Label htmlFor="siteName">Nom du Site *</Label>
                   <Input
                     id="siteName"
                     {...siteForm.register('siteName')}
-                    placeholder="Enter your site name"
+                    placeholder="Entrez le nom de votre site"
                     className={`transition-all duration-200 ${
                       siteForm.formState.errors.siteName 
                         ? 'border-destructive focus:border-destructive focus:ring-destructive' 
@@ -628,7 +628,7 @@ export default function SettingsForm({
                       </p>
                     )}
                     <span className={`text-xs ${
-                      (siteForm.watch('siteName') || '').length > 45 ? 'text-warning' : 'text-muted-foreground'
+                      (siteForm.watch('siteName') || '').length > 45 ? 'text-yellow-500' : 'text-muted-foreground'
                     }`}>
                       {(siteForm.watch('siteName') || '').length}/50
                     </span>
@@ -636,11 +636,11 @@ export default function SettingsForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="slogan">Slogan</Label>
+                  <Label htmlFor="slogan">Slogan *</Label>
                   <Input
                     id="slogan"
                     {...siteForm.register('slogan')}
-                    placeholder="Enter your site slogan"
+                    placeholder="Entrez le slogan de votre site *"
                     className={`transition-all duration-200 ${
                       siteForm.formState.errors.slogan 
                         ? 'border-destructive focus:border-destructive focus:ring-destructive' 
@@ -655,7 +655,7 @@ export default function SettingsForm({
                       </p>
                     )}
                     <span className={`text-xs ${
-                      (siteForm.watch('slogan') || '').length > 80 ? 'text-warning' : 'text-muted-foreground'
+                      (siteForm.watch('slogan') || '').length > 80 ? 'text-yellow-500' : 'text-muted-foreground'
                     }`}>
                       {(siteForm.watch('slogan') || '').length}/100
                     </span>
@@ -665,7 +665,7 @@ export default function SettingsForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <ImageUpload
-                      label="Logo"
+                      label="Logo *"
                       value={siteForm.watch('logoUrl')}
                       onChange={(value) => siteForm.setValue('logoUrl', value)}
                       onFileChange={setSelectedLogoFile}
@@ -681,7 +681,7 @@ export default function SettingsForm({
 
                   <div className="space-y-2">
                     <ImageUpload
-                      label="Hero Background Image"
+                      label="Image de Fond *"
                       value={siteForm.watch('heroBackgroundImg')}
                       onChange={(value) => siteForm.setValue('heroBackgroundImg', value)}
                       onFileChange={setSelectedHeroBackgroundFile}
@@ -696,7 +696,7 @@ export default function SettingsForm({
                   </div>
                   <div className="space-y-2">
                     <ImageUpload
-                      label="About Section Image"
+                        label="Image de la Section À Propos *"
                       value={(siteForm.watch('imageAboutSection') as any) || ''}
                       onChange={(value) => siteForm.setValue('imageAboutSection' as any, value as any)}
                       onFileChange={setSelectedAboutImageFile}
@@ -707,7 +707,7 @@ export default function SettingsForm({
                 </div>
 
                 <Button type="submit" disabled={isSitePending || csrfLoading}>
-                  {isSitePending ? 'Saving...' : 'Save Site Settings'}
+                    {isSitePending ? 'Enregistrement...' : 'Enregistrer les Paramètres du Site'}
                 </Button>
               </form>
                     </CardContent>
@@ -718,21 +718,21 @@ export default function SettingsForm({
         <TabsContent value="contact" className="space-y-6">
                   <Card>
                     <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
+                <CardTitle>Informations de Contact *</CardTitle>
               <CardDescription>
-                Contact details and location information
+                Informations de contact et informations de localisation
               </CardDescription>
                     </CardHeader>
             <CardContent>
               <form onSubmit={contactForm.handleSubmit(onContactSubmit)} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="contactEmail">Contact Email *</Label>
+                    <Label htmlFor="contactEmail">Email de Contact *</Label>
                     <Input
                       id="contactEmail"
                       {...contactForm.register('contactEmail')}
                       type="email"
-                      placeholder="contact@example.com"
+                      placeholder="contact@votre-site.com"
                       className={`transition-all duration-200 ${
                         contactForm.formState.errors.contactEmail || serverErrors.contactEmail
                           ? 'border-destructive focus:border-destructive focus:ring-destructive' 
@@ -744,7 +744,7 @@ export default function SettingsForm({
                       {(contactForm.formState.errors.contactEmail || serverErrors.contactEmail) && (
                         <p className="text-sm text-destructive flex items-center">
                           <X className="w-4 h-4 mr-1" />
-                          {contactForm.formState.errors.contactEmail?.message || serverErrors.contactEmail || 'Invalid email format'}
+                            {contactForm.formState.errors.contactEmail?.message || serverErrors.contactEmail || 'Format d\'email invalide'}
                         </p>
                       )}
                       <span className="text-xs text-muted-foreground">
@@ -754,11 +754,11 @@ export default function SettingsForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">Numéro de Téléphone *</Label>
                     <Input
                       id="phone"
                       {...contactForm.register('phone')}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+237 6 99 99 99 99"
                       className={`transition-all duration-200 ${
                         contactForm.formState.errors.phone || serverErrors.phone
                           ? 'border-destructive focus:border-destructive focus:ring-destructive' 
@@ -770,7 +770,7 @@ export default function SettingsForm({
                       {(contactForm.formState.errors.phone || serverErrors.phone) && (
                         <p className="text-sm text-destructive flex items-center">
                           <X className="w-4 h-4 mr-1" />
-                          {contactForm.formState.errors.phone?.message || serverErrors.phone || 'Invalid phone number'}
+                          {contactForm.formState.errors.phone?.message || serverErrors.phone || 'Numéro de téléphone invalide'}
                         </p>
                       )}
                       <span className="text-xs text-muted-foreground">
@@ -806,7 +806,7 @@ export default function SettingsForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="openingHours">Opening Hours</Label>
+                    <Label htmlFor="openingHours">Horaires d'Ouverture</Label>
                     <Input
                       id="openingHours"
                       {...contactForm.register('openingHours')}
@@ -835,11 +835,11 @@ export default function SettingsForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="address">Adresse</Label>
                   <Textarea
                     id="address"
                     {...contactForm.register('address')}
-                    placeholder="Enter your business address"
+                    placeholder="Entrez l'adresse de votre entreprise"
                     rows={3}
                     className={`transition-all duration-200 ${
                                               contactForm.formState.errors.address || serverErrors.address
@@ -864,7 +864,7 @@ export default function SettingsForm({
                       </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">Ville</Label>
                   <Input
                     id="city"
                     {...contactForm.register('city')}
@@ -891,7 +891,7 @@ export default function SettingsForm({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="googleMapsApiKey">Google Maps API Key</Label>
+                    <Label htmlFor="googleMapsApiKey">Clé API Google Maps</Label>
                     <Input
                       id="googleMapsApiKey"
                       {...contactForm.register('googleMapsApiKey')}
@@ -917,7 +917,7 @@ export default function SettingsForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="whatsappChatLink">WhatsApp Chat Link</Label>
+                    <Label htmlFor="whatsappChatLink">Lien WhatsApp Chat</Label>
                     <Input
                       id="whatsappChatLink"
                       {...contactForm.register('whatsappChatLink')}
@@ -944,7 +944,7 @@ export default function SettingsForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="googleMapEmbed">Google Map Embed Code</Label>
+                  <Label htmlFor="googleMapEmbed">Code Embed Google Map</Label>
                   <Textarea
                     id="googleMapEmbed"
                     {...contactForm.register('googleMapEmbed')}
@@ -973,7 +973,7 @@ export default function SettingsForm({
                       </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="googleMapLink">Google Maps Link</Label>
+                  <Label htmlFor="googleMapLink">Lien Google Maps</Label>
                   <Input
                     id="googleMapLink"
                     {...contactForm.register('googleMapLink')}
@@ -1002,14 +1002,14 @@ export default function SettingsForm({
                 <Separator className="my-6" />
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Social Media Links</h3>
+                  <h3 className="text-lg font-semibold">Liens Réseaux Sociaux</h3>
                   <p className="text-sm text-muted-foreground">
-                    Add your social media profiles to connect with customers
+                    Ajoutez vos profils réseaux sociaux pour vous connecter avec vos clients
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="instagramLink">Instagram Link</Label>
+                      <Label htmlFor="instagramLink">Lien Instagram</Label>
                       <Input
                         id="instagramLink"
                         {...contactForm.register('instagramLink')}
@@ -1036,7 +1036,7 @@ export default function SettingsForm({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="facebookLink">Facebook Link</Label>
+                      <Label htmlFor="facebookLink">Lien Facebook</Label>
                       <Input
                         id="facebookLink"
                         {...contactForm.register('facebookLink')}
@@ -1065,7 +1065,7 @@ export default function SettingsForm({
                 </div>
 
                 <Button type="submit" disabled={isContactPending || csrfLoading}>
-                  {isContactPending ? 'Saving...' : 'Save Contact Settings'}
+                  {isContactPending ? 'Enregistrement...' : 'Enregistrer les Paramètres de Contact'}
                 </Button>
               </form>
                     </CardContent>
@@ -1077,18 +1077,18 @@ export default function SettingsForm({
         <TabsContent value="theme" className="space-y-6">
                   <Card>
                     <CardHeader>
-              <CardTitle>Theme Customization</CardTitle>
+              <CardTitle>Personnalisation du Thème</CardTitle>
               <CardDescription>
-                Customize the visual appearance of your website
+                Personnalisez l'apparence visuelle de votre site web
               </CardDescription>
                     </CardHeader>
             <CardContent>
               <form onSubmit={themeForm.handleSubmit(onThemeSubmit)} className="space-y-6">
                 {/* Color Presets */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Color Presets</h3>
+                  <h3 className="text-lg font-semibold">Préréglages de Couleur</h3>
                   <p className="text-sm text-muted-foreground">
-                    Choose from popular color combinations or customize your own
+                    Choisissez parmi les combinaisons de couleurs populaires ou personnalisez votre propre combinaison
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
@@ -1130,11 +1130,11 @@ export default function SettingsForm({
 
                 {/* Custom Colors */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Custom Colors</h3>
+                  <h3 className="text-lg font-semibold">Couleurs Personnalisées</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <ColorPicker
-                        label="Primary Color"
+                        label="Couleur Principale"
                         value={themeForm.watch('primaryColor')}
                         onChange={(value) => themeForm.setValue('primaryColor', value)}
                         placeholder="222.2 47.4% 11.2%"
@@ -1143,7 +1143,7 @@ export default function SettingsForm({
 
                     <div className="space-y-2">
                       <ColorPicker
-                        label="Secondary Color"
+                        label="Couleur Secondaire"
                         value={themeForm.watch('secondaryColor')}
                         onChange={(value) => themeForm.setValue('secondaryColor', value)}
                         placeholder="210 40% 96%"
@@ -1153,7 +1153,7 @@ export default function SettingsForm({
                 </div>
 
                 <Button type="submit" disabled={isThemePending || csrfLoading}>
-                  {isThemePending ? 'Saving...' : 'Save Theme Settings'}
+                  {isThemePending ? 'Enregistrement...' : 'Enregistrer les Paramètres du Thème'}
                 </Button>
               </form>
             </CardContent>

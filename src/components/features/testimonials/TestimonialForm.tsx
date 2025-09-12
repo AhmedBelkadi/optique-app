@@ -55,22 +55,59 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
   const [isPending, startTransition] = useTransition();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string>('');
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: testimonial?.name || '',
-      message: testimonial?.message || '',
-      rating: testimonial?.rating || 5,
-      source: testimonial?.source || 'internal',
-      externalId: testimonial?.externalId || '',
-      externalUrl: testimonial?.externalUrl || '',
-      title: testimonial?.title || '',
-      image: testimonial?.image || '',
-      isActive: testimonial?.isActive ?? true,
-      isVerified: testimonial?.isVerified ?? false,
+      name: '',
+      message: '',
+      rating: 5,
+      source: 'internal',
+      externalId: '',
+      externalUrl: '',
+      title: '',
+      image: '',
+      isActive: true,
+      isVerified: false,
     },
   });
+
+  // Reset form when testimonial prop changes (for edit mode)
+  useEffect(() => {
+    if (testimonial) {
+      form.reset({
+        name: testimonial.name || '',
+        message: testimonial.message || '',
+        rating: testimonial.rating || 5,
+        source: testimonial.source || 'internal',
+        externalId: testimonial.externalId || '',
+        externalUrl: testimonial.externalUrl || '',
+        title: testimonial.title || '',
+        image: testimonial.image || '',
+        isActive: testimonial.isActive ?? true,
+        isVerified: testimonial.isVerified ?? false,
+      });
+      // Clear selected image file when switching to edit mode
+      setSelectedImageFile(null);
+    } else {
+      // Reset to default values for create mode
+      form.reset({
+        name: '',
+        message: '',
+        rating: 5,
+        source: 'internal',
+        externalId: '',
+        externalUrl: '',
+        title: '',
+        image: '',
+        isActive: true,
+        isVerified: false,
+      });
+      setSelectedImageFile(null);
+    }
+  }, [testimonial, form]);
 
   // Handle form errors from server action
   useEffect(() => {
@@ -125,16 +162,36 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
 
     startTransition(async () => {
       try {
+        // Set the file in the hidden input before form submission
+        if (selectedImageFile && fileInputRef.current) {
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(selectedImageFile);
+          fileInputRef.current.files = dataTransfer.files;
+        } else if (fileInputRef.current) {
+          // Clear the file input when no image is selected
+          fileInputRef.current.value = '';
+        }
+
         // Create FormData for server action
         const formData = new FormData();
         formData.append('csrf_token', csrfToken);
         
-        // Add form fields
+        // Add form fields (excluding image to avoid conflict with file)
         Object.entries(data).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
+          if (key !== 'image' && value !== undefined && value !== null && value !== '') {
             formData.append(key, value.toString());
           }
         });
+
+        // Add existing image URL separately for edit mode
+        if (mode === 'edit' && data.image) {
+          formData.append('imageUrl', data.image);
+        }
+
+        // Add image file from hidden input if present
+        if (fileInputRef.current?.files?.[0]) {
+          formData.append('image', fileInputRef.current.files[0]);
+        }
 
         // Add ID for edit mode
         if (mode === 'edit' && testimonial) {
@@ -235,6 +292,14 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+              {/* Hidden file input for image */}
+              <input
+                type="file"
+                name="image"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+              />
+              
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
@@ -378,7 +443,11 @@ export default function TestimonialForm({ mode, testimonial }: TestimonialFormPr
                     <TestimonialImageUpload
                       value={field.value}
                       onChange={field.onChange}
-                      onRemove={() => field.onChange('')}
+                      onFileChange={setSelectedImageFile}
+                      onRemove={() => {
+                        field.onChange('');
+                        setSelectedImageFile(null);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

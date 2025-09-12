@@ -320,7 +320,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
             <div className="w-full sm:w-48">
               <Select value={resourceFilter} onValueChange={setResourceFilter}>
                 <SelectTrigger className="border-border/50 focus:border-primary focus:ring-primary">
-                  <SelectValue placeholder="Filter by resource" />
+                  <SelectValue placeholder="Filtrer par ressource" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Resources</SelectItem>
@@ -337,7 +337,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
             <div className="w-full sm:w-48">
               <Select value={actionFilter} onValueChange={setActionFilter}>
                 <SelectTrigger className="border-border/50 focus:border-primary focus:ring-primary">
-                  <SelectValue placeholder="Filter by action" />
+                  <SelectValue placeholder="Filtrer par action" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Actions</SelectItem>
@@ -533,7 +533,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}
-                  placeholder="Describe what this permission allows users to do"
+                  placeholder="Décrivez ce que cette permission permet aux utilisateurs de faire"
                   disabled={createIsPending}
                 />
                 {createState.fieldErrors?.description && (
@@ -555,7 +555,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}>
-                    <SelectValue placeholder="Select a resource" />
+                    <SelectValue placeholder="Sélectionner une ressource" />
                   </SelectTrigger>
                   <SelectContent>
                     {RESOURCE_OPTIONS.map((option) => (
@@ -587,7 +587,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}>
-                    <SelectValue placeholder="Select an action" />
+                    <SelectValue placeholder="Sélectionner une action" />
                   </SelectTrigger>
                   <SelectContent>
                     {ACTION_OPTIONS.map((option) => (
@@ -635,7 +635,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                   {createIsPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating...
+                      Création...
                     </>
                   ) : (
                     <>
@@ -713,7 +713,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}
-                  placeholder="Describe what this permission allows users to do"
+                  placeholder="Décrivez ce que cette permission permet aux utilisateurs de faire"
                   disabled={updateIsPending}
                 />
                 {updateState.fieldErrors?.description && (
@@ -735,7 +735,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}>
-                    <SelectValue placeholder="Select a resource" />
+                    <SelectValue placeholder="Sélectionner une ressource" />
                   </SelectTrigger>
                   <SelectContent>
                     {RESOURCE_OPTIONS.map((option) => (
@@ -767,7 +767,7 @@ export default function PermissionManagement({ permissions: initialPermissions }
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}>
-                    <SelectValue placeholder="Select an action" />
+                    <SelectValue placeholder="Sélectionner une action" />
                   </SelectTrigger>
                   <SelectContent>
                     {ACTION_OPTIONS.map((option) => (

@@ -34,7 +34,7 @@ const bannerFormSchema = z.object({
   const endDate = new Date(data.endDate);
   return endDate > startDate;
 }, {
-  message: "End date must be after start date",
+  message: "La date de fin doit être après la date de début",
   path: ["endDate"],
 });
 
@@ -529,7 +529,7 @@ export default function BannerScheduler({ banners }: BannerSchedulerProps) {
                     {isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingBanner ? 'Updating...' : 'Creating...'}
+                        {editingBanner ? 'Updating...' : 'Création...'}
                       </>
                     ) : (
                       <>

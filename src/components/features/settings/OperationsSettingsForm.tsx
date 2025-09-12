@@ -192,7 +192,7 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Mode de maintenance</span>
               <Badge variant={watchedValues.maintenanceMode ? "destructive" : "secondary"}>
-                {watchedValues.maintenanceMode ? "Active" : "Inactive"}
+                {watchedValues.maintenanceMode ? "Actif" : "Inactif"}
               </Badge>
             </div>
             

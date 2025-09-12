@@ -103,7 +103,7 @@ export default function AdminMobileSidebar({ isOpen, onClose, user }: AdminMobil
             size="sm"
             onClick={onClose}
             className="h-8 w-8 p-0"
-            aria-label="Close sidebar"
+            aria-label="Fermer la barre latérale"
           >
             <X className="h-4 w-4" />
           </Button>

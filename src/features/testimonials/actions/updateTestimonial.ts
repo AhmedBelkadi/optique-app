@@ -7,6 +7,8 @@ import { logError } from '@/lib/errorHandling';
 import { requirePermission } from '@/lib/auth/authorization';
 import { revalidatePath } from 'next/cache';
 import { testimonialSchema, UpdateTestimonialInput } from '../schema/testimonialSchema';
+import { saveImage, validateImage, deleteImage } from '@/lib/shared/utils/imageUploadUtils';
+import { prisma } from '@/lib/prisma';
 
 export async function updateTestimonialAction(prevState: any, formData: FormData): Promise<any> {
   try {
@@ -40,7 +42,8 @@ export async function updateTestimonialAction(prevState: any, formData: FormData
     const externalId = formData.get('externalId') as string;
     const externalUrl = formData.get('externalUrl') as string;
     const title = formData.get('title') as string;
-    const image = formData.get('image') as string;
+    const imageFile = formData.get('image') as File;
+    const image = formData.get('imageUrl') as string; // Get existing image URL from separate field
     const isActive = formData.get('isActive') === 'true';
     const isVerified = formData.get('isVerified') === 'true';
 
@@ -67,8 +70,63 @@ export async function updateTestimonialAction(prevState: any, formData: FormData
       };
     }
 
-    // Update the testimonial
-    const result = await updateTestimonial(testimonialId, validationResult.data);
+    // Handle image upload if provided
+    let imagePath = image;
+    if (imageFile && imageFile.size > 0) {
+      try {
+        // Validate image first
+        const validation = validateImage(imageFile);
+        if (!validation.isValid) {
+          return {
+            success: false,
+            error: validation.error,
+            fieldErrors: { image: [validation.error] },
+            values: { name, message, rating, source, externalId, externalUrl, title, image, isActive, isVerified }
+          };
+        }
+
+        // Get existing testimonial image before updating
+        const existingTestimonial = await prisma.testimonial.findUnique({
+          where: { id: testimonialId },
+          select: { image: true }
+        });
+
+        // Upload image and update testimonial in transaction
+        await prisma.$transaction(async (tx) => {
+          const imageResult = await saveImage(imageFile, 'testimonials', testimonialId);
+          imagePath = imageResult.path;
+          
+          // Update testimonial with new image path
+          await tx.testimonial.update({
+            where: { id: testimonialId },
+            data: { image: imagePath },
+          });
+        });
+
+        // Clean up old image after successful update
+        if (existingTestimonial?.image) {
+          await deleteImage(existingTestimonial.image);
+        }
+        
+      } catch (error) {
+        logError(error as Error, { 
+          action: 'updateTestimonial', 
+          testimonialId,
+          step: 'imageUpload' 
+        });
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to upload image',
+          fieldErrors: {},
+          values: { name, message, rating, source, externalId, externalUrl, title, image, isActive, isVerified }
+        };
+      }
+    }
+
+    // Update the testimonial with the final data (including new image path if uploaded)
+    const updateData = { ...validationResult.data, image: imagePath };
+    const result = await updateTestimonial(testimonialId, updateData);
 
     if (result.success && result.data) {
       // Revalidate relevant paths

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,7 +26,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useCSRF } from '@/components/common/CSRFProvider';
-import ImageUploadField from './ImageUploadField';
 
 interface AboutSectionDialogProps {
   open: boolean;
@@ -95,13 +94,13 @@ export default function AboutSectionDialog({
   useEffect(() => {
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        toast.success(section ? 'About section updated successfully!' : 'About section created successfully!');
+        toast.success(section ? 'Section À propos mise à jour avec succès !' : 'Section À propos créée avec succès !');
         if (state.data) {
           onSuccess(state.data);
         }
         onOpenChange(false);
       } else if (state.error) {
-        toast.error(state.error || 'Failed to save about section');
+        toast.error(state.error || 'Échec de la sauvegarde de la section À propos');
       }
     }
     previousIsPending.current = isPending;
@@ -121,19 +120,19 @@ export default function AboutSectionDialog({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (csrfLoading) {
       e.preventDefault();
-      toast.error('Security token is still loading. Please wait.');
+      toast.error('Le jeton de sécurité est encore en cours de chargement. Veuillez patienter.');
       return;
     }
 
     if (csrfError) {
       e.preventDefault();
-      toast.error('Security token error. Please refresh the page.');
+      toast.error('Erreur du jeton de sécurité. Veuillez actualiser la page.');
       return;
     }
 
     if (!csrfToken) {
       e.preventDefault();
-      toast.error('Security token not available. Please refresh the page.');
+      toast.error('Jeton de sécurité non disponible. Veuillez actualiser la page.');
       return;
     }
   };
@@ -143,7 +142,7 @@ export default function AboutSectionDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {section ? 'Edit About Section' : 'Add About Section'}
+            {section ? 'Modifier la Section À propos' : 'Ajouter une Section À propos'}
           </DialogTitle>
         </DialogHeader>
 
@@ -161,7 +160,7 @@ export default function AboutSectionDialog({
                   <FormLabel>Section Title</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Our Story"
+                      placeholder="Notre Histoire"
                       name="title"
                       defaultValue={field.value}
                       onChange={field.onChange}
@@ -182,7 +181,7 @@ export default function AboutSectionDialog({
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Write your section content here..."
+                      placeholder="Écrivez le contenu de votre section ici..."
                       className="min-h-[200px]"
                       name="content"
                       defaultValue={field.value}
@@ -212,12 +211,12 @@ export default function AboutSectionDialog({
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Enregistrement...
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Save Section
+                    Enregistrer la Section
                   </>
                 )}
               </Button>

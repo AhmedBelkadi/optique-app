@@ -405,7 +405,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
       
       setSelectedPermissions(templatePermissionIds);
       setActiveTab('manual');
-      toast.success(`Applied ${template.name} template with ${templatePermissionIds.length} permissions`, {
+      toast.success(`Modèle ${template.name} appliqué avec ${templatePermissionIds.length} permissions`, {
         icon: '✨',
         style: {
           background: '#10b981',
@@ -667,7 +667,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}
-                  placeholder="Describe this role's purpose and responsibilities"
+                  placeholder="Décrivez le but et les responsabilités de ce rôle"
                   disabled={createIsPending}
                 />
                 {createState.fieldErrors?.description && (
@@ -958,7 +958,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                                             >
                                           {actionLabels[permission.action]}
                                         </Badge>
-                                          </div>
+                                      </div>
                                       {permission.description && (
                                         <p className="text-xs text-muted-foreground line-clamp-2">{permission.description}</p>
                                       )}
@@ -1009,8 +1009,8 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                   {createIsPending ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      <span className="hidden sm:inline">Creating...</span>
-                      <span className="sm:hidden">Creating...</span>
+                      <span className="hidden sm:inline">Création...</span>
+                      <span className="sm:hidden">Création...</span>
                     </>
                   ) : (
                     <>
@@ -1089,7 +1089,7 @@ export default function RoleManagement({ roles: initialRoles, permissions }: Rol
                       ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                       : 'border-border focus:border-primary focus:ring-primary'
                   }`}
-                  placeholder="Describe this role's purpose and responsibilities"
+                  placeholder="Décrivez le but et les responsabilités de ce rôle"
                   disabled={updateIsPending}
                 />
                 {updateState.fieldErrors?.description && (

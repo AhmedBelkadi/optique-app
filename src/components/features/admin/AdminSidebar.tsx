@@ -105,13 +105,13 @@ export default function AdminSidebar({ user, className = "", onSidebarCollapse }
             <button
               onClick={toggleSidebar}
               className="p-1 rounded-md hover:bg-muted/50 transition-colors"
-              title={isSidebarCollapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
-              aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={isSidebarCollapsed ? "Développer la barre latérale (Ctrl+B)" : "Réduire la barre latérale (Ctrl+B)"}
+              aria-label={isSidebarCollapsed ? "Développer la barre latérale" : "Réduire la barre latérale"}
             >
               {isSidebarCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronLeft className="h-4 w-4 text-muted-foreground" />}
             </button>
             {!isSidebarCollapsed && (
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Go to homepage">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Aller à la page d'accueil">
                 <Home className="h-4 w-4" />
               </Link>
             )}

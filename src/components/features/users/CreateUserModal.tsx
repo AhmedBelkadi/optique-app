@@ -43,7 +43,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
     
     if (previousIsPending.current && !isPending) {
       if (state.success) {
-        toast.success('User created successfully!', {
+        toast.success('Utilisateur créé avec succès !', {
           icon: '✅',
           style: {
             background: '#10b981',
@@ -76,7 +76,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
         // Reset form
         setSelectedRole('staff');
       } else if (state.error) {
-        toast.error(state.error || 'Failed to create user', {
+        toast.error(state.error || 'Échec de la création de l\'utilisateur', {
           icon: '❌',
           style: {
             background: '#ef4444',
@@ -114,10 +114,10 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             </div>
             <div>
               <DialogTitle className="text-xl font-semibold text-foreground">
-                Create New Staff Member
+                Créer un Nouveau Membre du Staff
               </DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                Add a new staff member to your team
+                Ajouter un nouveau membre du staff à votre équipe
               </p>
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium text-foreground">
-                Full Name *
+                Nom Complet *
               </Label>
               <Input
                 id="name"
@@ -143,7 +143,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                     ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                     : 'border-border focus:border-primary focus:ring-primary'
                 }`}
-                placeholder="Enter full name"
+                placeholder="Entrez le nom complet *"
                 disabled={isPending}
               />
               {state.fieldErrors?.name && (
@@ -157,7 +157,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email Address *
+                Adresse Email *
               </Label>
               <Input
                 id="email"
@@ -169,7 +169,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                     ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                     : 'border-border focus:border-primary focus:ring-primary'
                 }`}
-                placeholder="Enter email address"
+                placeholder="Entrez l'adresse email *"
                 disabled={isPending}
               />
               {state.fieldErrors?.email && (
@@ -183,7 +183,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             {/* Role */}
             <div className="space-y-2">
               <Label htmlFor="role" className="text-sm font-medium text-foreground">
-                Role *
+                Rôle *
               </Label>
               <Select
                 value={selectedRole}
@@ -195,7 +195,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                     ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                     : 'border-border focus:border-primary focus:ring-primary'
                 }`}>
-                  <SelectValue placeholder="Select a role" />
+                  <SelectValue placeholder="Sélectionner un rôle *" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="staff">Staff</SelectItem>
@@ -215,7 +215,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
             {/* Notes */}
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-sm font-medium text-foreground">
-                Notes (Optional)
+                Notes (Optionnel)
               </Label>
               <Textarea
                 id="notes"
@@ -226,7 +226,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                     ? 'border-red-500 focus:border-destructive focus:ring-destructive' 
                     : 'border-border focus:border-primary focus:ring-primary'
                 }`}
-                placeholder="Any additional notes about this user"
+                placeholder="Toute note supplémentaire sur cet utilisateur (optionnel)"
                 disabled={isPending}
               />
               {state.fieldErrors?.notes && (
@@ -257,7 +257,7 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                 disabled={isPending}
                 className="bg-gray-300 text-black font-medium py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50 transition-all duration-200"
               >
-                Cancel
+                Annuler
               </Button>
               <Button
                 type="submit"
@@ -267,12 +267,12 @@ export default function CreateUserModal({ isOpen, onClose, onSuccess }: CreateUs
                 {isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    Création...
                   </>
                 ) : (
                   <>
                     <Plus className="w-4 h-4 mr-2" />
-                    Create User
+                      Créer un Utilisateur
                   </>
                 )}
               </Button>

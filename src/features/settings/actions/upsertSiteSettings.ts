@@ -76,39 +76,131 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
       filesToProcess.push({ file: aboutFile, type: 'about-section', field: 'imageAboutSection' });
     }
 
-    // Process uploads with small delays to reduce VPS file system pressure
+    // Process uploads with robust error handling and retry logic
     for (let i = 0; i < filesToProcess.length; i++) {
       const { file, type, field } = filesToProcess[i];
       
       const uploadPromise = (async () => {
-        try {
-          // Add small delay between uploads to reduce file system pressure on VPS
-          if (i > 0) {
-            await new Promise(resolve => setTimeout(resolve, 100 * i));
+        const maxRetries = 3;
+        let lastError: Error | null = null;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            // Add small delay between uploads to reduce file system pressure on VPS
+            if (i > 0) {
+              await new Promise(resolve => setTimeout(resolve, 100 * i));
+            }
+            
+            console.log(`[Site Settings Action] Processing ${type} file (attempt ${attempt}/${maxRetries}): ${file.name} (${file.size} bytes)`);
+            
+            // Check file size before processing
+            const maxFileSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxFileSize) {
+              throw new Error(`File ${file.name} is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`);
+            }
+            
+            const imageResult = await saveSiteSettingsImage(file, type as any);
+            console.log(`[Site Settings Action] Successfully processed ${type}: ${imageResult.path}`);
+            return { type: field, url: imageResult.path };
+            
+          } catch (error) {
+            lastError = error as Error;
+            console.error(`[Site Settings Action] Attempt ${attempt} failed for ${type}:`, error);
+            
+            // Don't retry for certain types of errors
+            if (error instanceof Error) {
+              if (error.message.includes('too large') || 
+                  error.message.includes('invalid format') ||
+                  error.message.includes('validation failed')) {
+                throw error; // Don't retry validation errors
+              }
+            }
+            
+            // Wait before retrying (exponential backoff)
+            if (attempt < maxRetries) {
+              const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+              console.log(`[Site Settings Action] Retrying ${type} in ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
           }
-          
-          console.log(`[Site Settings Action] Processing ${type} file: ${file.name} (${file.size} bytes)`);
-          const imageResult = await saveSiteSettingsImage(file, type as any);
-          console.log(`[Site Settings Action] Successfully processed ${type}: ${imageResult.path}`);
-          return { type: field, url: imageResult.path };
-        } catch (error) {
-          console.error(`[Site Settings Action] Failed to upload ${type}:`, error);
-          throw new Error(`Failed to upload ${type}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+        
+        // If we get here, all retries failed
+        throw new Error(`Failed to upload ${type} after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
       })();
       
       uploadPromises.push(uploadPromise);
     }
 
-    // Wait for all uploads to complete
+    // Wait for all uploads to complete with better error handling
     if (uploadPromises.length > 0) {
       try {
         console.log(`[Site Settings Action] Waiting for ${uploadPromises.length} uploads to complete...`);
-        const results = await Promise.all(uploadPromises);
-        console.log(`[Site Settings Action] All uploads completed successfully:`, results);
         
-        // Update URLs based on upload results
-        for (const result of results) {
+        // Use Promise.allSettled to handle partial failures gracefully
+        const results = await Promise.allSettled(uploadPromises);
+        console.log(`[Site Settings Action] Upload results:`, results);
+        
+        const successfulUploads: { type: string; url: string }[] = [];
+        const failedUploads: string[] = [];
+        
+        // Process results
+        results.forEach((result, index) => {
+          const { type } = filesToProcess[index];
+          
+          if (result.status === 'fulfilled') {
+            successfulUploads.push(result.value);
+            console.log(`[Site Settings Action] ✅ ${type} uploaded successfully: ${result.value.url}`);
+          } else {
+            failedUploads.push(`${type}: ${result.reason?.message || 'Unknown error'}`);
+            console.error(`[Site Settings Action] ❌ ${type} upload failed:`, result.reason);
+          }
+        });
+        
+        // If all uploads failed, try fallback strategy (sequential uploads)
+        if (successfulUploads.length === 0 && failedUploads.length > 0) {
+          console.log('[Site Settings Action] All parallel uploads failed, trying sequential fallback...');
+          
+          const fallbackResults: { type: string; url: string }[] = [];
+          const fallbackErrors: string[] = [];
+          
+          // Try uploading files one by one
+          for (const { file, type, field } of filesToProcess) {
+            try {
+              console.log(`[Site Settings Action] Fallback upload for ${type}...`);
+              const imageResult = await saveSiteSettingsImage(file, type as any);
+              fallbackResults.push({ type: field, url: imageResult.path });
+              console.log(`[Site Settings Action] Fallback success for ${type}: ${imageResult.path}`);
+            } catch (error) {
+              const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+              fallbackErrors.push(`${type}: ${errorMsg}`);
+              console.error(`[Site Settings Action] Fallback failed for ${type}:`, error);
+            }
+          }
+          
+          // If fallback also failed completely, return error
+          if (fallbackResults.length === 0) {
+            return {
+              success: false,
+              message: 'Impossible de télécharger les images. Veuillez vérifier la taille et le format de vos fichiers.',
+              error: `Erreurs: ${fallbackErrors.join(', ')}`
+            };
+          }
+          
+          // Use fallback results
+          successfulUploads.push(...fallbackResults);
+          if (fallbackErrors.length > 0) {
+            failedUploads.push(...fallbackErrors);
+          }
+        }
+        
+        // If some uploads failed, warn but continue
+        if (failedUploads.length > 0) {
+          console.warn(`[Site Settings Action] ⚠️ Some uploads failed: ${failedUploads.join(', ')}`);
+        }
+        
+        // Update URLs based on successful upload results
+        for (const result of successfulUploads) {
           switch (result.type) {
             case 'logoUrl':
               logoUrl = result.url;
@@ -124,11 +216,12 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
               break;
           }
         }
+        
       } catch (error) {
-        console.error(`[Site Settings Action] Upload failed:`, error);
+        console.error(`[Site Settings Action] Critical upload error:`, error);
         return {
           success: false,
-          message: 'Échec de l\'upload des images',
+          message: 'Erreur critique lors du téléchargement des images',
           error: error instanceof Error ? error.message : 'Failed to upload images'
         };
       }
@@ -182,17 +275,21 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
       };
     }
   } catch (error) {
-    // Handle specific error types
+    // Handle specific error types with detailed user feedback
     if (error instanceof Error) {
-      if (error.message.includes('Limite de taux')) {
+      console.error(`[Site Settings Action] Error caught: ${error.message}`, error);
+      
+      // Rate limiting errors
+      if (error.message.includes('Limite de taux') || error.message.includes('rate limit')) {
         return {
           success: false,
-          message: 'Trop de tentatives. Veuillez patienter avant de réessayer.',
+          message: 'Trop de tentatives. Veuillez patienter 1 minute avant de réessayer.',
           error: 'Rate limit exceeded'
         };
       }
       
-      if (error.message.includes('CSRF')) {
+      // CSRF errors
+      if (error.message.includes('CSRF') || error.message.includes('csrf')) {
         return {
           success: false,
           message: 'Erreur de sécurité. Veuillez actualiser la page et réessayer.',
@@ -200,11 +297,65 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
         };
       }
       
-      if (error.message.includes('Permission')) {
+      // Permission errors
+      if (error.message.includes('Permission') || error.message.includes('permission')) {
         return {
           success: false,
           message: 'Accès refusé. Privilèges insuffisants.',
           error: 'Insufficient permissions'
+        };
+      }
+      
+      // File size errors
+      if (error.message.includes('too large') || error.message.includes('Request Entity Too Large')) {
+        return {
+          success: false,
+          message: 'Fichier trop volumineux. Veuillez réduire la taille de vos images (max 5MB par fichier).',
+          error: 'File too large'
+        };
+      }
+      
+      // File format errors
+      if (error.message.includes('invalid format') || error.message.includes('unsupported format')) {
+        return {
+          success: false,
+          message: 'Format de fichier non supporté. Utilisez JPG, PNG ou WebP.',
+          error: 'Invalid file format'
+        };
+      }
+      
+      // Database errors
+      if (error.message.includes('database') || error.message.includes('prisma') || error.message.includes('connection')) {
+        return {
+          success: false,
+          message: 'Erreur de base de données. Veuillez réessayer dans quelques instants.',
+          error: 'Database error'
+        };
+      }
+      
+      // File system errors
+      if (error.message.includes('ENOSPC') || error.message.includes('disk space')) {
+        return {
+          success: false,
+          message: 'Espace disque insuffisant sur le serveur. Contactez l\'administrateur.',
+          error: 'Insufficient disk space'
+        };
+      }
+      
+      if (error.message.includes('EACCES') || error.message.includes('permission denied')) {
+        return {
+          success: false,
+          message: 'Erreur de permissions de fichier. Contactez l\'administrateur.',
+          error: 'File permission error'
+        };
+      }
+      
+      // Network/timeout errors
+      if (error.message.includes('timeout') || error.message.includes('ECONNRESET')) {
+        return {
+          success: false,
+          message: 'Délai d\'attente dépassé. Veuillez réessayer avec des fichiers plus petits.',
+          error: 'Request timeout'
         };
       }
     }

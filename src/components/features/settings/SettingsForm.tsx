@@ -205,14 +205,41 @@ export default function SettingsForm({
       // Clear the selected file after successful save
       setSelectedLogoFile(null);
       setSelectedHeroBackgroundFile(null);
+      setSelectedAboutImageFile(null);
     } else if (siteState.error) {
-      toast.error(`❌ ${siteState.error}`, {
-        duration: 6000,
-        style: {
-          background: '#fef2f2',
-          color: '#dc2626',
-          border: '1px solid #fecaca'
-        }
+      console.error('[SettingsForm] Site settings error:', siteState.error);
+      
+      // Determine error type and show appropriate message
+      let errorMessage = siteState.error;
+      let errorType = 'error';
+      
+      if (siteState.error.includes('too large') || siteState.error.includes('Request Entity Too Large')) {
+        errorMessage = 'Fichiers trop volumineux. Veuillez réduire la taille de vos images.';
+        errorType = 'warning';
+      } else if (siteState.error.includes('timeout')) {
+        errorMessage = 'Délai d\'attente dépassé. Veuillez réessayer avec des fichiers plus petits.';
+        errorType = 'warning';
+      } else if (siteState.error.includes('CSRF')) {
+        errorMessage = 'Erreur de sécurité. Veuillez actualiser la page.';
+        errorType = 'error';
+      } else if (siteState.error.includes('Permission')) {
+        errorMessage = 'Accès refusé. Privilèges insuffisants.';
+        errorType = 'error';
+      }
+      
+      const toastStyle = errorType === 'warning' ? {
+        background: '#fffbeb',
+        color: '#d97706',
+        border: '1px solid #fed7aa'
+      } : {
+        background: '#fef2f2',
+        color: '#dc2626',
+        border: '1px solid #fecaca'
+      };
+      
+      toast.error(`❌ ${errorMessage}`, {
+        duration: 8000,
+        style: toastStyle
       });
     }
   }, [siteState]);

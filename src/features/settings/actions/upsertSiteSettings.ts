@@ -87,14 +87,12 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
             await new Promise(resolve => setTimeout(resolve, 100 * i));
           }
           
-          const validation = validateImage(file);
-          if (!validation.isValid) {
-            throw new Error(validation.error);
-          }
-
+          console.log(`[Site Settings Action] Processing ${type} file: ${file.name} (${file.size} bytes)`);
           const imageResult = await saveSiteSettingsImage(file, type as any);
+          console.log(`[Site Settings Action] Successfully processed ${type}: ${imageResult.path}`);
           return { type: field, url: imageResult.path };
         } catch (error) {
+          console.error(`[Site Settings Action] Failed to upload ${type}:`, error);
           throw new Error(`Failed to upload ${type}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       })();
@@ -105,23 +103,29 @@ export async function upsertSiteSettingsAction(prevState: UpsertSiteSettingsStat
     // Wait for all uploads to complete
     if (uploadPromises.length > 0) {
       try {
+        console.log(`[Site Settings Action] Waiting for ${uploadPromises.length} uploads to complete...`);
         const results = await Promise.all(uploadPromises);
+        console.log(`[Site Settings Action] All uploads completed successfully:`, results);
         
         // Update URLs based on upload results
         for (const result of results) {
           switch (result.type) {
             case 'logoUrl':
               logoUrl = result.url;
+              console.log(`[Site Settings Action] Updated logoUrl: ${logoUrl}`);
               break;
             case 'heroBackgroundImg':
               heroBackgroundImg = result.url;
+              console.log(`[Site Settings Action] Updated heroBackgroundImg: ${heroBackgroundImg}`);
               break;
             case 'imageAboutSection':
               imageAboutSection = result.url;
+              console.log(`[Site Settings Action] Updated imageAboutSection: ${imageAboutSection}`);
               break;
           }
         }
       } catch (error) {
+        console.error(`[Site Settings Action] Upload failed:`, error);
         return {
           success: false,
           message: 'Échec de l\'upload des images',

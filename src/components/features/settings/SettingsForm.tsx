@@ -319,6 +319,14 @@ export default function SettingsForm({
     }
 
     try {
+      console.log('[SettingsForm] Starting site settings submission...');
+      console.log('[SettingsForm] Form data:', data);
+      console.log('[SettingsForm] Selected files:', {
+        logo: selectedLogoFile ? `${selectedLogoFile.name} (${selectedLogoFile.size} bytes)` : 'none',
+        heroBackground: selectedHeroBackgroundFile ? `${selectedHeroBackgroundFile.name} (${selectedHeroBackgroundFile.size} bytes)` : 'none',
+        aboutImage: selectedAboutImageFile ? `${selectedAboutImageFile.name} (${selectedAboutImageFile.size} bytes)` : 'none'
+      });
+
       // Switch to server-side file handling in action
       const finalLogoUrl = data.logoUrl;
       const finalHeroBackgroundUrl = data.heroBackgroundImg;
@@ -342,13 +350,16 @@ export default function SettingsForm({
 
       // Append selected files for server-side upload
       if (selectedLogoFile) {
+        console.log('[SettingsForm] Appending logo file:', selectedLogoFile.name);
         formData.append('logo', selectedLogoFile);
       }
       if (selectedHeroBackgroundFile) {
+        console.log('[SettingsForm] Appending hero background file:', selectedHeroBackgroundFile.name);
         formData.append('heroBackground', selectedHeroBackgroundFile);
       }
 
       if (selectedAboutImageFile) {
+        console.log('[SettingsForm] Appending about image file:', selectedAboutImageFile.name);
         formData.append('imageAboutSectionFile', selectedAboutImageFile);
       }
       const aboutImg = (siteForm.watch('imageAboutSection') as any);
@@ -356,6 +367,7 @@ export default function SettingsForm({
         formData.append('imageAboutSection', aboutImg as any);
       }
 
+      console.log('[SettingsForm] FormData prepared, calling action...');
       // Use the action state action instead of direct call
       startTransition(() => {
         siteFormAction(formData);

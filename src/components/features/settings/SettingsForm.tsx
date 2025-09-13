@@ -306,6 +306,30 @@ export default function SettingsForm({
       errors.push('Slogan must be less than 100 characters');
     }
 
+    // File size validation (5MB limit per file, 10MB total)
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const maxTotalSize = 10 * 1024 * 1024; // 10MB
+    let totalSize = 0;
+
+    if (selectedLogoFile && selectedLogoFile.size > maxFileSize) {
+      errors.push(`Logo file is too large (${(selectedLogoFile.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`);
+    }
+    if (selectedLogoFile) totalSize += selectedLogoFile.size;
+
+    if (selectedHeroBackgroundFile && selectedHeroBackgroundFile.size > maxFileSize) {
+      errors.push(`Hero background file is too large (${(selectedHeroBackgroundFile.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`);
+    }
+    if (selectedHeroBackgroundFile) totalSize += selectedHeroBackgroundFile.size;
+
+    if (selectedAboutImageFile && selectedAboutImageFile.size > maxFileSize) {
+      errors.push(`About image file is too large (${(selectedAboutImageFile.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`);
+    }
+    if (selectedAboutImageFile) totalSize += selectedAboutImageFile.size;
+
+    if (totalSize > maxTotalSize) {
+      errors.push(`Total file size is too large (${(totalSize / 1024 / 1024).toFixed(1)}MB). Maximum total size is 10MB.`);
+    }
+
     if (errors.length > 0) {
       toast.error(`❌ Erreurs de Validation - ${errors.join(', ')}`, {
         duration: 6000,

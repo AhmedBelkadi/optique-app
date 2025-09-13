@@ -9,6 +9,10 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
 
+  // Configure body parser for large file uploads
+  server.use(express.json({ limit: '10mb' }));
+  server.use(express.urlencoded({ limit: '10mb', extended: true }));
+
   // Serve uploads folder
   const uploadsPath = path.join(__dirname, "uploads");
   console.log(`📁 Serving uploads from: ${uploadsPath}`);

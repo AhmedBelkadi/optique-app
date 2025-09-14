@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Product } from '@/features/products/schema/productSchema';
+import { logError } from '@/lib/errorHandling';
 
 export interface GetPublicProductsOptions {
   search?: string;
@@ -173,7 +174,7 @@ export async function getPublicProducts(options: GetPublicProductsOptions = {}):
       },
     };
   } catch (error) {
-    console.error('Error fetching public products:', error);
+    logError(error as Error, { context: 'getPublicProducts', options });
     return {
       success: false,
       error: 'Failed to fetch products',

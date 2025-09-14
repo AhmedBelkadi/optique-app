@@ -361,7 +361,7 @@ export function MobileTestimonialsGrid({
                         </p>
                         <div className="flex flex-col gap-1 items-end">
                           {testimonial.isVerified && (
-                            <Badge variant="secondary" className="text-white text-xs">
+                            <Badge variant="secondary" className="text-black text-xs">
                               ✓ Vérifié
                             </Badge>
                           )}

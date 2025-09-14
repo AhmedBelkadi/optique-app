@@ -2,17 +2,16 @@ import { getPublicTestimonials } from '@/features/testimonials/services/getPubli
 import { getSiteSettings } from '@/features/settings/services/siteSettings';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, Quote, Users, User, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import Image from 'next/image';
+import { Star,User, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Suspense } from 'react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { TestimonialsGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeletons';
 import { MobileTestimonialsGrid } from '@/components/features/testimonials/MobileTestimonialsGrid';
+import Link from 'next/link';
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -199,13 +198,13 @@ async function TestimonialsContent({ searchParams }: TestimonialsPageProps) {
                 disabled={page === (pagination?.totalPages || 1)}
                 asChild
               >
-                <a href={`/testimonials?${new URLSearchParams({
+                <Link href={`/testimonials?${new URLSearchParams({
                   ...(search && { search }),
                   page: (page + 1).toString()
                 })}`}>
                   Suivant
                   <ChevronRight className="h-4 w-4 ml-1" />
-                </a>
+                </Link>
               </Button>
             </div>
           )}

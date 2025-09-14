@@ -402,7 +402,7 @@ export default function ExternalAPIKeysForm({ initialSettings }: ExternalAPIKeys
         <Button
           onClick={handleSave}
           disabled={isPending || csrfLoading}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 w-full"
         >
           {isPending && <RefreshCw className="h-4 w-4 animate-spin" />}
           <Save className="h-4 w-4" />

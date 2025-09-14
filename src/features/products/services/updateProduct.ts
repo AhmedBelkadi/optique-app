@@ -5,6 +5,7 @@ import { validateAndSanitizeProduct } from '@/lib/shared/utils/sanitize';
 import { saveImage, generateImageAlt } from '@/lib/shared/utils/serverImageUpload';
 import { unlink } from 'fs/promises';
 import { join } from 'path';
+import { logError } from '@/lib/errorHandling';
 
 export interface UpdateProductResult {
   success: boolean;
@@ -58,9 +59,23 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
       updateData.reference = productData.reference;
     }
 
-    // Validate the update data
+    // Sanitize the update data first
+    const sanitizedUpdateData = validateAndSanitizeProduct({
+      name: updateData.name || existingProduct.name,
+      description: updateData.description || existingProduct.description,
+      price: updateData.price || existingProduct.price,
+      brand: updateData.brand || existingProduct.brand || '',
+      reference: updateData.reference || existingProduct.reference || '',
+      categoryIds: productData.categoryIds || existingProduct.categories.map(pc => pc.categoryId),
+    });
+
+    // Validate the sanitized update data
     const validation = productSchema.update.safeParse({
-      ...updateData,
+      name: sanitizedUpdateData.name !== existingProduct.name ? sanitizedUpdateData.name : undefined,
+      description: sanitizedUpdateData.description !== existingProduct.description ? sanitizedUpdateData.description : undefined,
+      price: sanitizedUpdateData.price !== existingProduct.price ? sanitizedUpdateData.price : undefined,
+      brand: sanitizedUpdateData.brand !== (existingProduct.brand || '') ? sanitizedUpdateData.brand : undefined,
+      reference: sanitizedUpdateData.reference !== (existingProduct.reference || '') ? sanitizedUpdateData.reference : undefined,
       categoryIds: productData.categoryIds || existingProduct.categories.map(pc => pc.categoryId),
     });
     
@@ -73,6 +88,7 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
 
     // Update product with transaction to handle categories and images
     const product = await prisma.$transaction(async (tx) => {
+      try {
       // Update basic product fields
       await tx.product.update({
         where: { id },
@@ -174,6 +190,10 @@ export async function updateProduct(id: string, productData: UpdateProductInput)
           },
         },
       });
+      } catch (error) {
+        logError(error as Error, { context: 'updateProductTransaction', productId: id });
+        throw error;
+      }
     });
 
     if (!product) {

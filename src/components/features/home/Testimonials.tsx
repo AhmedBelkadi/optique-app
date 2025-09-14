@@ -201,11 +201,8 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                       {testimonial.isVerified && (
                         <Badge 
                           variant="secondary" 
-                          className="text-xs"
-                          style={{
-                            backgroundColor: verifiedBadgeColor,
-                            color: '#FFFFFF'
-                          }}
+                          className="text-xs text-black"
+                  
                         >
                           ✓ Vérifié
                         </Badge>
@@ -358,11 +355,8 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                         {testimonial.isVerified && (
                           <Badge 
                             variant="secondary" 
-                            className="text-xs"
-                            style={{
-                              backgroundColor: verifiedBadgeColor,
-                              color: '#FFFFFF'
-                            }}
+                            className="text-xs text-black"
+                        
                           >
                             ✓ Vérifié
                           </Badge>

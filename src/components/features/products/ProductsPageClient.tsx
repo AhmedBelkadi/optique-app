@@ -19,6 +19,7 @@ import { MobileFilterSheet } from './MobileFilterSheet';
 import { QuickFilterChips } from './QuickFilterChips';
 import { Category } from '@/features/categories/schema/categorySchema';
 import { PAGE_SIZE } from '@/features/products/config';
+import Link from 'next/link';
 
 interface Product {
   id: string;
@@ -252,37 +253,37 @@ export function ProductsPageClient({
                 <Badge variant="secondary" className="gap-1">
                   Catégorie: {categories.find(c => c.id === currentFilters.category)?.name}
                   <Button variant="ghost" size="sm" className="h-auto p-0 ml-1" asChild>
-                    <a href={`/products?${new URLSearchParams({
+                    <Link href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.priceRange && { priceRange: currentFilters.priceRange }),
                       ...(currentFilters.sortBy && { sortBy: currentFilters.sortBy }),
                       ...(currentFilters.sortOrder && { sortOrder: currentFilters.sortOrder })
                     })}`}>
                       <X className="w-3 h-3" />
-                    </a>
-                  </Button>
+                    </Link>
+                  </Button  >
                 </Badge>
               )}
               {currentFilters.priceRange && currentFilters.priceRange !== 'all' && (
                 <Badge variant="secondary" className="gap-1">
                   Prix: {currentFilters.priceRange === 'budget' ? 'Moins de 100 MAD' : currentFilters.priceRange === 'mid' ? '100 MAD - 300 MAD' : '300 MAD+'}
                   <Button variant="ghost" size="sm" className="h-auto p-0 ml-1" asChild>
-                    <a href={`/products?${new URLSearchParams({
+                    <Link href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),
                       ...(currentFilters.sortBy && { sortBy: currentFilters.sortBy }),
                       ...(currentFilters.sortOrder && { sortOrder: currentFilters.sortOrder })
                     })}`}>
                       <X className="w-3 h-3" />
-                    </a>
+                    </Link>
                   </Button>
                 </Badge>
               )}
               <Button variant="ghost" size="sm" className="ml-auto" asChild>
-                <a href="/products">
+                <Link href="/products">
                   <FilterX className="w-4 h-4 mr-1" />
                   Effacer tout
-                </a>
+                </Link>
               </Button>
             </div>
           </div>
@@ -299,10 +300,10 @@ export function ProductsPageClient({
               </p>
               {hasActiveFilters && (
                 <Button variant="ghost" size="sm" asChild>
-                  <a href="/products">
+                  <Link href="/products">
                     <FilterX className="w-4 h-4 mr-1" />
                     Effacer les Filtres
-                  </a>
+                  </Link>
                 </Button>
               )}
             </div>
@@ -333,14 +334,27 @@ export function ProductsPageClient({
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
-              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <div className="aspect-square bg-muted rounded animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-1/2 animate-pulse" />
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+                <Search className="w-12 h-12 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Aucun produit trouvé
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                {hasActiveFilters 
+                  ? "Aucun produit ne correspond à vos critères de recherche. Essayez de modifier vos filtres ou de faire une nouvelle recherche."
+                  : "Il n'y a actuellement aucun produit disponible dans notre catalogue."
+                }
+              </p>
+              {hasActiveFilters && (
+                <Button asChild>
+                  <Link href="/products">
+                    <FilterX className="w-4 h-4 mr-2" />
+                    Effacer les Filtres
+                  </Link>
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -361,7 +375,7 @@ export function ProductsPageClient({
                 {/* Previous Button */}
                 {pagination.page > 1 && (
                   <Button variant="default" size="sm" asChild>
-                    <a href={`/products?${new URLSearchParams({
+                    <Link href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),
                       ...(currentFilters.priceRange && { priceRange: currentFilters.priceRange }),
@@ -371,7 +385,7 @@ export function ProductsPageClient({
                     })}`}>
                       <ChevronLeft className="w-4 h-4 mr-1" />
                       Précédent
-                    </a>
+                    </Link>
                   </Button>
                 )}
                 
@@ -402,7 +416,7 @@ export function ProductsPageClient({
                         size="sm"
                         asChild
                       >
-                        <a href={`/products?${new URLSearchParams({
+                        <Link href={`/products?${new URLSearchParams({
                           ...(currentFilters.search && { search: currentFilters.search }),
                           ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),
                           ...(currentFilters.priceRange && { priceRange: currentFilters.priceRange }),
@@ -411,7 +425,7 @@ export function ProductsPageClient({
                           page: pageNum.toString()
                         })}`}>
                           {pageNum}
-                        </a>
+                        </Link>
                       </Button>
                     );
                   })}
@@ -420,7 +434,7 @@ export function ProductsPageClient({
                 {/* Next Button */}
                 {pagination.page < pagination.totalPages && (
                   <Button variant="default" size="sm" asChild>
-                    <a href={`/products?${new URLSearchParams({
+                    <Link href={`/products?${new URLSearchParams({
                       ...(currentFilters.search && { search: currentFilters.search }),
                       ...(currentFilters.category && currentFilters.category !== 'all' && { category: currentFilters.category }),
                       ...(currentFilters.priceRange && { priceRange: currentFilters.priceRange }),
@@ -430,7 +444,7 @@ export function ProductsPageClient({
                     })}`}>
                       Suivant
                       <ChevronRight className="w-4 h-4 ml-1" />
-                    </a>
+                    </Link>
                   </Button>
                 )}
               </div>

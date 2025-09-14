@@ -23,6 +23,7 @@ export default function AdminHeader({
 }: AdminHeaderProps) {
   const { pageInfo } = useAdminPage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { csrfToken } = useCSRF();
 
   return (
@@ -100,12 +101,17 @@ export default function AdminHeader({
 
           {/* User */}
           {user ? (
-            <div className="flex items-center space-x-3">
+            <div className={`flex items-center space-x-3 transition-opacity duration-200 ${isLoggingOut ? 'opacity-60' : 'opacity-100'}`}>
               <div className="hidden sm:flex flex-col items-end text-right">
                 <p className="text-sm font-medium text-foreground">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
-              <UserNav csrfToken={csrfToken} />
+              <UserNav 
+                csrfToken={csrfToken} 
+                onLogoutStateChange={(loggingOut) => {
+                  setIsLoggingOut(loggingOut);
+                }}
+              />
             </div>
           ) : (
             <div className="flex items-center space-x-2">

@@ -50,14 +50,6 @@ async function ProductDetailsContent({ params }: ProductDetailsPageProps) {
         ]} 
       />
 
-      {/* Page Header */}
-      <div className="container mx-auto px-4 py-12">
-        <PageHeader
-          title={product.name}
-          description={product.description || "Découvrez ce produit premium de notre collection"}
-        />
-      </div>
-
       {/* Product Details - Mobile Optimized */}
       <section className="py-8 md:py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

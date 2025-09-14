@@ -64,11 +64,22 @@ export async function saveImage(
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Create unique filename
+  // Create unique filename with security validation
   const timestamp = Date.now();
-  const extension = file.name.split('.').pop();
+  const extension = file.name.split('.').pop()?.toLowerCase();
+  
+  // Validate extension
+  if (!extension || !['jpg', 'jpeg', 'png', 'webp'].includes(extension)) {
+    throw new Error('Invalid file extension');
+  }
+  
   const orderSuffix = order !== undefined ? `-${order}` : '';
   const filename = `${entityId}${orderSuffix}-${timestamp}.${extension}`;
+  
+  // Additional filename validation
+  if (filename.length > 255) {
+    throw new Error('Filename too long');
+  }
 
   // Ensure uploads directory exists
   const uploadsDir = join(process.cwd(), 'uploads', entityType);

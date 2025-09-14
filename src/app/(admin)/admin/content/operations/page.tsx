@@ -69,11 +69,11 @@ export default async function ContentOperationsPage() {
         showNotifications={true}
       />
 
-      <div className="px-4 sm:px-6 py-4 min-h-screen space-y-6">
+      <div className="px-4 sm:px-6 py-4 space-y-6">
 
         <Tabs defaultValue="operations" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-muted/50 border border-border ">
-            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200" value="operations">Paramètres opérationnels</TabsTrigger>
+            <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200" value="operations">Mode de maintenance</TabsTrigger>
             <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200" value="external-apis">API externes</TabsTrigger>
           </TabsList>
           

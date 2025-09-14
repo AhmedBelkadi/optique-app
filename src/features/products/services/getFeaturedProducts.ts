@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { Product } from '../schema/productSchema';
+import { logError } from '@/lib/errorHandling';
 
 export interface GetFeaturedProductsResult {
   success: boolean;
@@ -62,7 +63,7 @@ export async function getFeaturedProducts(limit: number = 6): Promise<GetFeature
       data: transformedProducts,
     };
   } catch (error) {
-    console.error('Error fetching featured products:', error);
+    logError(error as Error, { context: 'getFeaturedProducts', limit });
     return {
       success: false,
       error: 'Failed to fetch featured products',

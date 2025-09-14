@@ -643,19 +643,19 @@ export default function SettingsForm({
             value="site" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Site *
+            Site
           </TabsTrigger>
           <TabsTrigger 
             value="contact" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Contact *
+            Contact
           </TabsTrigger>
           <TabsTrigger 
             value="theme" 
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all duration-200"
           >
-            Thème *
+            Thème
           </TabsTrigger>
          
         </TabsList>
@@ -664,7 +664,7 @@ export default function SettingsForm({
         <TabsContent value="site" className="space-y-6">
                   <Card>
                     <CardHeader>
-              <CardTitle>Informations du Site *</CardTitle>
+              <CardTitle>Informations du Site</CardTitle>
               <CardDescription>
                 Informations de base sur votre site web
               </CardDescription>
@@ -769,7 +769,7 @@ export default function SettingsForm({
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isSitePending || csrfLoading}>
+                <Button type="submit" disabled={isSitePending || csrfLoading} className="w-full" >
                     {isSitePending ? 'Enregistrement...' : 'Enregistrer les Paramètres du Site'}
                 </Button>
               </form>
@@ -781,7 +781,7 @@ export default function SettingsForm({
         <TabsContent value="contact" className="space-y-6">
                   <Card>
                     <CardHeader>
-                <CardTitle>Informations de Contact *</CardTitle>
+                <CardTitle>Informations de Contact</CardTitle>
               <CardDescription>
                 Informations de contact et informations de localisation
               </CardDescription>
@@ -1127,7 +1127,7 @@ export default function SettingsForm({
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isContactPending || csrfLoading}>
+                <Button type="submit" disabled={isContactPending || csrfLoading} className="w-full">
                   {isContactPending ? 'Enregistrement...' : 'Enregistrer les Paramètres de Contact'}
                 </Button>
               </form>
@@ -1215,7 +1215,7 @@ export default function SettingsForm({
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isThemePending || csrfLoading}>
+                <Button type="submit" disabled={isThemePending || csrfLoading} className="w-full">
                   {isThemePending ? 'Enregistrement...' : 'Enregistrer les Paramètres du Thème'}
                 </Button>
               </form>

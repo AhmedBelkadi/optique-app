@@ -178,7 +178,7 @@ export default function OperationsSettingsForm({ settings }: OperationsSettingsF
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Enregistrer les paramètres de maintenance
+                  Enregistrer
                 </>
               )}
             </Button>

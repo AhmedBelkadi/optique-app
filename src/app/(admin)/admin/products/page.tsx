@@ -34,49 +34,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   // 🔐 AUTHENTICATION & AUTHORIZATION CHECK
   await requirePermission('products', 'read');
 
-  const { 
-    search, 
-    category, 
-    brand, 
-    reference, 
-    minPrice, 
-    maxPrice, 
-    sortBy, 
-    sortOrder,
-    page,
-    limit
-  } = await searchParams;
-  
   // Fetch categories for the filter dropdown   
   const categoriesResult = await getAllCategoriesAction();
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-  
-  // Parse price filters
-  const minPriceNum = minPrice ? parseFloat(minPrice) : undefined;
-  const maxPriceNum = maxPrice ? parseFloat(maxPrice) : undefined;
-  
-  // Parse category filter (convert single category to array for new schema)
-  const categoryIds = category ? [category] : undefined;
-  
-  // Parse pagination parameters
-  const pageNum = page ? parseInt(page) : 1;
-  const limitNum = limit ? parseInt(limit) : 12;
-  
-  const result = await getAllProductsAction({
-    search,
-    categoryIds,
-    brand,
-    reference,
-    minPrice: minPriceNum,
-    maxPrice: maxPriceNum,
-    sortBy: sortBy as 'name' | 'price' | 'createdAt' | 'brand' || 'createdAt',
-    sortOrder: sortOrder as 'asc' | 'desc' || 'desc',
-    page: pageNum,
-    limit: limitNum,
-  });
-  
-  const products = result.success && result.data ? result.data : [];
-  const pagination = result.success ? result.pagination : undefined;
 
   return (
     <>
@@ -111,9 +71,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <div className="space-y-4">
               <ProductFilters categories={categories} />
               <ProductsContainer 
-                initialProducts={products} 
-                pagination={pagination}
-                currentPage={pageNum}
+                initialProducts={[]} 
+                pagination={undefined}
+                currentPage={1}
               />
             </div>
           </Suspense>

@@ -36,7 +36,6 @@ export default async function RootLayout({
               primaryColor={themeSettings?.primaryColor}
               secondaryColor={themeSettings?.secondaryColor}
             />
-            
             {/* Site content - maintenance mode and banners handled in specific layouts */}
             {children}
           </CSRFProvider>

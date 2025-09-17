@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AboutSectionDialog from './AboutSectionDialog';
 import DeleteAboutSectionModal from './DeleteAboutSectionModal';
-import SortableList from './SortableList';
+import SortableList from '../../common/SortableList';
 import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface AboutSectionsManagerProps {

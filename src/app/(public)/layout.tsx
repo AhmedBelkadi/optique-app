@@ -4,7 +4,7 @@ import { getContactSettings } from '@/features/settings/services/contactSettings
 import { getActiveBanner } from '@/features/banners/services/getActiveBanner';
 import { getPublicServices } from '@/features/services/services/getPublicServices';
 import MaintenanceModeWrapper from '@/components/common/MaintenanceModeWrapper';
-import PromotionalBanner from '@/components/common/PromotionalBanner';
+import PromotionalBanner from '@/components/features/banners/PromotionalBanner';
 import NavBar from '@/components/common/NavBar';
 import Footer from '@/components/common/Footer';
 import FloatingCTA from '@/components/features/home/FloatingCTA';

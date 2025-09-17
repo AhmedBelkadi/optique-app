@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
-import AboutPageManager from '@/components/features/cms/AboutPageManager';
-import AboutPageSkeleton from '@/components/features/cms/AboutPageSkeleton';
+import AboutPageManager from '@/components/features/about/AboutPageManager';
+import AboutPageSkeleton from '@/components/features/about/AboutPageSkeleton';
 import { getAllAboutSectionsAction } from '@/features/about/actions/getAllAboutSectionsAction';
 import { getAboutBenefitsAction } from '@/features/about/actions/getAboutBenefitsAction';
 import { requirePermission } from '@/lib/auth/authorization';

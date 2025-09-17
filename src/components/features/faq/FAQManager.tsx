@@ -11,7 +11,7 @@ import { FAQ } from '@/features/faqs/schema/faqSchema';
 import { reorderFAQsAction } from '@/features/faqs/actions/reorderFAQs';
 import FAQDialog from './FAQDialog';
 import DeleteFAQModal from './DeleteFAQModal';
-import SortableList from './SortableList';
+import SortableList from '../../common/SortableList';
 import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface FAQManagerProps {

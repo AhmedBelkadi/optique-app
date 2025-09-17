@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
-import DashboardMetrics from '@/components/features/admin/DashboardMetrics';
-import RecentProducts from '@/components/features/admin/RecentProducts';
-import UpcomingAppointments from '@/components/features/admin/UpcomingAppointments';
-import DataQualityDashboard from '@/components/features/admin/DataQualityDashboard';
+import AdminPageConfig from '@/components/common/sidebar-header/AdminPageConfig';
+import DashboardMetrics from '@/components/features/dashboard/DashboardMetrics';
+import RecentProducts from '@/components/features/dashboard/RecentProducts';
+import UpcomingAppointments from '@/components/features/dashboard/UpcomingAppointments';
+import DataQualityDashboard from '@/components/features/dashboard/DataQualityDashboard';
 import { requirePermission } from '@/lib/auth/authorization';
 
 // Force dynamic rendering

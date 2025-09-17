@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import FAQModal from './FAQModal';
 import DeleteFAQModal from './DeleteFAQModal';
-import SortableList from './SortableList';
+import SortableList from '../../common/SortableList';
 import { reorderFAQsAction, ReorderFAQsState } from '@/features/faqs/actions/reorderFAQs';
 import { formatDateShort } from '@/lib/shared/utils/dateUtils';
 

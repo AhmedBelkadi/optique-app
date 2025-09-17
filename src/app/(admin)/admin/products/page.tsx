@@ -1,11 +1,10 @@
 
 import { Suspense } from 'react';
-import { getAllProductsAction } from '@/features/products/actions/getAllProductsAction';
 import { getAllCategoriesAction } from '@/features/categories/actions/getAllCategoriesAction';
 import ProductsContainer from '@/components/features/products/ProductsContainer';
 import ProductFilters from '@/components/features/products/ProductFilters';
 import { Plus, Trash2 } from 'lucide-react';
-import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
+import AdminPageConfig from '@/components/common/sidebar-header/AdminPageConfig';
 import ProductsSkeleton from '@/components/features/products/ProductsSkeleton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

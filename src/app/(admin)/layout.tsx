@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/features/auth/services/session';
-import AdminLayout from '@/components/features/admin/AdminLayout';
+import AdminLayout from '@/components/common/sidebar-header/AdminLayout';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

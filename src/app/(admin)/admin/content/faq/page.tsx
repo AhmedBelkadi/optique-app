@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
-import FAQPageManager from '@/components/features/cms/FAQPageManager';
-import FAQPageSkeleton from '@/components/features/cms/FAQPageSkeleton';
+import FAQPageManager from '@/components/features/faq/FAQPageManager';
+import FAQPageSkeleton from '@/components/features/faq/FAQPageSkeleton';
 import { getAllFAQsAction } from '@/features/faqs/actions/getAllFAQsAction';
 import { requirePermission } from '@/lib/auth/authorization';
 

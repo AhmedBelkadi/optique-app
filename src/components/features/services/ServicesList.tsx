@@ -39,7 +39,7 @@ import { useCSRF } from '@/components/common/CSRFProvider';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 
-const SortableList = dynamic(() => import('../cms/SortableList'), {
+const SortableList = dynamic(() => import('../../common/SortableList'), {
   ssr: false,
   loading: () => <div className="space-y-3">Loading...</div>
 }) as <T>(props: {

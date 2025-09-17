@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { getAllPermissions } from '@/features/auth/services/roleService';
-import PermissionManagement from '@/components/features/admin/PermissionManagement';
+import PermissionManagement from '@/components/features/roles/PermissionManagement';
 import AdminPageConfig from '@/components/features/admin/AdminPageConfig';
 import { requirePermission } from '@/lib/auth/authorization';
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AboutBenefitForm from './AboutBenefitForm';
 import DeleteAboutBenefitModal from './DeleteAboutBenefitModal';
-import SortableList from './SortableList';
+import SortableList from '../../common/SortableList';
 import { useCSRF } from '@/components/common/CSRFProvider';
 
 interface AboutBenefitsManagerProps {
